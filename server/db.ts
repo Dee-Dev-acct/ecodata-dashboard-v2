@@ -9,14 +9,19 @@ let mssqlClient: mssql.ConnectionPool | null = null;
 let mssqlPool: mssql.ConnectionPool | null = null;
 let db: any;
 
+const usePostgres = process.env.DATABASE_URL;
 const useMSSQL = process.env.MSSQL_SERVER && 
                   process.env.MSSQL_DATABASE && 
                   process.env.MSSQL_USER && 
                   process.env.MSSQL_PASSWORD;
 
-// Try MSSQL Server connection first
-if (useMSSQL) {
-  console.log("Attempting to connect to Microsoft SQL Server...");
+// Try PostgreSQL first
+if (usePostgres) {
+  connectToPostgres();
+} 
+// Fall back to MSSQL if PostgreSQL is not available
+else if (useMSSQL) {
+  console.log("PostgreSQL not available. Attempting to connect to Microsoft SQL Server...");
   console.log(`Server: ${process.env.MSSQL_SERVER}`);
   console.log(`Database: ${process.env.MSSQL_DATABASE}`);
   console.log(`User: ${process.env.MSSQL_USER}`);
@@ -64,12 +69,10 @@ if (useMSSQL) {
         user: process.env.MSSQL_USER,
         passwordLength: process.env.MSSQL_PASSWORD?.length
       });
-      // Fallback to Postgres if available
-      connectToPostgres();
+      console.warn("No database configuration working. Using in-memory storage.");
     });
 } else {
-  // Fallback to Postgres
-  connectToPostgres();
+  console.warn("No database configuration found. Using in-memory storage.");
 }
 
 // Helper function to connect to Postgres

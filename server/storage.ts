@@ -788,9 +788,9 @@ export class DatabaseStorage implements IStorage {
 
 // Choose the correct database implementation based on which database is available
 export const storage = 
-  // Try MSSQL first
-  (process.env.MSSQL_SERVER && process.env.MSSQL_DATABASE && process.env.MSSQL_USER && process.env.MSSQL_PASSWORD)
-  ? new DatabaseStorage() // Prefer MSSQL if credentials are provided
-  : process.env.DATABASE_URL 
-    ? new DatabaseStorage() // Fall back to PostgreSQL if available
+  // Try PostgreSQL first
+  process.env.DATABASE_URL
+  ? new DatabaseStorage() // Prefer PostgreSQL if credentials are provided
+  : (process.env.MSSQL_SERVER && process.env.MSSQL_DATABASE && process.env.MSSQL_USER && process.env.MSSQL_PASSWORD)
+    ? new DatabaseStorage() // Fall back to MSSQL if available
     : new MemStorage();    // Use in-memory if no database is available
