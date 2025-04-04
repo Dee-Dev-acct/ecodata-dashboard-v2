@@ -10,7 +10,7 @@ const BlogPostPage = () => {
   const slug = params?.slug || "";
   
   const { data: post, isLoading, error } = useQuery<BlogPost>({
-    queryKey: [`/api/blog/posts/${slug}`],
+    queryKey: ['/api/blog/posts', slug],
     enabled: !!slug,
   });
 

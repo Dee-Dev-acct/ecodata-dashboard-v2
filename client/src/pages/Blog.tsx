@@ -6,7 +6,7 @@ import BlogCard from "@/components/blog/BlogCard";
 
 const Blog = () => {
   const { data: posts, isLoading, error } = useQuery<BlogPost[]>({
-    queryKey: ['/api/blog/posts?published=true'],
+    queryKey: ['/api/blog/posts', { published: true }],
   });
 
   return (

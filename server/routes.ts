@@ -158,10 +158,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/blog/posts", async (req: Request, res: Response) => {
+  // Serve blog posts at both API paths for compatibility
+  app.get(["/api/blog/posts", "/api/blog-posts"], async (req: Request, res: Response) => {
     try {
       const published = req.query.published === 'true';
+      console.log("Fetching blog posts with published =", published);
       const posts = await storage.getBlogPosts({ published });
+      console.log("Found blog posts:", posts.length);
       return res.json(posts);
     } catch (error) {
       console.error("Error fetching blog posts:", error);
@@ -169,7 +172,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/blog/posts/:slug", async (req: Request, res: Response) => {
+  // Serve single blog post by slug at both API paths for compatibility
+  app.get(["/api/blog/posts/:slug", "/api/blog-posts/:slug"], async (req: Request, res: Response) => {
     try {
       const { slug } = req.params;
       const post = await storage.getBlogPostBySlug(slug);
