@@ -1,7 +1,104 @@
 import { pgTable, text, serial, integer, boolean, timestamp, jsonb } from "drizzle-orm/pg-core";
+import { sqliteTable, text as sqliteText, integer as sqliteInteger, real } from "drizzle-orm/sqlite-core";
+import { sql } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 import { relations } from "drizzle-orm";
+
+// Define MSSQL table interfaces
+// These don't actually define database structure but provide TypeScript interfaces for our API
+// We're using raw SQL for database operations
+
+// Users MSSQL schema interface
+export interface MSSQLUser {
+  id: number;
+  username: string;
+  password: string;
+  email: string;
+  role: string;
+  created_at: Date;
+}
+
+// Contact messages MSSQL schema interface
+export interface MSSQLContactMessage {
+  id: number;
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+  consent: boolean;
+  is_read: boolean;
+  created_at: Date;
+}
+
+// Newsletter subscribers MSSQL schema interface
+export interface MSSQLNewsletterSubscriber {
+  id: number;
+  email: string;
+  consent: boolean;
+  created_at: Date;
+}
+
+// Services MSSQL schema interface
+export interface MSSQLService {
+  id: number;
+  title: string;
+  description: string;
+  icon: string;
+  created_at: Date;
+  updated_at: Date;
+}
+
+// Testimonials MSSQL schema interface
+export interface MSSQLTestimonial {
+  id: number;
+  name: string;
+  position: string;
+  company: string;
+  testimonial: string;
+  rating: number;
+  image_url: string | null;
+  created_at: Date;
+  updated_at: Date;
+}
+
+// Impact metrics MSSQL schema interface
+export interface MSSQLImpactMetric {
+  id: number;
+  title: string;
+  value: string;
+  description: string;
+  icon: string;
+  category: string;
+  created_at: Date;
+  updated_at: Date;
+}
+
+// Blog posts MSSQL schema interface
+export interface MSSQLBlogPost {
+  id: number;
+  title: string;
+  slug: string;
+  content: string;
+  excerpt: string;
+  author_id: number;
+  featured_image: string | null;
+  tags: string | null; // Stored as JSON string in SQL Server
+  category: string;
+  published: boolean;
+  publish_date: Date | null;
+  created_at: Date;
+  updated_at: Date;
+}
+
+// Settings MSSQL schema interface
+export interface MSSQLSetting {
+  id: number;
+  section: string;
+  key: string;
+  value: string; // Stored as JSON string in SQL Server
+  updated_at: Date;
+}
 
 // User schema
 export const users = pgTable("users", {

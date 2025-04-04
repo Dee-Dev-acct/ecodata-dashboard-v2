@@ -1,6 +1,8 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { useMSSQL } from "./db";
+import { initializeMSSQLDatabase } from "./mssql-helper";
 
 const app = express();
 app.use(express.json());
@@ -37,6 +39,31 @@ app.use((req, res, next) => {
 });
 
 (async () => {
+  // Initialize MSSQL database if MSSQL is enabled
+  if (useMSSQL) {
+    try {
+      log('Initializing MSSQL database connection...');
+      // Give more time for the connection to be established
+      setTimeout(async () => {
+        try {
+          if (mssqlClient) {
+            log('MSSQL client connected, initializing database...');
+            await initializeMSSQLDatabase();
+            log('MSSQL database initialized successfully');
+          } else {
+            // If not connected yet, try connecting directly
+            log('MSSQL client not initialized yet. Falling back to PostgreSQL.');
+          }
+        } catch (err) {
+          log(`Error during MSSQL initialization: ${err}`);
+          log('Falling back to PostgreSQL or in-memory storage.');
+        }
+      }, 5000); // 5 second delay
+    } catch (error) {
+      log(`Error in MSSQL setup: ${error}`);
+    }
+  }
+
   const server = await registerRoutes(app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
