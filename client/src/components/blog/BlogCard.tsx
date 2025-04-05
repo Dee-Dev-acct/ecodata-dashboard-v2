@@ -22,7 +22,7 @@ const BlogCard = ({ post }: BlogCardProps) => {
   const imageUrl = post.featuredImage || 'https://placehold.co/600x400/e2e8f0/1e293b?text=ECODATA';
 
   return (
-    <div className="group bg-white dark:bg-[#264653] rounded-lg shadow-md overflow-hidden transition-transform hover:-translate-y-1 hover:shadow-lg">
+    <div className="group bg-gradient-to-b from-white to-[#FAFFFE] dark:from-[#264653] dark:to-[#1D3741] rounded-lg shadow-md overflow-hidden transition-all hover:-translate-y-1 hover:shadow-lg border border-transparent hover:border-[#E0F3F0] dark:hover:border-[#345E6A]">
       <Link href={`/blog/${post.slug}`}>
         <div className="block">
           <div className="aspect-w-16 aspect-h-9 overflow-hidden">
@@ -34,7 +34,7 @@ const BlogCard = ({ post }: BlogCardProps) => {
           </div>
           
           <div className="p-6">
-            <div className="flex items-center text-sm text-gray-500 dark:text-[#D1CFC0] mb-2">
+            <div className="flex items-center text-sm text-gray-500 dark:text-[#A8D0D4] mb-2">
               <span className="capitalize">{post.category}</span>
               <span className="mx-2">•</span>
               <span>{formattedDate}</span>
@@ -44,12 +44,12 @@ const BlogCard = ({ post }: BlogCardProps) => {
               {post.title}
             </h3>
             
-            <p className="text-gray-600 dark:text-[#F4F1DE] mb-4 line-clamp-3">
+            <p className="text-gray-600 dark:text-[#E3E8EA] mb-4 line-clamp-3">
               {post.excerpt}
             </p>
             
             <div className="flex items-center">
-              <div className="inline-flex items-center text-[#2A9D8F] font-medium">
+              <div className="inline-flex items-center text-[#2A9D8F] font-medium group-hover:text-[#1F7B70] dark:group-hover:text-[#4DD4C1] transition-colors">
                 Read more
                 <svg 
                   xmlns="http://www.w3.org/2000/svg" 
@@ -68,7 +68,7 @@ const BlogCard = ({ post }: BlogCardProps) => {
                 {post.tags.map((tag, index) => (
                   <span 
                     key={index}
-                    className="text-xs px-2 py-1 bg-gray-100 dark:bg-[#1A323C] text-gray-600 dark:text-[#D1CFC0] rounded-full"
+                    className="text-xs px-2 py-1 bg-[#EBF9F7] dark:bg-[#1A3C46] text-[#267D72] dark:text-[#9ECBC5] rounded-full transition-colors"
                   >
                     #{tag}
                   </span>

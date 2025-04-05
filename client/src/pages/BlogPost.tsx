@@ -19,11 +19,20 @@ const BlogPostPage = () => {
       <Header />
       
       <main className="flex-grow">
-        <section className="bg-[#F4F1DE] dark:bg-[#264653] py-12">
+        <section className="bg-gradient-to-br from-[#E6F7F4] to-[#D1F5EE] dark:bg-gradient-to-br dark:from-[#1A4D5C] dark:to-[#0F3540] py-12">
           <div className="container mx-auto px-4">
             <div className="max-w-3xl mx-auto">
-              <Link href="/blog" className="inline-flex items-center text-[#2A9D8F] hover:text-[#1F7268] mb-6 transition-colors">
-                <i className="fas fa-arrow-left mr-2"></i> Back to Blog
+              <Link href="/blog" className="inline-flex items-center text-[#2A9D8F] hover:text-[#1F7268] mb-6 transition-colors group">
+                <svg 
+                  xmlns="http://www.w3.org/2000/svg" 
+                  className="h-4 w-4 mr-2 group-hover:-translate-x-1 transition-transform" 
+                  fill="none" 
+                  viewBox="0 0 24 24" 
+                  stroke="currentColor"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+                Back to Blog
               </Link>
               
               {isLoading ? (
@@ -43,8 +52,11 @@ const BlogPostPage = () => {
                 </div>
               ) : (
                 <div>
-                  <h1 className="text-3xl md:text-4xl font-heading font-bold mb-4">{post.title}</h1>
-                  <div className="flex items-center text-sm text-gray-600 dark:text-[#D1CFC0] mb-8">
+                  <h1 className="text-3xl md:text-4xl font-heading font-bold mb-4 relative inline-block">
+                    <span className="relative z-10">{post.title}</span>
+                    <span className="absolute bottom-1 left-0 w-full h-3 bg-[#2A9D8F] opacity-20 -rotate-1"></span>
+                  </h1>
+                  <div className="flex flex-wrap items-center text-sm text-gray-600 dark:text-[#A8D0D4] mb-8">
                     <span>
                       {new Date(post.publishDate || post.createdAt!).toLocaleDateString('en-US', {
                         year: 'numeric',
@@ -53,13 +65,18 @@ const BlogPostPage = () => {
                       })}
                     </span>
                     <span className="mx-2">•</span>
-                    <span>{post.category}</span>
+                    <span className="capitalize">{post.category}</span>
                     {post.tags && post.tags.length > 0 && (
                       <>
                         <span className="mx-2">•</span>
-                        <div className="flex flex-wrap">
+                        <div className="flex flex-wrap gap-2 mt-1">
                           {post.tags.map((tag, index) => (
-                            <span key={index} className="mr-2">#{tag}</span>
+                            <span 
+                              key={index} 
+                              className="text-xs px-2 py-1 bg-[#EBF9F7] dark:bg-[#1A3C46] text-[#267D72] dark:text-[#9ECBC5] rounded-full"
+                            >
+                              #{tag}
+                            </span>
                           ))}
                         </div>
                       </>
@@ -72,9 +89,9 @@ const BlogPostPage = () => {
         </section>
         
         {post && (
-          <section className="py-12 bg-white dark:bg-[#333333]">
+          <section className="py-12 bg-gradient-to-b from-white to-[#F8FDFC] dark:from-[#2A3B40] dark:to-[#1F2E32]">
             <div className="container mx-auto px-4">
-              <div className="max-w-3xl mx-auto">
+              <div className="max-w-3xl mx-auto bg-white dark:bg-[#1D3741] p-8 rounded-lg shadow-md">
                 <BlogContent content={post.content} />
               </div>
             </div>
