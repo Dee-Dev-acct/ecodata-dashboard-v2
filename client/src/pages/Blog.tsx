@@ -17,9 +17,9 @@ const Blog = () => {
         <section className="bg-gradient-to-br from-[#E6F7F4] to-[#D1F5EE] dark:bg-gradient-to-br dark:from-[#1A4D5C] dark:to-[#0F3540] py-16">
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
-              <h1 className="text-4xl font-heading font-bold mb-4 relative inline-block">
-                <span className="relative z-10">Our Blog</span>
-                <span className="absolute bottom-0 left-0 w-full h-3 bg-[#2A9D8F] opacity-30 -rotate-1"></span>
+              <h1 className="text-4xl font-heading font-bold mb-7 relative inline-block">
+                <span>Our Blog</span>
+                <span className="absolute -bottom-3 left-0 w-full h-2 bg-[#2A9D8F] opacity-40"></span>
               </h1>
               <p className="text-lg max-w-2xl mx-auto dark:text-[#F4F1DE]">
                 Insights, case studies, and updates from our team of environmental data specialists.

@@ -52,9 +52,9 @@ const BlogPostPage = () => {
                 </div>
               ) : (
                 <div>
-                  <h1 className="text-3xl md:text-4xl font-heading font-bold mb-4 relative inline-block">
-                    <span className="relative z-10">{post.title}</span>
-                    <span className="absolute bottom-1 left-0 w-full h-3 bg-[#2A9D8F] opacity-20 -rotate-1"></span>
+                  <h1 className="text-3xl md:text-4xl font-heading font-bold mb-7 relative inline-block">
+                    <span>{post.title}</span>
+                    <span className="absolute -bottom-3 left-0 w-full h-2 bg-[#2A9D8F] opacity-40"></span>
                   </h1>
                   <div className="flex flex-wrap items-center text-sm text-gray-600 dark:text-[#A8D0D4] mb-8">
                     <span>
