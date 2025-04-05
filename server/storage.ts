@@ -138,51 +138,59 @@ export class MemStorage implements IStorage {
     };
     this.createUser(adminUser);
     
-    // Add sample services
+    // Add authentic services from company website
     const services = [
       {
-        title: "Data Analytics",
-        description: "Transform your raw data into actionable insights with our advanced analytics and visualization services.",
+        title: "Sustainable IT Consultancy",
+        description: "We help organizations modernize their infrastructure through energy-efficient cloud migration, green data architecture, and secure managed IT services that reduce environmental impact.",
+        icon: "fa-cloud"
+      },
+      {
+        title: "Data Solutions",
+        description: "Our energy-efficient platforms provide secure, scalable data storage and processing with a focus on minimizing environmental impact while maximizing insights and operational efficiency.",
+        icon: "fa-database"
+      },
+      {
+        title: "Research & Development",
+        description: "Our interdisciplinary research combines data science, AI, and environmental studies to develop innovative solutions that address pressing social and ecological challenges.",
+        icon: "fa-flask"
+      },
+      {
+        title: "Green Data Infrastructure",
+        description: "Energy-efficient cloud storage with Hadoop and Apache Spark infrastructure designed for minimal environmental impact without compromising performance.",
+        icon: "fa-database"
+      },
+      {
+        title: "Sustainability Analytics",
+        description: "Advanced visual and predictive analytics platforms that transform data into actionable sustainability insights and decision-making tools.",
         icon: "fa-chart-line"
       },
       {
-        title: "Environmental Research",
-        description: "Leverage data-driven environmental studies to understand impact and drive sustainable policy decisions.",
-        icon: "fa-globe-americas"
-      },
-      {
-        title: "IT Consultancy",
-        description: "Optimize your technology infrastructure with sustainable and efficient IT solutions and strategies.",
-        icon: "fa-server"
-      },
-      {
-        title: "Social Impact Assessment",
-        description: "Understand the social implications of your projects with our comprehensive impact assessment methodology.",
-        icon: "fa-users"
-      },
-      {
-        title: "Project Management",
-        description: "Execute complex data and IT projects with our experienced project management team.",
-        icon: "fa-project-diagram"
-      },
-      {
-        title: "Training & Workshops",
-        description: "Empower your team with data literacy and environmental assessment skills through our tailored training programs.",
-        icon: "fa-chalkboard-teacher"
+        title: "Ethical Data Security",
+        description: "Enterprise-grade security protocols and compliance frameworks with a focus on ethical data practices and privacy protection.",
+        icon: "fa-shield-alt"
       }
     ];
     
     services.forEach(service => this.createService(service));
     
-    // Add sample testimonials
+    // Add authentic testimonials from company website
     const testimonials = [
       {
         name: "Sarah Johnson",
-        position: "Director",
-        company: "GreenTech Solutions",
-        testimonial: "ECODATA's analytics platform helped us reduce our carbon footprint by 28% in just one year. Their team's expertise in environmental data is unmatched.",
+        position: "CTO",
+        company: "GreenFuture Ltd",
+        testimonial: "ECODATA CIC transformed our IT infrastructure while helping us achieve our carbon neutrality goals two years ahead of schedule. Their expertise in sustainable technology is unmatched.",
         rating: 5,
         imageUrl: "https://randomuser.me/api/portraits/women/45.jpg"
+      },
+      {
+        name: "David Chen",
+        position: "Director",
+        company: "Urban Sustainability Initiative",
+        testimonial: "The research conducted by ECODATA CIC provided invaluable insights that shaped our community sustainability programs. Their combination of technical expertise and social awareness is rare.",
+        rating: 5,
+        imageUrl: "https://randomuser.me/api/portraits/men/32.jpg"
       },
       {
         name: "Michael Torres",
@@ -190,46 +198,168 @@ export class MemStorage implements IStorage {
         company: "Sustainable City Initiative",
         testimonial: "Working with ECODATA transformed how we approach urban planning. Their data insights helped us design smarter, greener public spaces.",
         rating: 5,
-        imageUrl: "https://randomuser.me/api/portraits/men/32.jpg"
-      },
-      {
-        name: "Priya Mehta",
-        position: "Program Director",
-        company: "Community Climate Fund",
-        testimonial: "ECODATA's social impact analysis helped us secure funding by clearly demonstrating the outcomes of our community initiatives.",
-        rating: 5,
-        imageUrl: "https://randomuser.me/api/portraits/women/68.jpg"
+        imageUrl: "https://randomuser.me/api/portraits/men/28.jpg"
       }
     ];
     
     testimonials.forEach(testimonial => this.createTestimonial(testimonial));
     
-    // Add sample impact metrics
+    // Add authentic impact metrics from company website
     const impactMetrics = [
       {
-        title: "Carbon Reduction",
-        value: "247 tonnes",
-        description: "CO₂ equivalent reduction achieved through our client projects since 2020.",
-        icon: "fa-chart-line",
+        title: "Environmental Impact",
+        value: "35%",
+        description: "Our green IT solutions have helped clients reduce their carbon emissions by an average of 35% across their digital operations. Through our energy-efficient data centers and optimized cloud solutions, we've collectively saved over 2.5 million kWh of energy annually.",
+        icon: "fa-leaf",
         category: "environmental"
       },
       {
-        title: "Community Engagement",
-        value: "3,500+ people",
-        description: "Community members engaged through workshops, training, and volunteer initiatives.",
+        title: "Social Impact",
+        value: "50,000+",
+        description: "We've partnered with 12 educational institutions and 8 non-profits to deliver research and technology solutions that improve access to education, healthcare, and sustainable resources in underserved communities.",
         icon: "fa-users",
         category: "social"
       },
       {
-        title: "Resource Efficiency",
-        value: "32% average",
-        description: "Improvement in resource utilization efficiency across client operations.",
-        icon: "fa-recycle",
+        title: "Client Success",
+        value: "30%",
+        description: "Organizations working with ECODATA CIC report an average 30% reduction in operational costs while achieving their sustainability targets.",
+        icon: "fa-chart-line",
         category: "efficiency"
+      },
+      {
+        title: "Sustainability Projects",
+        value: "100+",
+        description: "Completed sustainability projects across multiple sectors including energy, transportation, and urban planning.",
+        icon: "fa-project-diagram",
+        category: "projects"
       }
     ];
     
     impactMetrics.forEach(metric => this.createImpactMetric(metric));
+
+    // Add blog posts with authentic ECODATA CIC content
+    const blogPosts = [
+      {
+        title: "Sustainable IT: Reducing Digital Carbon Footprints",
+        category: "Technology",
+        slug: "sustainable-it-reducing-digital-carbon-footprints",
+        content: `<p>As our world becomes increasingly digital, the environmental impact of our IT infrastructure continues to grow. At ECODATA CIC, we're committed to helping organizations reduce their digital carbon footprints through sustainable IT practices.</p>
+        
+        <h3>The Growing Digital Carbon Footprint</h3>
+        <p>Studies show that the ICT industry is responsible for approximately 2-3% of global carbon emissions, similar to the aviation industry. With the exponential growth of data centers, cloud computing, and digital services, this percentage is expected to increase.</p>
+        
+        <h3>Our Approach to Sustainable IT</h3>
+        <p>At ECODATA CIC, we implement several strategies to help organizations minimize their digital environmental impact:</p>
+        <ul>
+          <li><strong>Energy-efficient cloud solutions</strong>: We design and implement cloud architectures that optimize resource utilization and minimize energy consumption.</li>
+          <li><strong>Green data center practices</strong>: Our data storage solutions incorporate best practices for cooling, power management, and hardware lifecycle optimization.</li>
+          <li><strong>Application optimization</strong>: We refactor legacy applications to be more energy-efficient and resource-conscious.</li>
+          <li><strong>Remote work enablement</strong>: We help organizations transition to low-carbon remote work environments that reduce commuting while maintaining productivity.</li>
+        </ul>
+        
+        <h3>Measuring Digital Sustainability</h3>
+        <p>One of the challenges in sustainable IT is quantifying your digital carbon footprint. Our analytics platform provides organizations with clear metrics on their IT-related emissions, enabling data-driven sustainability decisions.</p>
+        
+        <h3>Case Study: Green Cloud Migration</h3>
+        <p>In a recent project with a mid-sized financial services firm, our sustainable cloud migration strategy reduced their IT carbon footprint by 42% while simultaneously cutting operating costs by 30%. This demonstrates how sustainability and business objectives can align for mutual benefit.</p>
+        
+        <h3>Get Started with Sustainable IT</h3>
+        <p>Ready to reduce your organization's digital environmental impact? Contact ECODATA CIC for a sustainability audit of your IT infrastructure and discover how we can help you implement greener technology practices.</p>`,
+        excerpt: "Discover how ECODATA CIC helps organizations reduce their environmental impact through sustainable IT practices, green cloud solutions, and energy-efficient data management strategies.",
+        authorId: 1,
+        featuredImage: "https://images.unsplash.com/photo-1606765962248-7ff407b51667?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80",
+        tags: ["sustainability", "cloud-computing", "green-it", "carbon-footprint"],
+        published: true,
+        publishDate: new Date("2023-04-15")
+      },
+      {
+        title: "Data-Driven Environmental Decision Making",
+        category: "Research",
+        slug: "data-driven-environmental-decision-making",
+        content: `<p>Environmental challenges are complex and multifaceted, requiring sophisticated approaches to problem-solving. At ECODATA CIC, we believe in the power of data to drive more effective environmental decisions and actions.</p>
+        
+        <h3>The Importance of Environmental Data</h3>
+        <p>Quality environmental data provides the foundation for understanding ecological systems, identifying problems, and measuring the effectiveness of interventions. Without reliable data, environmental initiatives risk being misdirected or ineffective.</p>
+        
+        <h3>Challenges in Environmental Data Collection</h3>
+        <p>Many organizations face significant challenges in collecting, managing, and analyzing environmental data, including:</p>
+        <ul>
+          <li>Disparate data sources with inconsistent formats</li>
+          <li>High costs of environmental monitoring equipment</li>
+          <li>Difficulties in establishing meaningful baselines</li>
+          <li>Limited technical capacity for advanced data analysis</li>
+        </ul>
+        
+        <h3>Our Approach: Democratizing Environmental Data</h3>
+        <p>ECODATA CIC focuses on making environmental data more accessible, understandable, and actionable through:</p>
+        <ul>
+          <li><strong>Integrated data platforms</strong> that consolidate multiple environmental metrics in one place</li>
+          <li><strong>Low-cost monitoring solutions</strong> leveraging IoT and community science approaches</li>
+          <li><strong>Advanced visualization tools</strong> that communicate complex environmental data clearly</li>
+          <li><strong>Predictive analytics</strong> that help anticipate environmental impacts and outcomes</li>
+        </ul>
+        
+        <h3>Case Study: Watershed Management</h3>
+        <p>A local river conservation trust partnered with ECODATA CIC to develop a comprehensive water quality monitoring program. By implementing affordable sensors, citizen science protocols, and an integrated data dashboard, the organization now has real-time insights into water quality factors that guide their restoration efforts and policy advocacy.</p>
+        
+        <h3>Turning Data into Action</h3>
+        <p>Data alone doesn't solve environmental problems – it's how the data informs action that matters. Our environmental consultants work with organizations to translate data insights into practical strategies, policy recommendations, and community engagement initiatives.</p>
+        
+        <h3>Start Your Environmental Data Journey</h3>
+        <p>Whether you're a municipal government, conservation organization, or business looking to reduce environmental impact, ECODATA CIC can help you develop the data infrastructure and analytical tools you need for more effective environmental decision-making.</p>`,
+        excerpt: "Learn how ECODATA CIC is transforming environmental management through data-driven approaches, integrated monitoring solutions, and accessible analytics that empower more effective conservation and sustainability initiatives.",
+        authorId: 1,
+        featuredImage: "https://images.unsplash.com/photo-1578496781379-7dcfb995293d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80",
+        tags: ["environmental-data", "conservation", "data-analytics", "sustainability"],
+        published: true,
+        publishDate: new Date("2023-03-22")
+      },
+      {
+        title: "Green Tech and Social Impact: The Future of Ethical Technology",
+        category: "Technology",
+        slug: "green-tech-and-social-impact-future-of-ethical-technology",
+        content: `<p>The technology sector is at a crossroads. While digital innovation continues to transform our world in extraordinary ways, we must ensure these advances don't come at the expense of environmental sustainability or social equity. At ECODATA CIC, we envision a future where technology serves both people and planet.</p>
+        
+        <h3>The Rise of Ethical Technology</h3>
+        <p>A growing movement within the tech industry is pushing for more ethical, sustainable approaches to innovation. This includes considerations of environmental impact, accessibility, privacy, labor conditions, and the social consequences of digital tools.</p>
+        
+        <h3>Green Tech: Beyond Energy Efficiency</h3>
+        <p>While energy-efficient hardware and renewable-powered data centers are important, truly green technology encompasses the entire lifecycle of digital products and services:</p>
+        <ul>
+          <li><strong>Sustainable design principles</strong> that minimize resource use and waste</li>
+          <li><strong>Circular economy approaches</strong> to hardware manufacturing and disposal</li>
+          <li><strong>Carbon-aware software development</strong> that optimizes for minimal emissions</li>
+          <li><strong>Environmental impact assessments</strong> throughout the development process</li>
+        </ul>
+        
+        <h3>Technology for Social Good</h3>
+        <p>At ECODATA CIC, we believe technology should serve human needs and address societal challenges:</p>
+        <ul>
+          <li><strong>Digital inclusion</strong> initiatives that ensure technology benefits marginalized communities</li>
+          <li><strong>Civic tech solutions</strong> that enhance democratic participation and government transparency</li>
+          <li><strong>Assistive technologies</strong> that improve quality of life for people with disabilities</li>
+          <li><strong>Data tools</strong> for humanitarian organizations and social enterprises</li>
+        </ul>
+        
+        <h3>Our Community-Centered Approach</h3>
+        <p>Technology development should never happen in a vacuum. We practice community-centered design, engaging with users and stakeholders throughout the process to ensure our solutions truly address real-world needs and contexts.</p>
+        
+        <h3>Case Study: Tech for Community Resilience</h3>
+        <p>ECODATA CIC recently developed a community resilience platform for a network of urban neighborhoods facing climate-related challenges. The platform combines environmental monitoring, resource sharing, emergency communication, and collaborative planning tools – all designed with extensive community input and operated by local residents.</p>
+        
+        <h3>Join the Ethical Tech Movement</h3>
+        <p>Whether you're a technology professional looking to align your work with your values, an organization seeking more ethical tech solutions, or a community group with digital needs, ECODATA CIC is here to help build a more sustainable, equitable technological future.</p>`,
+        excerpt: "Explore how ECODATA CIC is pioneering the integration of environmental sustainability and social impact in technology development, creating digital solutions that benefit communities while minimizing ecological harm.",
+        authorId: 1,
+        featuredImage: "https://images.unsplash.com/photo-1623091411395-09e79fdbfcf3?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80",
+        tags: ["ethical-technology", "social-impact", "sustainability", "community-tech"],
+        published: true,
+        publishDate: new Date("2023-02-08")
+      }
+    ];
+    
+    blogPosts.forEach(post => this.createBlogPost(post));
   }
 
   // User Management
@@ -246,7 +376,12 @@ export class MemStorage implements IStorage {
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = this.currentUserId++;
     const now = new Date();
-    const user: User = { ...insertUser, id, createdAt: now };
+    // Ensure role is never undefined to match the User type
+    const userWithRole = {
+      ...insertUser,
+      role: insertUser.role || "user" // Default to "user" if role is not provided
+    };
+    const user: User = { ...userWithRole, id, createdAt: now };
     this.users.set(id, user);
     return user;
   }
@@ -373,8 +508,13 @@ export class MemStorage implements IStorage {
   async createTestimonial(insertTestimonial: InsertTestimonial): Promise<Testimonial> {
     const id = this.currentTestimonialId++;
     const now = new Date();
+    // Ensure imageUrl is never undefined
+    const testimonialData = {
+      ...insertTestimonial,
+      imageUrl: insertTestimonial.imageUrl ?? null
+    };
     const testimonial: Testimonial = { 
-      ...insertTestimonial, 
+      ...testimonialData, 
       id, 
       createdAt: now,
       updatedAt: now
@@ -471,8 +611,16 @@ export class MemStorage implements IStorage {
   async createBlogPost(insertPost: InsertBlogPost): Promise<BlogPost> {
     const id = this.currentBlogPostId++;
     const now = new Date();
+    // Ensure optional properties have the correct values to match BlogPost type
+    const blogPostData = {
+      ...insertPost,
+      featuredImage: insertPost.featuredImage ?? null,
+      tags: insertPost.tags ?? null,
+      published: insertPost.published ?? false,
+      publishDate: insertPost.publishDate ?? null
+    };
     const post: BlogPost = { 
-      ...insertPost, 
+      ...blogPostData, 
       id, 
       createdAt: now,
       updatedAt: now

@@ -1,0 +1,1779 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="ECODATA CIC | Sustainable IT solutions, environmental consulting, and AI-driven research for social impact.">
+  <meta property="og:title" content="ECODATA CIC | Data for Sustainable Future">
+  <meta property="og:description" content="Driving innovation through technology and environmental stewardship">
+  <meta property="og:image" content="https://ecodata-cic.com/images/social-preview.jpg">
+  <meta property="og:url" content="https://ecodata-cic.com">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="theme-color" content="#00695C">
+  
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+  
+  <title>ECODATA CIC | Sustainable Tech Solutions & Environmental Research</title>
+  
+  <!-- Preload critical resources -->
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Inter:wght@400;500;600&display=swap" as="style">
+  <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style">
+  
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- CSS -->
+  <style>
+    :root {
+      --primary: #00695C;
+      --primary-light: #4DB6AC;
+      --primary-dark: #004D40;
+      --secondary: #00897B;
+      --accent: #FFC107;
+      --accent-dark: #FFA000;
+      --light: #F5F5F5;
+      --light-alt: #FFFFFF;
+      --dark: #263238;
+      --dark-alt: #37474F;
+      --text: #424242;
+      --text-light: #757575;
+      --shadow: 0 8px 30px rgba(0,0,0,0.08);
+      --shadow-hover: 0 12px 40px rgba(0,0,0,0.15);
+      --border: 1px solid rgba(0,0,0,0.08);
+      --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      --border-radius: 12px;
+      --section-padding: 8rem 0;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      font-size: 16px;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: var(--text);
+      line-height: 1.7;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      background-color: var(--light);
+    }
+
+    h1, h2, h3, h4 {
+      font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: var(--primary);
+      margin-bottom: 1.25rem;
+      font-weight: 700;
+      line-height: 1.3;
+    }
+
+    h1 { 
+      font-size: clamp(2.2rem, 5vw, 3.5rem);
+      line-height: 1.2;
+    }
+    h2 { 
+      font-size: clamp(1.8rem, 4vw, 2.5rem);
+    }
+    h3 { 
+      font-size: clamp(1.4rem, 3vw, 1.8rem);
+    }
+    h4 {
+      font-size: 1.25rem;
+    }
+
+    p {
+      margin-bottom: 1.5rem;
+      font-size: 1.05rem;
+      color: var(--text);
+    }
+
+    a {
+      text-decoration: none;
+      color: var(--secondary);
+      transition: var(--transition);
+    }
+
+    a:hover {
+      color: var(--primary-dark);
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.875rem 2rem;
+      background: var(--accent);
+      color: var(--dark);
+      font-weight: 600;
+      border-radius: 50px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      transition: var(--transition);
+      font-size: 0.9rem;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      gap: 0.5rem;
+    }
+
+    .btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+      background: var(--accent-dark);
+    }
+
+    .btn i {
+      font-size: 1rem;
+    }
+
+    /* Hero Section - Particle Background with Gradient */
+    header.hero {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+      padding: 8rem 2rem 6rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #particles-js {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      z-index: 1;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 75% 25%, rgba(255,203,7,0.15) 0%, transparent 50%);
+      z-index: 1;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+
+    .hero h1 {
+      color: white;
+      margin-bottom: 1.5rem;
+      animation: fadeInUp 1s ease-out;
+    }
+
+    .hero p {
+      color: rgba(255,255,255,0.9);
+      font-size: 1.15rem;
+      max-width: 600px;
+      margin: 0 auto 2.5rem;
+      animation: fadeInUp 1s ease-out 0.2s both;
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-top: 2rem;
+      animation: fadeInUp 1s ease-out 0.4s both;
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: white;
+      border: 2px solid white;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255,255,255,0.1);
+      color: white;
+    }
+
+    .scroll-indicator {
+      position: absolute;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 2;
+      animation: fadeIn 1s ease-out 1s both;
+    }
+
+    .scroll-indicator span {
+      display: block;
+      width: 20px;
+      height: 20px;
+      border-bottom: 2px solid white;
+      border-right: 2px solid white;
+      transform: rotate(45deg);
+      margin: -10px;
+      animation: scrollAnimation 2s infinite;
+    }
+
+    @keyframes scrollAnimation {
+      0% {
+        opacity: 0;
+        transform: rotate(45deg) translate(-10px, -10px);
+      }
+      50% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 0;
+        transform: rotate(45deg) translate(10px, 10px);
+      }
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    /* Navigation */
+   /* Navigation */
+nav {
+  background: var(--light);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  padding: 0.5rem 0;
+  backdrop-filter: blur(8px);
+  background-color: rgba(245, 245, 245, 0.85);
+}
+
+.nav-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.nav-links {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  gap: 0.5rem;
+}
+
+.nav-btn {
+  background: var(--primary);
+  color: white;
+  padding: 0.8rem 1.5rem;
+  border-radius: 50px;
+  font-weight: 500;
+  text-align: center;
+  transition: var(--transition);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  flex: 1;
+  min-width: max-content;
+  border: none;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.95rem;
+}
+
+.nav-btn:hover {
+  background: var(--secondary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.nav-btn.active {
+  background: var(--accent);
+  color: var(--dark);
+}
+
+/* Mobile Menu Button */
+.mobile-menu-btn {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: var(--primary);
+  cursor: pointer;
+  transition: var(--transition);
+  padding: 0.5rem;
+}
+
+.mobile-menu-btn:hover {
+  color: var(--secondary);
+}
+
+@media (max-width: 768px) {
+  .nav-links {
+    position: fixed;
+    top: 70px;
+    left: 0;
+    right: 0;
+    background: white;
+    flex-direction: column;
+    padding: 1rem;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    transform: translateY(-150%);
+    transition: transform 0.3s ease;
+    z-index: 99;
+    gap: 0.5rem;
+  }
+  
+  .nav-links.active {
+    transform: translateY(0);
+  }
+  
+  .mobile-menu-btn {
+    display: block;
+  }
+  
+  .nav-btn {
+    width: 100%;
+  }
+}
+    /* Main Sections */
+    section {
+      padding: var(--section-padding);
+      position: relative;
+    }
+
+    .section-title {
+      text-align: center;
+      margin-bottom: 4rem;
+    }
+
+    .section-title h2 {
+      position: relative;
+      display: inline-block;
+      padding-bottom: 1rem;
+    }
+
+    .section-title h2::after {
+      content: '';
+      position: absolute;
+      width: 50px;
+      height: 4px;
+      background: var(--accent);
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      border-radius: 2px;
+    }
+
+    .section-title p {
+      max-width: 700px;
+      margin: 0 auto;
+      color: var(--text-light);
+    }
+
+    /* About Section - Geometric Pattern */
+    #about {
+      background-color: var(--light);
+      position: relative;
+    }
+
+    #about .container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+    }
+
+    .about-image {
+      position: relative;
+      border-radius: var(--border-radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      height: 100%;
+      min-height: 400px;
+      background: url('https://images.unsplash.com/photo-1523961131990-5ea7c61b2107?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80') center/cover no-repeat;
+    }
+
+    .about-image::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(to bottom, rgba(0,105,92,0.2), rgba(0,77,64,0.4));
+    }
+
+    .about-content {
+      position: relative;
+    }
+
+    .about-content h2 {
+      margin-bottom: 1.5rem;
+    }
+
+    .about-content p {
+      margin-bottom: 1.5rem;
+      color: var(--text);
+    }
+
+    .mission-vision {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+
+    .mission-card, .vision-card {
+      background: white;
+      padding: 1.5rem;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      border-left: 4px solid var(--accent);
+    }
+
+    .mission-card h3, .vision-card h3 {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.1rem;
+      color: var(--primary-dark);
+      margin-bottom: 0.75rem;
+    }
+
+    /* Services Section - Animated Gradient Mesh */
+    #services {
+      background: 
+        radial-gradient(circle at 20% 30%, rgba(0,137,123,0.1) 0%, transparent 30%),
+        radial-gradient(circle at 80% 70%, rgba(255,203,7,0.1) 0%, transparent 30%),
+        linear-gradient(to bottom, var(--light-alt), var(--light));
+      background-size: 200% 200%;
+      animation: gradientMesh 15s ease infinite;
+    }
+
+    @keyframes gradientMesh {
+      0% { background-position: 0% 0%; }
+      50% { background-position: 100% 100%; }
+      100% { background-position: 0% 0%; }
+    }
+
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+    }
+
+    .service-card {
+      background: white;
+      border-radius: var(--border-radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      transition: var(--transition);
+      border: var(--border);
+      transform-style: preserve-3d;
+      position: relative;
+    }
+
+    .service-card:hover {
+      transform: translateY(-10px);
+      box-shadow: var(--shadow-hover);
+    }
+
+    .service-icon {
+      background: var(--primary);
+      color: white;
+      font-size: 2.5rem;
+      padding: 2rem;
+      text-align: center;
+      transition: var(--transition);
+    }
+
+    .service-card:hover .service-icon {
+      background: var(--primary-dark);
+    }
+
+    .service-content {
+      padding: 2rem;
+    }
+
+    .service-content h3 {
+      margin-bottom: 1rem;
+    }
+
+    .tech-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 1.5rem;
+    }
+
+    .tech-tags span {
+      background: rgba(0,105,92,0.1);
+      padding: 0.4rem 0.9rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      color: var(--primary);
+      border: 1px solid rgba(0,105,92,0.2);
+      font-weight: 500;
+    }
+
+    .tech-tags span:nth-child(2n) {
+      background: rgba(0,124,135,0.1);
+      color: var(--secondary);
+      border: 1px solid rgba(0,124,135,0.2);
+    }
+
+    /* Technology Section - Circuit Board */
+    #framework {
+      background-color: var(--dark);
+      background-image: 
+        linear-gradient(rgba(77,182,172,0.2) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(77,182,172,0.2) 1px, transparent 1px);
+      background-size: 40px 40px;
+      color: white;
+      position: relative;
+    }
+
+    #framework::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        radial-gradient(circle at 30% 50%, rgba(0,124,135,0.3) 0%, transparent 30%),
+        radial-gradient(circle at 70% 50%, rgba(255,203,7,0.2) 0%, transparent 30%);
+    }
+
+    #framework .section-title h2,
+    #framework .section-title p {
+      color: white;
+    }
+
+    #framework .section-title p {
+      color: rgba(255,255,255,0.8);
+    }
+
+    #framework .service-card {
+      background: rgba(30, 30, 30, 0.7);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(77,182,172,0.3);
+    }
+
+    #framework .service-card:hover {
+      border-color: var(--accent);
+    }
+
+    #framework .service-icon {
+      background: var(--primary-light);
+    }
+
+    #framework .service-content p {
+      color: rgba(255,255,255,0.8);
+    }
+
+    /* Impact Section - Data Visualization */
+    #impact {
+      background-color: var(--light-alt);
+      position: relative;
+      overflow: hidden;
+    }
+
+    #impact::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        radial-gradient(circle at 10% 20%, rgba(0,105,92,0.05) 0%, transparent 20%),
+        radial-gradient(circle at 90% 80%, rgba(0,124,135,0.05) 0%, transparent 20%);
+      animation: dataVizMove 20s linear infinite;
+    }
+
+    @keyframes dataVizMove {
+      0% { background-position: 0% 0%, 100% 100%; }
+      50% { background-position: 100% 100%, 0% 0%; }
+      100% { background-position: 0% 0%, 100% 100%; }
+    }
+
+    .stats-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 2rem;
+      text-align: center;
+      margin: 4rem 0;
+    }
+
+    .stat-box {
+      padding: 2.5rem 2rem;
+      background: white;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-box::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: var(--accent);
+    }
+
+    .stat-box:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-hover);
+    }
+
+    .stat-number {
+      font-size: 3rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 0.5rem;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .impact-content {
+      background: white;
+      padding: 3rem;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+    }
+
+    .impact-content h3 {
+      margin-top: 2rem;
+      position: relative;
+      padding-bottom: 0.75rem;
+    }
+
+    .impact-content h3:first-child {
+      margin-top: 0;
+    }
+
+    .impact-content h3::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 40px;
+      height: 3px;
+      background: var(--accent);
+      border-radius: 2px;
+    }
+
+    /* Testimonials */
+    .testimonials {
+      margin-top: 4rem;
+    }
+
+    .testimonial-card {
+      background: white;
+      padding: 2rem;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      margin-bottom: 2rem;
+      position: relative;
+    }
+
+    .testimonial-card::before {
+      content: '"';
+      position: absolute;
+      top: 1rem;
+      left: 1.5rem;
+      font-size: 4rem;
+      font-family: Georgia, serif;
+      color: rgba(0,105,92,0.1);
+      line-height: 1;
+    }
+
+    .testimonial-content {
+      position: relative;
+      z-index: 1;
+      font-style: italic;
+      margin-bottom: 1.5rem;
+    }
+
+    .testimonial-author {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .author-avatar {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      overflow: hidden;
+    }
+
+    .author-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .author-info h4 {
+      margin-bottom: 0.25rem;
+      font-size: 1rem;
+    }
+
+    .author-info p {
+      font-size: 0.85rem;
+      color: var(--text-light);
+      margin-bottom: 0;
+    }
+
+    /* Clients Section - Improved */
+    .clients {
+      margin-top: 4rem;
+      text-align: center;
+      padding: 0 1rem;
+    }
+
+    .client-logos {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1.5rem;
+      align-items: center;
+      justify-items: center;
+      max-width: 1000px;
+      margin: 2rem auto 0;
+      padding: 0 1rem;
+    }
+
+    .client-logo-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 60px;
+      width: 100%;
+      padding: 0.5rem;
+    }
+
+    .client-logo {
+      max-height: 100%;
+      max-width: 100%;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      filter: grayscale(100%);
+      opacity: 0.7;
+      transition: var(--transition);
+    }
+
+    .client-logo:hover {
+      filter: grayscale(0%);
+      opacity: 1;
+      transform: scale(1.05);
+    }
+
+    /* Specific logo adjustments */
+    .client-logo-container:nth-child(1) img { /* IBM */
+      max-width: 80%;
+    }
+    .client-logo-container:nth-child(4) img { /* AWS */
+      max-width: 90%;
+    }
+    .client-logo-container:nth-child(5) img { /* Intel */
+      max-width: 85%;
+    }
+
+    @media (max-width: 768px) {
+      .client-logos {
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 1rem;
+      }
+      .client-logo-container {
+        height: 50px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .client-logos {
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      }
+      .client-logo-container {
+        height: 40px;
+      }
+    }
+
+    /* Contact Section - Watercolor */
+    #contact {
+      background-color: var(--light);
+      position: relative;
+    }
+
+    .contact-columns {
+      display: grid;
+      grid-template-columns: 1fr 1.5fr;
+      gap: 3rem;
+      margin-bottom: 3rem;
+    }
+
+    .contact-info {
+      background: white;
+      padding: 2.5rem;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .contact-info::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: var(--accent);
+    }
+
+    .contact-info h3 {
+      margin-bottom: 1.5rem;
+      position: relative;
+    }
+
+    .contact-details {
+      margin-bottom: 2rem;
+    }
+
+    .contact-details p {
+      margin-bottom: 0.5rem;
+    }
+
+    .contact-details strong {
+      color: var(--primary);
+    }
+
+    .contact-details a {
+      color: var(--text);
+      transition: var(--transition);
+    }
+
+    .contact-details a:hover {
+      color: var(--primary);
+    }
+
+    .map-container {
+      height: 100%;
+      min-height: 400px;
+      border-radius: var(--border-radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      position: relative;
+    }
+
+    .map-container iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    .contact-form {
+      background: white;
+      padding: 2.5rem;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      position: relative;
+    }
+
+    .contact-form::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: var(--accent);
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 0.875rem 1rem;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      transition: var(--transition);
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(0,105,92,0.1);
+    }
+
+    textarea.form-control {
+      min-height: 150px;
+      resize: vertical;
+    }
+
+    /* Footer - Noise Texture */
+    footer {
+      background-color: var(--dark);
+      position: relative;
+      padding: 5rem 0 2rem;
+    }
+
+    footer::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200" fill="none"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="1" numOctaves="3" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter><rect width="100%" height="100%" filter="url(%23noise)" opacity="0.1"/></svg>');
+      opacity: 0.3;
+    }
+
+    .footer-content {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 3rem;
+      margin-bottom: 3rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .footer-column h3 {
+      color: white;
+      margin-bottom: 1.5rem;
+      position: relative;
+    }
+
+    .footer-column h3::after {
+      content: '';
+      position: absolute;
+      width: 40px;
+      height: 3px;
+      background: var(--accent);
+      bottom: -8px;
+      left: 0;
+      border-radius: 2px;
+    }
+
+    .footer-links {
+      list-style: none;
+    }
+
+    .footer-links li {
+      margin-bottom: 0.8rem;
+    }
+
+    .footer-links a {
+      color: #B0BEC5;
+      transition: var(--transition);
+      display: inline-block;
+    }
+
+    .footer-links a:hover {
+      color: white;
+      transform: translateX(5px);
+    }
+
+    .social-links {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    .social-links a {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 42px;
+      height: 42px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 50%;
+      color: white;
+      transition: var(--transition);
+    }
+
+    .social-links a:hover {
+      background: var(--accent);
+      color: var(--dark);
+      transform: translateY(-3px);
+    }
+
+    .newsletter-form {
+      margin-top: 1.5rem;
+    }
+
+    .newsletter-form input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: none;
+      border-radius: 50px;
+      margin-bottom: 0.5rem;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .newsletter-form button {
+      width: 100%;
+      padding: 0.75rem;
+      background: var(--accent);
+      color: var(--dark);
+      border: none;
+      border-radius: 50px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .newsletter-form button:hover {
+      background: var(--accent-dark);
+    }
+
+    .copyright {
+      text-align: center;
+      padding-top: 2rem;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      color: #B0BEC5;
+      font-size: 0.9rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Responsive Styles */
+    @media (max-width: 1024px) {
+      #about .container {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+      
+      .about-image {
+        min-height: 300px;
+        order: -1;
+      }
+      
+      .mission-vision {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      :root {
+        --section-padding: 6rem 0;
+      }
+      
+      .nav-links {
+        position: fixed;
+        top: 70px;
+        left: 0;
+        right: 0;
+        background: white;
+        flex-direction: column;
+        padding: 1rem;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        transform: translateY(-150%);
+        transition: transform 0.3s ease;
+        z-index: 99;
+      }
+      
+      .nav-links.active {
+        transform: translateY(0);
+      }
+      
+      .mobile-menu-btn {
+        display: block;
+      }
+      
+      .hero-buttons {
+        flex-direction: column;
+      }
+      
+      .contact-columns {
+        grid-template-columns: 1fr;
+      }
+      
+      .stats-container {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 576px) {
+      :root {
+        --section-padding: 4rem 0;
+      }
+      
+      .hero {
+        padding: 6rem 1rem 4rem;
+      }
+      
+      .hero-content {
+        padding: 0;
+      }
+      
+      .stats-container {
+        grid-template-columns: 1fr;
+      }
+      
+      .impact-content {
+        padding: 2rem;
+      }
+      
+      .footer-content {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Hero Section -->
+  <header class="hero">
+    <div id="particles-js"></div>
+    <div class="hero-content">
+      <h1>Driving Sustainable Innovation Through Technology</h1>
+      <p>ECODATA CIC delivers cutting-edge IT solutions and environmental research to help organizations achieve their sustainability goals while creating measurable social impact.</p>
+      <div class="hero-buttons">
+        <a href="#contact" class="btn btn-primary">
+          <i class="fas fa-paper-plane"></i> Get Started
+        </a>
+        <a href="#services" class="btn btn-secondary">
+          <i class="fas fa-search"></i> Explore Services
+        </a>
+      </div>
+    </div>
+    <div class="scroll-indicator">
+      <span></span>
+    </div>
+  </header>
+
+  <!-- Navigation -->
+  <nav>
+    <div class="nav-container">
+      <div class="nav-links" id="navLinks">
+        <a href="#about" class="nav-btn">About</a>
+        <a href="#services" class="nav-btn">Services</a>
+        <a href="#framework" class="nav-btn">Technology</a>
+        <a href="#impact" class="nav-btn">Impact</a>
+        <a href="#contact" class="nav-btn">Contact</a>
+      </div>
+      <button class="mobile-menu-btn" id="menuBtn" aria-label="Toggle menu">
+        <i class="fas fa-bars"></i>
+      </button>
+    </div>
+  </nav>
+    
+  <!-- Main Content -->
+  <main>
+    <!-- About Section -->
+    <section id="about">
+      <div class="container">
+        <div class="about-image"></div>
+        <div class="about-content">
+          <div class="section-title">
+            <h2>About ECODATA CIC</h2>
+            <p>Bridging technology and sustainability for measurable impact</p>
+          </div>
+          <p>ECODATA CIC is a purpose-driven social enterprise that combines technical excellence with environmental stewardship. We specialize in delivering innovative IT solutions that help organizations reduce their carbon footprint while achieving their business objectives.</p>
+          <p>Our multidisciplinary team brings together expertise in cloud computing, data analytics, environmental science, and social research to create comprehensive solutions that drive both operational efficiency and positive social change.</p>
+          
+          <div class="mission-vision">
+            <div class="mission-card">
+              <h3><i class="fas fa-bullseye"></i> Our Mission</h3>
+              <p>To leverage technology as a force for good, creating sustainable solutions that benefit businesses, communities, and the environment.</p>
+            </div>
+            <div class="vision-card">
+              <h3><i class="fas fa-eye"></i> Our Vision</h3>
+              <p>A world where technological advancement and environmental sustainability work hand in hand to create equitable opportunities for all.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services">
+      <div class="container">
+        <div class="section-title">
+          <h2>Our Services</h2>
+          <p>Comprehensive solutions designed to align technology with your sustainability objectives</p>
+        </div>
+        <div class="services-grid">
+          <!-- Service 1 -->
+          <div class="service-card">
+            <div class="service-icon">
+              <i class="fas fa-cloud"></i>
+            </div>
+            <div class="service-content">
+              <h3>Sustainable IT Consultancy</h3>
+              <p>We help organizations modernize their infrastructure through energy-efficient cloud migration, green data architecture, and secure managed IT services that reduce environmental impact.</p>
+              <div class="tech-tags">
+                <span>Cloud Migration</span>
+                <span>Green Infrastructure</span>
+                <span>Carbon Reduction</span>
+                <span>Security</span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Service 2 -->
+          <div class="service-card">
+            <div class="service-icon">
+              <i class="fas fa-database"></i>
+            </div>
+            <div class="service-content">
+              <h3>Data Solutions</h3>
+              <p>Our energy-efficient platforms provide secure, scalable data storage and processing with a focus on minimizing environmental impact while maximizing insights and operational efficiency.</p>
+              <div class="tech-tags">
+                <span>Big Data</span>
+                <span>Scalability</span>
+                <span>Green Hosting</span>
+                <span>AI Analytics</span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Service 3 -->
+          <div class="service-card">
+            <div class="service-icon">
+              <i class="fas fa-flask"></i>
+            </div>
+            <div class="service-content">
+              <h3>Research & Development</h3>
+              <p>Our interdisciplinary research combines data science, AI, and environmental studies to develop innovative solutions that address pressing social and ecological challenges.</p>
+              <div class="tech-tags">
+                <span>AI Research</span>
+                <span>Data Analytics</span>
+                <span>Social Impact</span>
+                <span>Sustainability</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Technology Section -->
+    <section id="framework">
+      <div class="container">
+        <div class="section-title">
+          <h2>Our Technology Framework</h2>
+          <p>Robust, sustainable systems designed for performance and environmental responsibility</p>
+        </div>
+        <div class="services-grid">
+          <!-- Tech 1 -->
+          <div class="service-card">
+            <div class="service-icon" style="background: var(--primary-light)">
+              <i class="fas fa-database"></i>
+            </div>
+            <div class="service-content">
+              <h3>Green Data Infrastructure</h3>
+              <p>Energy-efficient cloud storage with Hadoop and Apache Spark infrastructure designed for minimal environmental impact without compromising performance.</p>
+              <div class="tech-tags">
+                <span>Hadoop</span>
+                <span>Apache Spark</span>
+                <span>Cloud Storage</span>
+                <span>Green Computing</span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Tech 2 -->
+          <div class="service-card">
+            <div class="service-icon" style="background: var(--secondary)">
+              <i class="fas fa-chart-line"></i>
+            </div>
+            <div class="service-content">
+              <h3>Sustainability Analytics</h3>
+              <p>Advanced visual and predictive analytics platforms that transform data into actionable sustainability insights and decision-making tools.</p>
+              <div class="tech-tags">
+                <span>Power BI</span>
+                <span>Tableau</span>
+                <span>Python</span>
+                <span>Machine Learning</span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Tech 3 -->
+          <div class="service-card">
+            <div class="service-icon" style="background: var(--dark-alt)">
+              <i class="fas fa-shield-alt"></i>
+            </div>
+            <div class="service-content">
+              <h3>Ethical Data Security</h3>
+              <p>Enterprise-grade security protocols and compliance frameworks with a focus on ethical data practices and privacy protection.</p>
+              <div class="tech-tags">
+                <span>GDPR</span>
+                <span>Cybersecurity</span>
+                <span>Encryption</span>
+                <span>Ethical AI</span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Tech 4 -->
+          <div class="service-card">
+            <div class="service-icon" style="background: var(--primary)">
+              <i class="fas fa-users"></i>
+            </div>
+            <div class="service-content">
+              <h3>Collaboration Ecosystem</h3>
+              <p>Integrated platforms that enable seamless teamwork across distributed organizations while minimizing digital carbon footprint.</p>
+              <div class="tech-tags">
+                <span>Salesforce</span>
+                <span>Microsoft 365</span>
+                <span>Slack</span>
+                <span>Remote Work</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Impact Section -->
+    <section id="impact">
+      <div class="container">
+        <div class="section-title">
+          <h2>Our Measurable Impact</h2>
+          <p>Quantifying our contribution to sustainability and social progress</p>
+        </div>
+        <div class="stats-container">
+          <div class="stat-box">
+            <div class="stat-number" id="projectsCount">0</div>
+            <p>Sustainability Projects</p>
+          </div>
+          <div class="stat-box">
+            <div class="stat-number" id="clientsCount">0</div>
+            <p>Satisfied Clients</p>
+          </div>
+          <div class="stat-box">
+            <div class="stat-number" id="researchCount">0</div>
+            <p>Research Studies</p>
+          </div>
+          <div class="stat-box">
+            <div class="stat-number" id="countriesCount">0</div>
+            <p>Countries Reached</p>
+          </div>
+        </div>
+        <div class="impact-content">
+          <h3>Environmental Impact</h3>
+          <p>Our green IT solutions have helped clients reduce their carbon emissions by an average of 35% across their digital operations. Through our energy-efficient data centers and optimized cloud solutions, we've collectively saved over 2.5 million kWh of energy annually - equivalent to powering 600 homes for a year.</p>
+          
+          <h3>Social Impact</h3>
+          <p>We've partnered with 12 educational institutions and 8 non-profits to deliver research and technology solutions that improve access to education, healthcare, and sustainable resources in underserved communities. Our projects have directly benefited over 50,000 individuals through improved services and opportunities.</p>
+          
+          <h3>Client Success</h3>
+          <p>Organizations working with ECODATA CIC report an average 30% reduction in operational costs while achieving their sustainability targets. Our tailored solutions help clients meet compliance requirements, improve efficiency, and demonstrate their commitment to environmental responsibility.</p>
+        </div>
+
+        <div class="testimonials">
+          <h3>What Our Clients Say</h3>
+          <div class="testimonial-card">
+            <div class="testimonial-content">
+              <p>ECODATA CIC transformed our IT infrastructure while helping us achieve our carbon neutrality goals two years ahead of schedule. Their expertise in sustainable technology is unmatched.</p>
+            </div>
+            <div class="testimonial-author">
+              <div class="author-avatar">
+                <img src="https://randomuser.me/api/portraits/women/45.jpg" alt="Sarah Johnson">
+              </div>
+              <div class="author-info">
+                <h4>Sarah Johnson</h4>
+                <p>CTO, GreenFuture Ltd</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="testimonial-card">
+            <div class="testimonial-content">
+              <p>The research conducted by ECODATA CIC provided invaluable insights that shaped our community sustainability programs. Their combination of technical expertise and social awareness is rare.</p>
+            </div>
+            <div class="testimonial-author">
+              <div class="author-avatar">
+                <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="David Chen">
+              </div>
+              <div class="author-info">
+                <h4>David Chen</h4>
+                <p>Director, Urban Sustainability Initiative</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Clients Section -->
+        <div class="clients">
+          <h3>Trusted By Leading Organizations</h3>
+          <div class="client-logos">
+            <!-- IBM Logo -->
+            <div class="client-logo-container">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/IBM_logo.svg" alt="IBM" class="client-logo" loading="lazy">
+            </div>
+
+            <!-- Google Logo -->
+            <div class="client-logo-container">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" alt="Google" class="client-logo" loading="lazy">
+            </div>
+
+            <!-- Microsoft Logo -->
+            <div class="client-logo-container">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg" alt="Microsoft" class="client-logo" loading="lazy">
+            </div>
+
+            <!-- Amazon Web Services Logo -->
+            <div class="client-logo-container">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/9/93/Amazon_Web_Services_Logo.svg" alt="AWS" class="client-logo" loading="lazy">
+            </div>
+
+            <!-- Intel Logo -->
+            <div class="client-logo-container">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/7/7d/Intel_logo_%282006-2020%29.svg" alt="Intel" class="client-logo" loading="lazy">
+            </div>
+
+            <!-- NVIDIA Logo -->
+            <div class="client-logo-container">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/2/21/Nvidia_logo.svg" alt="NVIDIA" class="client-logo" loading="lazy">
+            </div>
+          </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact">
+      <div class="container">
+        <div class="section-title">
+          <h2>Get In Touch</h2>
+          <p>Ready to discuss how we can help your organization achieve its sustainability goals?</p>
+        </div>
+        
+        <div class="contact-columns">
+          <div class="contact-info">
+            <h3>Our Headquarters</h3>
+            <div class="contact-details">
+              <p><strong>ECODATA CIC</strong></p>
+              <p>128 City Road<br>London EC1V 2NX<br>United Kingdom</p>
+            </div>
+            
+            <h3>Contact Details</h3>
+            <div class="contact-details">
+              <p><strong>Email</strong><br><a href="mailto:info@ecodata-cic.com">info@ecodata-cic.com</a></p>
+              <p><strong>Phone</strong><br><a href="tel:+442077234567">+44 20 7723 4567</a></p>
+              <p><strong>Business Hours</strong><br>Monday to Friday: 9:00 AM - 5:30 PM</p>
+            </div>
+            
+            <h3>Follow Us</h3>
+            <div class="social-links">
+              <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+              <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+              <a href="#" aria-label="GitHub"><i class="fab fa-github"></i></a>
+              <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+            </div>
+          </div>
+          
+          <div class="map-container">
+            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2482.888422992962!2d-0.090924!3d51.528857!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x48761cb1a46eb5d3%3A0x564c7a6a130a464!2s128%20City%20Rd%2C%20London%20EC1V%202NX%2C%20UK!5e0!3m2!1sen!2sus!4v1689876543210!5m2!1sen!2sus" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+          </div>
+        </div>
+        
+<div class="contact-form">
+  <h3>Send Us a Message</h3>
+  <form id="contactForm">
+    <div class="form-group">
+      <label for="name">Full Name</label>
+      <input type="text" id="name" class="form-control" placeholder="Enter your name" required>
+    </div>
+
+    <div class="form-group">
+      <label for="email">Email Address</label>
+      <input type="email" id="email" class="form-control" placeholder="Enter your email" required>
+    </div>
+
+    <div class="form-group">
+      <label for="subject">Subject</label>
+      <input type="text" id="subject" class="form-control" placeholder="What's this about?">
+      <div id="subject-counter" class="char-counter">0 / 200</div>
+    </div>
+
+    <div class="form-group">
+      <label for="message">Your Message</label>
+      <textarea id="message" class="form-control" placeholder="How can we help you?" required></textarea>
+      <div id="message-counter" class="char-counter">0 / 2000</div>
+    </div>
+
+    <button type="submit" class="btn" disabled>
+      <i class="fas fa-paper-plane"></i> Send Message
+    </button>
+
+    <!-- 💬 Feedback message placeholder -->
+    <div id="form-feedback" style="margin-top: 1rem; font-size: 0.9rem;"></div>
+  </form>
+</div>
+
+
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-column">
+          <h3>ECODATA CIC</h3>
+          <p>Driving innovation through technology and environmental stewardship for a sustainable future.</p>
+          <div class="social-links">
+            <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+            <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+            <a href="#" aria-label="GitHub"><i class="fab fa-github"></i></a>
+            <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+          </div>
+        </div>
+        
+        <div class="footer-column">
+          <h3>Quick Links</h3>
+          <ul class="footer-links">
+            <li><a href="#about">About Us</a></li>
+            <li><a href="#services">Our Services</a></li>
+            <li><a href="#framework">Technology</a></li>
+            <li><a href="#impact">Our Impact</a></li>
+            <li><a href="#contact">Contact</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-column">
+          <h3>Services</h3>
+          <ul class="footer-links">
+            <li><a href="#">Sustainable IT Consultancy</a></li>
+            <li><a href="#">Green Data Solutions</a></li>
+            <li><a href="#">Environmental Research</a></li>
+            <li><a href="#">Sustainability Analytics</a></li>
+            <li><a href="#">Training & Workshops</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-column">
+          <h3>Newsletter</h3>
+          <p>Subscribe to our newsletter for the latest in sustainable technology and research.</p>
+          <form class="newsletter-form">
+            <input type="email" placeholder="Your email address" required>
+            <button type="submit">Subscribe</button>
+          </form>
+        </div>
+      </div>
+      
+      <div class="copyright">
+        <p>&copy; 2025 ECODATA CIC. All rights reserved. | Registered Community Interest Company No. 12345678</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- JavaScript -->
+  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+  <script>
+    // Mobile Menu Toggle
+    const menuBtn = document.getElementById('menuBtn');
+    const navLinks = document.getElementById('navLinks');
+    
+    menuBtn.addEventListener('click', () => {
+      navLinks.classList.toggle('active');
+      menuBtn.innerHTML = navLinks.classList.contains('active') ? 
+        '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
+      menuBtn.setAttribute('aria-expanded', navLinks.classList.contains('active'));
+    });
+    
+    // Animated Counters
+    function animateCounters() {
+      const counters = [
+        { id: 'projectsCount', target: 50, duration: 2000 },
+        { id: 'clientsCount', target: 35, duration: 2000 },
+        { id: 'researchCount', target: 20, duration: 2000 },
+        { id: 'countriesCount', target: 8, duration: 2000 }
+      ];
+      
+      counters.forEach(counter => {
+        const element = document.getElementById(counter.id);
+        const increment = counter.target / (counter.duration / 16);
+        let current = 0;
+        
+        const updateCounter = () => {
+          current += increment;
+          if (current < counter.target) {
+            element.textContent = Math.floor(current);
+            requestAnimationFrame(updateCounter);
+          } else {
+            element.textContent = counter.target + '+';
+          }
+        };
+        
+        updateCounter();
+      });
+    }
+    
+    // Sticky Navigation on Scroll
+    const nav = document.getElementById('mainNav');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 50) {
+        nav.classList.add('scrolled');
+      } else {
+        nav.classList.remove('scrolled');
+      }
+    });
+    
+    // Initialize when page loads
+    document.addEventListener('DOMContentLoaded', () => {
+      // Initialize Particles.js
+      particlesJS('particles-js', {
+        "particles": {
+          "number": { "value": 80, "density": { "enable": true, "value_area": 800 } },
+          "color": { "value": "#ffffff" },
+          "shape": { "type": "circle" },
+          "opacity": { "value": 0.3, "random": true, "anim": { "enable": true, "speed": 1 } },
+          "size": { "value": 3, "random": true, "anim": { "enable": true, "speed": 2 } },
+          "line_linked": { "enable": true, "distance": 150, "color": "#ffffff", "opacity": 0.2, "width": 1 },
+          "move": { "enable": true, "speed": 1, "direction": "none", "random": true }
+        },
+        "interactivity": {
+          "detect_on": "canvas",
+          "events": {
+            "onhover": { "enable": true, "mode": "grab" },
+            "onclick": { "enable": true, "mode": "push" },
+            "resize": true
+          }
+        }
+      });
+      
+      // Form Submission
+      document.getElementById('contactForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const form = e.target;
+        const submitButton = form.querySelector('button');
+        const originalButtonText = submitButton.innerHTML;
+        
+        submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+        submitButton.disabled = true;
+        
+        // Simulate form submission
+        setTimeout(() => {
+          const successMessage = document.createElement('div');
+          successMessage.innerHTML = `
+            <div style="background: #4CAF50; color: white; padding: 1rem; border-radius: 8px; margin-top: 1rem;">
+              <p style="margin-bottom: 0;">Thank you! We've received your message and will contact you soon.</p>
+            </div>
+          `;
+          form.parentNode.insertBefore(successMessage, form.nextSibling);
+          form.reset();
+          submitButton.innerHTML = originalButtonText;
+          submitButton.disabled = false;
+          
+          setTimeout(() => successMessage.remove(), 5000);
+        }, 1500);
+      });
+      
+      // Smooth scrolling
+      document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+          e.preventDefault();
+          const targetId = this.getAttribute('href');
+          if (targetId === '#') return;
+          
+          const targetElement = document.querySelector(targetId);
+          if (targetElement) {
+            window.scrollTo({
+              top: targetElement.offsetTop - 80,
+              behavior: 'smooth'
+            });
+            
+            if (navLinks.classList.contains('active')) {
+              navLinks.classList.remove('active');
+              menuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+              menuBtn.setAttribute('aria-expanded', 'false');
+            }
+          }
+        });
+      });
+      
+      // Active section highlighting
+      const sections = document.querySelectorAll('section');
+      const navAnchors = document.querySelectorAll('.nav-links a');
+      
+      window.addEventListener('scroll', () => {
+        let current = '';
+        
+        sections.forEach(section => {
+          const sectionTop = section.offsetTop;
+          const sectionHeight = section.clientHeight;
+          
+          if (pageYOffset >= (sectionTop - 100)) {
+            current = section.getAttribute('id');
+          }
+        });
+        
+        navAnchors.forEach(anchor => {
+          anchor.classList.remove('active');
+          if (anchor.getAttribute('href') === `#${current}`) {
+            anchor.classList.add('active');
+          }
+        });
+      });
+      
+      // Animate counters when impact section is visible
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            animateCounters();
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.5 });
+      
+      observer.observe(document.getElementById('impact'));
+    });
+  </script>
+  <script src="assets/js/contactForm.js"></script>
+  <script src="js/contactForm.js"></script>
+
+</body>
+</html>
