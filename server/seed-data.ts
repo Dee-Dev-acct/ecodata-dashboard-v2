@@ -11,37 +11,37 @@ import {
 const partnersData: InsertPartner[] = [
   {
     name: "Google",
-    logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Google_%22G%22_Logo.svg/512px-Google_%22G%22_Logo.svg.png",
+    logoUrl: "https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png",
     websiteUrl: "https://www.google.com",
     category: "technology"
   },
   {
     name: "Microsoft",
-    logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Microsoft_logo.svg/512px-Microsoft_logo.svg.png",
+    logoUrl: "https://img-prod-cms-rt-microsoft-com.akamaized.net/cms/api/am/imageFileData/RE1Mu3b?ver=5c31",
     websiteUrl: "https://www.microsoft.com",
     category: "technology"
   },
   {
     name: "IBM",
-    logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/IBM_logo.svg/512px-IBM_logo.svg.png",
+    logoUrl: "https://www.ibm.com/brand/experience-guides/developer/8f4e3cc2b5d52354a6d43c8edba1e3c9/02_8-bar-positive.svg",
     websiteUrl: "https://www.ibm.com",
     category: "technology"
   },
   {
     name: "AWS",
-    logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Amazon_Web_Services_Logo.svg/512px-Amazon_Web_Services_Logo.svg.png",
+    logoUrl: "https://d1.awsstatic.com/logos/aws-logo-lockups/poweredbyaws/PB_AWS_logo_RGB_stacked_REV_SQ.91cd4af40773cbfbd15577a3c2b8a346fe3e8fa2.png",
     websiteUrl: "https://aws.amazon.com",
     category: "technology"
   },
   {
     name: "Intel",
-    logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/Intel_logo_%282006-2020%29.svg/512px-Intel_logo_%282006-2020%29.svg.png",
+    logoUrl: "https://www.intel.com/content/dam/www/central-libraries/us/en/images/intel-logo.png",
     websiteUrl: "https://www.intel.com",
     category: "technology"
   },
   {
     name: "NVIDIA",
-    logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/Nvidia_logo.svg/512px-Nvidia_logo.svg.png",
+    logoUrl: "https://www.nvidia.com/content/dam/en-zz/Solutions/about-nvidia/logo-and-brand/01-nvidia-logo-vert-500x200-2c50-p@2x.png",
     websiteUrl: "https://www.nvidia.com",
     category: "technology"
   }
