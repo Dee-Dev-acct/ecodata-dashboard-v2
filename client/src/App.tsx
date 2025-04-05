@@ -16,6 +16,7 @@ import FundingGoals from "@/pages/FundingGoals";
 import Checkout from "@/pages/Checkout";
 import AuthPage from "@/pages/auth-page";
 import Dashboard from "@/pages/Dashboard";
+import SpinnerDemo from "@/pages/SpinnerDemo";
 
 function Router() {
   return (
@@ -31,6 +32,7 @@ function Router() {
       <Route path="/checkout/:goalId?" component={Checkout} />
       <Route path="/donation-success" component={DonationSuccess} />
       <Route path="/subscription-success" component={SubscriptionSuccess} />
+      <Route path="/spinner-demo" component={SpinnerDemo} />
       <Route component={NotFound} />
     </Switch>
   );
