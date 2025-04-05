@@ -1,4 +1,17 @@
 import type { Express, Request, Response } from "express";
+
+// Declare user property on Express Request interface
+declare global {
+  namespace Express {
+    interface Request {
+      user?: {
+        userId: number;
+        username: string;
+        role: string;
+      };
+    }
+  }
+}
 import { createServer, type Server } from "http";
 import session from "express-session";
 import MemoryStore from "memorystore";
@@ -53,6 +66,63 @@ export async function registerRoutes(app: Express): Promise<Server> {
   );
 
   // Authentication routes
+  app.post("/api/auth/register", async (req: Request, res: Response) => {
+    try {
+      // Parse and validate the request body
+      const result = insertUserSchema.safeParse(req.body);
+      if (!result.success) {
+        return res.status(400).json({ 
+          message: "Invalid user data", 
+          errors: result.error.errors 
+        });
+      }
+      
+      const userData = result.data;
+      
+      // Check if username or email already exists
+      const existingUser = await storage.getUserByUsername(userData.username);
+      if (existingUser) {
+        return res.status(400).json({ message: "Username already taken" });
+      }
+      
+      const existingEmail = await storage.getUserByEmail(userData.email);
+      if (existingEmail) {
+        return res.status(400).json({ message: "Email already registered" });
+      }
+      
+      // Hash the password
+      const hashedPassword = await hashPassword(userData.password);
+      
+      // Create the user with hashed password
+      const user = await storage.createUser({
+        ...userData,
+        password: hashedPassword,
+      });
+      
+      // Generate token
+      const token = generateToken(user.id, user.username, user.role);
+      
+      // Update last login time
+      await storage.updateUser(user.id, { lastLogin: new Date() });
+      
+      // Return the token and user data (excluding password)
+      return res.status(201).json({
+        token,
+        user: {
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          role: user.role,
+          firstName: user.firstName,
+          lastName: user.lastName
+        }
+      });
+    } catch (error) {
+      console.error("Registration error:", error);
+      return res.status(500).json({ message: "An error occurred during registration" });
+    }
+  });
+
   app.post("/api/auth/login", async (req: Request, res: Response) => {
     try {
       const { username, password } = req.body;
@@ -66,6 +136,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!authResult) {
         return res.status(401).json({ message: "Invalid username or password" });
       }
+      
+      // Update last login time
+      await storage.updateUser(authResult.user.id, { lastLogin: new Date() });
       
       return res.json(authResult);
     } catch (error) {
@@ -108,6 +181,129 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Newsletter subscription routes
+  // User routes
+  app.get("/api/user/profile", authenticateToken, async (req: Request, res: Response) => {
+    try {
+      if (!req.user) {
+        return res.status(401).json({ message: "Authentication required" });
+      }
+      
+      const userId = req.user.userId;
+      const user = await storage.getUser(userId);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Return user data without sensitive information
+      // Use type assertion since we know these properties exist on the User type
+      const userWithSensitiveInfo = user as any;
+      const { password, verificationToken, resetPasswordToken, ...userData } = userWithSensitiveInfo;
+      return res.json(userData);
+    } catch (error) {
+      console.error("Error fetching user profile:", error);
+      return res.status(500).json({ message: "Failed to fetch user profile" });
+    }
+  });
+  
+  app.put("/api/user/profile", authenticateToken, async (req: Request, res: Response) => {
+    try {
+      if (!req.user) {
+        return res.status(401).json({ message: "Authentication required" });
+      }
+      
+      const userId = req.user.userId;
+      const user = await storage.getUser(userId);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Validate update data (allow only specific fields to be updated)
+      const allowedFields = ["firstName", "lastName", "email", "bio", "interests", "notificationsEnabled"];
+      const updateData: Record<string, any> = {};
+      
+      for (const field of allowedFields) {
+        if (req.body[field] !== undefined) {
+          updateData[field] = req.body[field];
+        }
+      }
+      
+      // Update user
+      const updatedUser = await storage.updateUser(userId, updateData);
+      
+      if (!updatedUser) {
+        return res.status(500).json({ message: "Failed to update user" });
+      }
+      
+      // Return updated user data without sensitive information
+      // Use type assertion since we know these properties exist on the User type
+      const userWithSensitiveInfo = updatedUser as any;
+      const { password, verificationToken, resetPasswordToken, ...userData } = userWithSensitiveInfo;
+      return res.json(userData);
+    } catch (error) {
+      console.error("Error updating user profile:", error);
+      return res.status(500).json({ message: "Failed to update user profile" });
+    }
+  });
+  
+  app.get("/api/user/donations", authenticateToken, async (req: Request, res: Response) => {
+    try {
+      if (!req.user) {
+        return res.status(401).json({ message: "Authentication required" });
+      }
+      
+      const userId = req.user.userId;
+      const donations = await storage.getDonationsByUserId(userId);
+      return res.json(donations);
+    } catch (error) {
+      console.error("Error fetching user donations:", error);
+      return res.status(500).json({ message: "Failed to fetch donation history" });
+    }
+  });
+  
+  app.get("/api/user/subscriptions", authenticateToken, async (req: Request, res: Response) => {
+    try {
+      if (!req.user) {
+        return res.status(401).json({ message: "Authentication required" });
+      }
+      
+      const userId = req.user.userId;
+      const subscriptions = await storage.getSubscriptionsByUserId(userId);
+      return res.json(subscriptions);
+    } catch (error) {
+      console.error("Error fetching user subscriptions:", error);
+      return res.status(500).json({ message: "Failed to fetch subscription history" });
+    }
+  });
+  
+  app.put("/api/user/watchlist", authenticateToken, async (req: Request, res: Response) => {
+    try {
+      if (!req.user) {
+        return res.status(401).json({ message: "Authentication required" });
+      }
+      
+      const userId = req.user.userId;
+      const { watchlist } = req.body;
+      
+      if (!Array.isArray(watchlist)) {
+        return res.status(400).json({ message: "Watchlist must be an array" });
+      }
+      
+      // Update user's watchlist
+      const updatedUser = await storage.updateUser(userId, { watchlist });
+      
+      if (!updatedUser) {
+        return res.status(500).json({ message: "Failed to update watchlist" });
+      }
+      
+      return res.json({ watchlist: updatedUser.watchlist });
+    } catch (error) {
+      console.error("Error updating watchlist:", error);
+      return res.status(500).json({ message: "Failed to update watchlist" });
+    }
+  });
+  
   app.post("/api/newsletter/subscribe", async (req: Request, res: Response) => {
     try {
       // Validate request body

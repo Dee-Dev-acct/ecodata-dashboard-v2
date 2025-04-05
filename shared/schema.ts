@@ -148,7 +148,8 @@ export const insertUserSchema = createInsertSchema(users).pick({
   bio: true,
   interests: true,
   watchlist: true,
-  notificationsEnabled: true
+  notificationsEnabled: true,
+  lastLogin: true
 });
 
 // Contact messages schema
