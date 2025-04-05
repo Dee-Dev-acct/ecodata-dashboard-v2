@@ -28,7 +28,7 @@ const Footer = () => {
             <nav className="flex flex-col space-y-2">
               <a href="#services" className="text-gray-300 hover:text-white transition-colors">Services</a>
               <a href="#about" className="text-gray-300 hover:text-white transition-colors">About Us</a>
-              <a href="#impact" className="text-gray-300 hover:text-white transition-colors">Our Impact</a>
+              <Link href="/impact" className="text-gray-300 hover:text-white transition-colors">Our Impact</Link>
               <a href="#technology" className="text-gray-300 hover:text-white transition-colors">Technology</a>
               <a href="#contact" className="text-gray-300 hover:text-white transition-colors">Contact</a>
             </nav>

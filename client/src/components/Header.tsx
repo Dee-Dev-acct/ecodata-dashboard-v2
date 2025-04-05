@@ -53,12 +53,12 @@ const Header = () => {
           >
             Technology
           </a>
-          <Link 
-            href="/impact" 
+          <a 
+            href="#impact" 
             className="font-medium hover:text-[#2A9D8F] dark:text-[#F4F1DE] dark:hover:text-[#38B593] transition-colors"
           >
             Impact
-          </Link>
+          </a>
           <Link 
             href="/blog" 
             className="font-medium hover:text-[#2A9D8F] dark:text-[#F4F1DE] dark:hover:text-[#38B593] transition-colors"
@@ -136,13 +136,13 @@ const Header = () => {
             >
               Technology
             </a>
-            <Link 
-              href="/impact" 
+            <a 
+              href="#impact" 
               onClick={() => setMobileMenuOpen(false)}
               className="py-2 px-4 hover:bg-[#F4F1DE] dark:hover:bg-[#1A323C] dark:text-white rounded transition-colors"
             >
               Impact
-            </Link>
+            </a>
             <Link 
               href="/blog" 
               onClick={() => setMobileMenuOpen(false)}
