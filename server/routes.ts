@@ -194,6 +194,115 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.status(500).json({ message: "Failed to fetch partners" });
     }
   });
+  
+  app.get("/api/funding-goals", async (req: Request, res: Response) => {
+    try {
+      // In a production app, this would retrieve data from the database
+      // For now, we'll return sample data for demonstration purposes
+      const fundingGoals = [
+        {
+          id: 'reforestation',
+          title: 'Reforestation Data Initiative',
+          description: 'Help us fund data collection and analysis for reforestation projects',
+          currentAmount: 3750,
+          targetAmount: 10000,
+          milestones: [
+            {
+              value: 2500,
+              label: 'Monitoring Systems',
+              description: 'Fund initial data collection sensors for forest monitoring'
+            },
+            {
+              value: 5000,
+              label: 'Halfway Mark',
+              description: 'Enable expanded data analysis and visualization tools'
+            },
+            {
+              value: 7500,
+              label: 'Research Phase',
+              description: 'Launch comprehensive environmental impact assessment studies'
+            },
+            {
+              value: 10000,
+              label: 'Full Funding',
+              description: 'Complete implementation of the entire data-driven reforestation monitoring system'
+            }
+          ],
+          theme: 'forest'
+        },
+        {
+          id: 'water-quality',
+          title: 'Water Quality Monitoring Network',
+          description: 'Support our initiative to build a network of water quality sensors across key waterways',
+          currentAmount: 8200,
+          targetAmount: 15000,
+          milestones: [
+            {
+              value: 3000,
+              label: 'Initial Sensors',
+              description: 'Deploy the first batch of water quality monitoring sensors'
+            },
+            {
+              value: 6000,
+              label: 'Data Platform',
+              description: 'Develop the data collection and analysis platform'
+            },
+            {
+              value: 9000,
+              label: 'Network Expansion',
+              description: 'Expand the sensor network to additional waterways'
+            },
+            {
+              value: 12000,
+              label: 'Community Engagement',
+              description: 'Launch community science program for participatory data collection'
+            },
+            {
+              value: 15000,
+              label: 'Full Coverage',
+              description: 'Achieve full regional coverage and real-time monitoring capabilities'
+            }
+          ],
+          theme: 'ocean'
+        },
+        {
+          id: 'community-impact',
+          title: 'Community Impact Measurement',
+          description: 'Fund our community-focused data collection and impact assessment projects',
+          currentAmount: 4500,
+          targetAmount: 8000,
+          milestones: [
+            {
+              value: 2000,
+              label: 'Research Tools',
+              description: 'Develop community impact assessment methodologies and tools'
+            },
+            {
+              value: 4000,
+              label: 'Data Collection',
+              description: 'Implement initial community data collection projects'
+            },
+            {
+              value: 6000,
+              label: 'Analysis Framework',
+              description: 'Build comprehensive analytics framework for social impact data'
+            },
+            {
+              value: 8000,
+              label: 'Full Implementation',
+              description: 'Complete the community impact measurement system and dashboards'
+            }
+          ],
+          theme: 'sunset'
+        }
+      ];
+      
+      return res.json(fundingGoals);
+    } catch (error) {
+      console.error("Error fetching funding goals:", error);
+      return res.status(500).json({ message: "Failed to fetch funding goals" });
+    }
+  });
 
   // Serve blog posts at both API paths for compatibility
   app.get(["/api/blog/posts", "/api/blog-posts"], async (req: Request, res: Response) => {

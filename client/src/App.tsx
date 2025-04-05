@@ -11,6 +11,7 @@ import Blog from "@/pages/Blog";
 import BlogPost from "@/pages/BlogPost";
 import DonationSuccess from "@/pages/DonationSuccess";
 import SubscriptionSuccess from "@/pages/SubscriptionSuccess";
+import FundingGoals from "@/pages/FundingGoals";
 
 function Router() {
   return (
@@ -20,6 +21,7 @@ function Router() {
       <Route path="/admin/:panel*" component={Admin} />
       <Route path="/blog" component={Blog} />
       <Route path="/blog/:slug" component={BlogPost} />
+      <Route path="/funding-goals" component={FundingGoals} />
       <Route path="/donation-success" component={DonationSuccess} />
       <Route path="/subscription-success" component={SubscriptionSuccess} />
       <Route component={NotFound} />
