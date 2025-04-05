@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { ImpactMetric } from "@shared/schema";
+import ImpactVisualization from "./ImpactVisualization";
 
 const ImpactCard = ({ title, value, description, icon, category }: { 
   title: string; 
@@ -80,6 +81,22 @@ const Impact = () => {
             ))}
           </div>
         )}
+        
+        {/* Interactive Data Visualization Section */}
+        <div className="mt-20 bg-[#F4F1DE]/30 dark:bg-[#264653]/30 rounded-xl p-6 shadow-sm">
+          <div className="text-center mb-8">
+            <h2 className="text-2xl font-heading font-bold mb-4 relative inline-block">
+              <span>Interactive Impact Analytics</span>
+              <span className="absolute -bottom-2 left-0 w-full h-1 bg-[#2A9D8F] opacity-40"></span>
+            </h2>
+            <p className="text-base max-w-3xl mx-auto dark:text-[#F4F1DE]/90">
+              Explore our impact data through interactive visualizations. See the progress over time, 
+              compare metrics, and understand how our work translates into real-world results.
+            </p>
+          </div>
+          
+          <ImpactVisualization />
+        </div>
         
         {/* SDG Goals Section */}
         <div className="mt-16">
