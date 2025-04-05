@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Service } from "@shared/schema";
+import React, { useMemo } from "react";
 
 const ServiceCard = ({ title, description, icon }: { title: string; description: string; icon: string }) => {
   return (
@@ -19,6 +20,30 @@ const Services = () => {
   const { data: services, isLoading, error } = useQuery<Service[]>({
     queryKey: ['/api/services'],
   });
+
+  // Function to prioritize CIC-focused services
+  const prioritizedServices = useMemo(() => {
+    if (!services) return [];
+    
+    // Make a copy of the services array
+    const sortedServices = [...services];
+    
+    // Sort services to prioritize CIC-focused ones
+    return sortedServices.sort((a, b) => {
+      // These are our CIC priority services
+      const cicPriorityTitles = [
+        "Digital Literacy & Tech Training",
+        "Community Innovation & Social Impact Projects"
+      ];
+      
+      const aIsCICService = cicPriorityTitles.includes(a.title);
+      const bIsCICService = cicPriorityTitles.includes(b.title);
+      
+      if (aIsCICService && !bIsCICService) return -1; // a comes first
+      if (!aIsCICService && bIsCICService) return 1;  // b comes first
+      return 0; // keep original order for non-CIC services
+    });
+  }, [services]);
 
   return (
     <section id="services" className="py-16 bg-white dark:bg-[#333333]">
@@ -44,7 +69,7 @@ const Services = () => {
           </div>
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
-            {services?.map((service) => (
+            {prioritizedServices.map((service) => (
               <ServiceCard 
                 key={service.id}
                 title={service.title}
