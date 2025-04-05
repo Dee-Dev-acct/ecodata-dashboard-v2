@@ -23,25 +23,25 @@ const partnersData: InsertPartner[] = [
   },
   {
     name: "IBM",
-    logoUrl: "https://1000logos.net/wp-content/uploads/2018/02/IBM-Logo.png",
+    logoUrl: "https://upload.wikimedia.org/wikipedia/commons/5/51/IBM_logo.svg",
     websiteUrl: "https://www.ibm.com",
     category: "technology"
   },
   {
     name: "AWS",
-    logoUrl: "https://1000logos.net/wp-content/uploads/2022/07/AWS-Logo.png",
+    logoUrl: "https://upload.wikimedia.org/wikipedia/commons/9/93/Amazon_Web_Services_Logo.svg",
     websiteUrl: "https://aws.amazon.com",
     category: "technology"
   },
   {
     name: "Intel",
-    logoUrl: "https://1000logos.net/wp-content/uploads/2017/02/Intel-Logo.png",
+    logoUrl: "https://upload.wikimedia.org/wikipedia/commons/7/7d/Intel_logo_%282006-2020%29.svg",
     websiteUrl: "https://www.intel.com",
     category: "technology"
   },
   {
     name: "NVIDIA",
-    logoUrl: "https://www.nvidia.com/content/dam/en-zz/Solutions/about-nvidia/logo-and-brand/01-nvidia-logo-vert-500x200-2c50-p@2x.png",
+    logoUrl: "https://upload.wikimedia.org/wikipedia/commons/2/21/Nvidia_logo.svg",
     websiteUrl: "https://www.nvidia.com",
     category: "technology"
   }
