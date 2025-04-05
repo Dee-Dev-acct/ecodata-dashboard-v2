@@ -18,6 +18,7 @@ import AuthPage from "@/pages/auth-page";
 import Dashboard from "@/pages/Dashboard";
 import SpinnerDemo from "@/pages/SpinnerDemo";
 import Impact from "@/pages/Impact";
+import DataInsights from "@/pages/DataInsights";
 
 function Router() {
   return (
@@ -30,6 +31,7 @@ function Router() {
       <Route path="/blog" component={Blog} />
       <Route path="/blog/:slug" component={BlogPost} />
       <Route path="/impact" component={Impact} />
+      <Route path="/data-insights" component={DataInsights} />
       <Route path="/funding-goals" component={FundingGoals} />
       <Route path="/checkout/:goalId?" component={Checkout} />
       <Route path="/donation-success" component={DonationSuccess} />

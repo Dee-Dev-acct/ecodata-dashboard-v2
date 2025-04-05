@@ -40,7 +40,7 @@ const Footer = () => {
               <Link href="/blog" className="text-gray-300 hover:text-white transition-colors">Blog</Link>
               <a href="#" className="text-gray-300 hover:text-white transition-colors">Case Studies</a>
               <a href="#" className="text-gray-300 hover:text-white transition-colors">Publications</a>
-              <a href="#" className="text-gray-300 hover:text-white transition-colors">Data Insights</a>
+              <Link href="/data-insights" className="text-gray-300 hover:text-white transition-colors">Data Insights</Link>
               <a href="#" className="text-gray-300 hover:text-white transition-colors">FAQs</a>
             </nav>
           </div>
