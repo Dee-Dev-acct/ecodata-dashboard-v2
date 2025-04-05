@@ -1,6 +1,19 @@
 import { Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
+import jwt, { JwtPayload } from 'jsonwebtoken';
+
+// Define custom user interface for the request
+declare global {
+  namespace Express {
+    interface Request {
+      user?: {
+        userId: number;
+        username: string;
+        role: string;
+      };
+    }
+  }
+}
 import { storage } from './storage';
 
 // Secret key for JWT
@@ -35,7 +48,7 @@ export function authenticateToken(req: Request, res: Response, next: NextFunctio
     return res.status(401).json({ message: 'Authentication required' });
   }
   
-  jwt.verify(token, JWT_SECRET, (err, user) => {
+  jwt.verify(token, JWT_SECRET, (err: any, user: any) => {
     if (err) {
       return res.status(403).json({ message: 'Invalid or expired token' });
     }
@@ -56,23 +69,39 @@ export function isAdmin(req: Request, res: Response, next: NextFunction) {
 
 // Authentication functions
 export async function login(username: string, password: string): Promise<{ token: string; user: { id: number; username: string; email: string; role: string; } } | null> {
+  console.log(`Attempting login for username: ${username}`);
+  
   const user = await storage.getUserByUsername(username);
   
-  if (!user) return null;
+  if (!user) {
+    console.log(`User not found: ${username}`);
+    return null;
+  }
   
-  const isMatch = await comparePassword(password, user.password);
-  if (!isMatch) return null;
+  console.log(`User found. Comparing passwords...`);
+  console.log(`Stored password hash length: ${user.password.length}`);
   
-  // Generate token
-  const token = generateToken(user.id, user.username, user.role);
-  
-  return {
-    token,
-    user: {
-      id: user.id,
-      username: user.username,
-      email: user.email,
-      role: user.role
-    }
-  };
+  try {
+    const isMatch = await comparePassword(password, user.password);
+    console.log(`Password match result: ${isMatch}`);
+    
+    if (!isMatch) return null;
+    
+    // Generate token
+    const token = generateToken(user.id, user.username, user.role);
+    console.log(`Login successful for user: ${username} with role: ${user.role}`);
+    
+    return {
+      token,
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        role: user.role
+      }
+    };
+  } catch (error: any) {
+    console.error(`Error during password comparison:`, error);
+    return null;
+  }
 }

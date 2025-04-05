@@ -3,10 +3,12 @@ import { Heart } from "lucide-react";
 import { useLocation } from "wouter";
 import { cn } from "@/lib/utils";
 
-interface DonateButtonProps extends ButtonProps {
+type CustomVariant = "filled" | "outline" | "ghost" | "subtle";
+
+interface DonateButtonProps extends Omit<ButtonProps, 'variant'> {
   goalId?: string;
   amount?: number;
-  variant?: "filled" | "outline" | "ghost" | "subtle";
+  variant?: CustomVariant;
   icon?: boolean;
 }
 

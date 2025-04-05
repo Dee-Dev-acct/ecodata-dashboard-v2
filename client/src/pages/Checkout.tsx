@@ -1,20 +1,22 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useStripe, useElements, Elements, PaymentElement } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
+import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { Button } from "@/components/ui/button";
-import { useLocation, useRoute } from 'wouter';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { Loader2, AlertTriangle } from "lucide-react";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
-import { z } from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { apiRequest } from '@/lib/queryClient';
-import { EcoLoader } from '@/components/ui/eco-loader';
+import { useLocation, useParams } from 'wouter';
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Separator } from '@/components/ui/separator';
+import { Slider } from '@/components/ui/slider';
+import { Switch } from '@/components/ui/switch';
+import { Loader2, Info, CreditCard, Leaf } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 // Make sure to call `loadStripe` outside of a component's render to avoid
 // recreating the `Stripe` object on every render.
@@ -23,84 +25,54 @@ if (!import.meta.env.VITE_STRIPE_PUBLIC_KEY) {
 }
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 
-// Schema for donation form
-const donationFormSchema = z.object({
-  amount: z.string().refine(val => {
-    const num = Number(val);
-    return !isNaN(num) && num >= 1 && num <= 10000;
-  }, { message: "Amount must be between £1 and £10,000" }),
-  name: z.string().min(2, "Name is too short").max(100, "Name is too long"),
-  email: z.string().email("Invalid email address"),
-  isGiftAid: z.boolean().default(false),
-  giftAidName: z.string().optional(),
-  giftAidAddress: z.string().optional(),
-  giftAidPostcode: z.string().optional(),
-});
-
-type DonationFormValues = z.infer<typeof donationFormSchema>;
-
-const CheckoutForm = ({ goalId }: { goalId?: string }) => {
+// The payment form that users will fill out
+const CheckoutForm = ({ donationType, donationAmount }: { donationType: 'one-time' | 'monthly'; donationAmount: number }) => {
   const stripe = useStripe();
   const elements = useElements();
-  const [isLoading, setIsLoading] = useState(false);
-  const [paymentError, setPaymentError] = useState<string | null>(null);
   const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
   const [, navigate] = useLocation();
+  
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-  const form = useForm<DonationFormValues>({
-    resolver: zodResolver(donationFormSchema),
-    defaultValues: {
-      amount: goalId ? "50" : "25",
-      name: "",
-      email: "",
-      isGiftAid: false,
-      giftAidName: "",
-      giftAidAddress: "",
-      giftAidPostcode: "",
-    },
-  });
-
-  const isGiftAid = form.watch("isGiftAid");
-
-  const handleSubmit = async (data: DonationFormValues) => {
     if (!stripe || !elements) {
-      // Stripe.js has not yet loaded.
-      // Make sure to disable form submission until Stripe.js has loaded.
       return;
     }
 
     setIsLoading(true);
-    setPaymentError(null);
 
     try {
-      const { error } = await stripe.confirmPayment({
-        elements,
-        confirmParams: {
-          return_url: window.location.origin + "/donation-success",
-        },
-      });
+      // Use the appropriate method based on donation type
+      const { error } = donationType === 'one-time' 
+        ? await stripe.confirmPayment({
+            elements,
+            confirmParams: {
+              return_url: window.location.origin + '/donation-success',
+            },
+          })
+        : await stripe.confirmPayment({
+            elements,
+            confirmParams: {
+              return_url: window.location.origin + '/subscription-success',
+            },
+          });
 
       if (error) {
-        setPaymentError(error.message || "An error occurred during payment");
         toast({
-          title: "Payment Failed",
-          description: error.message || "An error occurred during payment",
+          title: "Payment failed",
+          description: error.message || "An unexpected error occurred",
           variant: "destructive",
         });
         setIsLoading(false);
-      } else {
-        // The payment succeeded!
-        toast({
-          title: "Payment Processing",
-          description: "Your payment is being processed",
-        });
-        // Payment was successful - Stripe will redirect to success page
       }
+      // Otherwise, the page will redirect to the success URL
+      
     } catch (error: any) {
-      setPaymentError(error.message || "An error occurred during payment");
+      console.error('Payment error:', error);
       toast({
-        title: "Payment Error",
-        description: error.message || "An error occurred during payment",
+        title: "Payment failed",
+        description: error.message || "An unexpected error occurred",
         variant: "destructive",
       });
       setIsLoading(false);
@@ -108,218 +80,112 @@ const CheckoutForm = ({ goalId }: { goalId?: string }) => {
   };
 
   return (
-    <div className="max-w-3xl mx-auto py-8 px-4">
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-          <Card className="mb-6">
-            <CardHeader>
-              <CardTitle>One-time Donation</CardTitle>
-              <CardDescription>
-                Support our environmental data initiatives with a one-time donation
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <FormField
-                control={form.control}
-                name="amount"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Donation Amount (£)</FormLabel>
-                    <FormControl>
-                      <Input type="number" min="1" max="10000" step="0.01" placeholder="25.00" {...field} />
-                    </FormControl>
-                    <FormDescription>
-                      Enter the amount you'd like to donate (between £1 and £10,000)
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Your Name</FormLabel>
-                    <FormControl>
-                      <Input placeholder="John Doe" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email Address</FormLabel>
-                    <FormControl>
-                      <Input type="email" placeholder="you@example.com" {...field} />
-                    </FormControl>
-                    <FormDescription>
-                      We'll send your donation receipt to this email
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <Separator className="my-4" />
-
-              <FormField
-                control={form.control}
-                name="isGiftAid"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                    <FormControl>
-                      <Checkbox
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                    <div className="space-y-1 leading-none">
-                      <FormLabel>
-                        Gift Aid
-                      </FormLabel>
-                      <FormDescription>
-                        Boost your donation by 25p of Gift Aid for every £1 you donate. Gift Aid is
-                        reclaimed by the charity from the tax you pay for the current tax year.
-                      </FormDescription>
-                    </div>
-                  </FormItem>
-                )}
-              />
-
-              {isGiftAid && (
-                <div className="space-y-4 border p-4 rounded-md mt-2">
-                  <FormField
-                    control={form.control}
-                    name="giftAidName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Full Name (for Gift Aid)</FormLabel>
-                        <FormControl>
-                          <Input placeholder="John Doe" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="giftAidAddress"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Home Address (for Gift Aid)</FormLabel>
-                        <FormControl>
-                          <Input placeholder="123 Example St" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="giftAidPostcode"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Postcode (for Gift Aid)</FormLabel>
-                        <FormControl>
-                          <Input placeholder="AB12 3CD" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          <PaymentElement />
-
-          {paymentError && (
-            <div className="p-4 bg-destructive/10 border border-destructive rounded-md flex items-center gap-2 text-destructive">
-              <AlertTriangle size={18} />
-              <span>{paymentError}</span>
-            </div>
-          )}
-
-          <div className="flex items-center justify-end space-x-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => navigate("/")}
-              disabled={isLoading}
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <PaymentElement />
+      
+      <div className="space-y-4 mt-6">
+        <div className="flex items-start space-x-2">
+          <Checkbox id="gift-aid" />
+          <div className="grid gap-1.5 leading-none">
+            <Label
+              htmlFor="gift-aid"
+              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
             >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              disabled={isLoading || !stripe || !elements}
-              className="bg-primary hover:bg-primary/90 text-primary-foreground"
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Processing...
-                </>
-              ) : (
-                `Donate £${form.getValues("amount") || "0"}`
-              )}
-            </Button>
+              Claim Gift Aid (UK taxpayers only)
+            </Label>
+            <p className="text-xs text-muted-foreground">
+              By checking this box, I confirm I am a UK taxpayer and understand that if I pay less Income Tax and/or Capital 
+              Gains Tax than the amount of Gift Aid claimed on all my donations in that tax year, it's my responsibility to pay any difference.
+            </p>
           </div>
-        </form>
-      </Form>
-    </div>
+        </div>
+      </div>
+      
+      <Button 
+        type="submit" 
+        className="w-full" 
+        disabled={isLoading || !stripe || !elements}
+      >
+        {isLoading ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            Processing...
+          </>
+        ) : (
+          `Donate ${donationType === 'one-time' ? `£${donationAmount}` : `£${donationAmount} monthly`}`
+        )}
+      </Button>
+      
+      <div className="flex items-center justify-center space-x-2 text-xs text-muted-foreground">
+        <CreditCard className="h-4 w-4" />
+        <span>Secure payment processing by Stripe</span>
+      </div>
+    </form>
   );
 };
 
+// The main Checkout component that wraps everything
 export default function Checkout() {
   const [clientSecret, setClientSecret] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [match, params] = useRoute<{ goalId?: string }>("/checkout/:goalId?");
-  const goalId = match ? params.goalId : undefined;
+  
+  const [donationType, setDonationType] = useState<'one-time' | 'monthly'>('one-time');
+  const [donationAmount, setDonationAmount] = useState(25);
+  const [customAmount, setCustomAmount] = useState(25);
+  const [showCustomAmount, setShowCustomAmount] = useState(false);
+
+  const params = useParams<{ goalId?: string }>();
+  const { goalId } = params;
   const { toast } = useToast();
-
+  
+  // Handle changes in the custom amount input
+  const handleCustomAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseFloat(e.target.value);
+    if (!isNaN(value) && value > 0) {
+      setCustomAmount(value);
+      setDonationAmount(value);
+    }
+  };
+  
+  // Switch between predefined amounts and custom amount
+  const toggleCustomAmount = () => {
+    setShowCustomAmount(!showCustomAmount);
+    if (!showCustomAmount) {
+      setDonationAmount(customAmount);
+    }
+  };
+  
+  // Select a predefined amount
+  const selectAmount = (amount: number) => {
+    setDonationAmount(amount);
+    setShowCustomAmount(false);
+  };
+  
+  // Create PaymentIntent or SetupIntent when the checkout parameters change
   useEffect(() => {
-    // Create PaymentIntent as soon as the page loads
+    // Function to create the payment intent
     const createPaymentIntent = async () => {
+      setIsLoading(true);
+      setError(null);
       try {
-        setIsLoading(true);
-        setError(null);
-
-        // Default amount - this will be overridden by user input later
-        const defaultAmount = goalId ? 50 : 25;
-
-        const response = await apiRequest("POST", "/api/create-payment-intent", { 
-          amount: defaultAmount,
-          goalId
+        const endpoint = donationType === 'one-time' 
+          ? '/api/create-payment-intent' 
+          : '/api/create-subscription';
+        
+        const response = await apiRequest('POST', endpoint, { 
+          amount: donationAmount,
+          goalId: goalId || undefined
         });
         
         const data = await response.json();
-        
-        if (response.ok) {
-          setClientSecret(data.clientSecret);
-        } else {
-          setError(data.message || "Failed to create payment intent");
-          toast({
-            title: "Payment Setup Error",
-            description: data.message || "There was a problem setting up the payment. Please try again.",
-            variant: "destructive",
-          });
-        }
-      } catch (err: any) {
-        setError(err.message || "An unexpected error occurred");
+        setClientSecret(data.clientSecret);
+      } catch (error: any) {
+        console.error('Error creating payment intent:', error);
+        setError(error.message || 'Failed to initialize payment. Please try again.');
         toast({
-          title: "Connection Error",
-          description: "There was a problem connecting to the payment service. Please try again.",
+          title: "Error",
+          description: error.message || "Failed to set up payment. Please try again.",
           variant: "destructive",
         });
       } finally {
@@ -327,37 +193,202 @@ export default function Checkout() {
       }
     };
 
-    createPaymentIntent();
-  }, [goalId, toast]);
+    // Only create a payment intent if we have a valid amount
+    if (donationAmount > 0) {
+      createPaymentIntent();
+    }
+  }, [donationType, donationAmount, goalId, toast]);
 
-  if (isLoading) {
-    return (
-      <div className="h-screen flex flex-col items-center justify-center">
-        <EcoLoader />
-        <p className="mt-4 text-muted-foreground">Setting up your donation...</p>
-      </div>
-    );
-  }
+  // Stripe Elements appearance options
+  const appearance = {
+    theme: 'stripe' as 'stripe',
+    variables: {
+      colorPrimary: '#2A9D8F', // Match our brand color
+    },
+  };
 
-  if (error) {
-    return (
-      <div className="h-screen flex flex-col items-center justify-center p-6">
-        <div className="bg-destructive/10 border border-destructive rounded-md p-6 max-w-md w-full">
-          <div className="flex items-center gap-2 text-destructive mb-4">
-            <AlertTriangle size={24} />
-            <h2 className="text-xl font-semibold">Payment Error</h2>
-          </div>
-          <p className="text-foreground mb-6">{error}</p>
-          <Button onClick={() => window.location.reload()}>Try Again</Button>
-        </div>
-      </div>
-    );
-  }
-
-  // Make SURE to wrap the form in <Elements> which provides the stripe context.
   return (
-    <Elements stripe={stripePromise} options={{ clientSecret }}>
-      <CheckoutForm goalId={goalId} />
-    </Elements>
+    <div className="min-h-screen flex flex-col">
+      <Header />
+      <main className="flex-grow bg-gray-50 dark:bg-gray-900 py-12">
+        <div className="container max-w-6xl mx-auto px-4 md:px-6">
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+            <div className="lg:col-span-3">
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+                <h1 className="text-2xl font-bold mb-6">Make a Donation</h1>
+                
+                <Tabs defaultValue="one-time" className="mb-8" onValueChange={(value) => setDonationType(value as 'one-time' | 'monthly')}>
+                  <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="one-time">One-time Donation</TabsTrigger>
+                    <TabsTrigger value="monthly">Monthly Subscription</TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="one-time" className="pt-4">
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-medium">Help us make an immediate impact</h3>
+                      <p className="text-muted-foreground">
+                        Your one-time donation will help fund crucial environmental data projects 
+                        that create lasting changes in our communities.
+                      </p>
+                    </div>
+                  </TabsContent>
+                  <TabsContent value="monthly" className="pt-4">
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-medium">Become a monthly supporter</h3>
+                      <p className="text-muted-foreground">
+                        Join our community of monthly donors to help us plan and sustain
+                        long-term projects for continuous environmental impact.
+                      </p>
+                    </div>
+                  </TabsContent>
+                </Tabs>
+                
+                <div className="mb-8">
+                  <h3 className="text-lg font-medium mb-4">Select donation amount</h3>
+                  
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+                    {[10, 25, 50, 100].map((amount) => (
+                      <Button
+                        key={amount}
+                        variant={donationAmount === amount && !showCustomAmount ? "default" : "outline"}
+                        onClick={() => selectAmount(amount)}
+                        className="font-semibold text-lg"
+                      >
+                        £{amount}
+                      </Button>
+                    ))}
+                  </div>
+                  
+                  <div className="flex items-center space-x-2 mb-4">
+                    <Switch
+                      id="custom-amount"
+                      checked={showCustomAmount}
+                      onCheckedChange={toggleCustomAmount}
+                    />
+                    <Label htmlFor="custom-amount">Custom amount</Label>
+                  </div>
+                  
+                  {showCustomAmount && (
+                    <div className="flex items-center space-x-2 mb-6">
+                      <span className="text-xl font-medium">£</span>
+                      <Input
+                        type="number"
+                        min="1"
+                        step="1"
+                        value={customAmount}
+                        onChange={handleCustomAmountChange}
+                        className="text-lg"
+                        placeholder="Enter amount"
+                      />
+                    </div>
+                  )}
+                </div>
+                
+                <div className="my-8">
+                  <Separator />
+                </div>
+                
+                <div className="mb-6">
+                  <h3 className="text-lg font-medium mb-4">Payment details</h3>
+                  
+                  {isLoading ? (
+                    <div className="flex flex-col items-center justify-center py-10">
+                      <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
+                      <p className="text-muted-foreground">Setting up secure payment...</p>
+                    </div>
+                  ) : error ? (
+                    <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md p-4 text-center">
+                      <p className="text-red-600 dark:text-red-400">{error}</p>
+                      <Button 
+                        variant="outline" 
+                        className="mt-4"
+                        onClick={() => window.location.reload()}
+                      >
+                        Try Again
+                      </Button>
+                    </div>
+                  ) : clientSecret ? (
+                    <Elements stripe={stripePromise} options={{ clientSecret, appearance }}>
+                      <CheckoutForm donationType={donationType} donationAmount={donationAmount} />
+                    </Elements>
+                  ) : null}
+                </div>
+              </div>
+            </div>
+            
+            <div className="lg:col-span-2">
+              <div className="sticky top-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Your Impact</CardTitle>
+                    <CardDescription>How your donation helps our mission</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="flex items-start space-x-3">
+                      <div className="bg-primary/10 p-2 rounded-full">
+                        <Leaf className="h-5 w-5 text-primary" />
+                      </div>
+                      <div>
+                        <h4 className="font-medium">Environmental Data Collection</h4>
+                        <p className="text-sm text-muted-foreground">
+                          Funds advanced sensor networks and monitoring stations.
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-start space-x-3">
+                      <div className="bg-primary/10 p-2 rounded-full">
+                        <Info className="h-5 w-5 text-primary" />
+                      </div>
+                      <div>
+                        <h4 className="font-medium">Community Education</h4>
+                        <p className="text-sm text-muted-foreground">
+                          Supports public workshops and educational programs.
+                        </p>
+                      </div>
+                    </div>
+                    
+                    {goalId && (
+                      <div className="mt-6 p-4 bg-muted rounded-lg">
+                        <h4 className="font-medium mb-2">Funding specific project</h4>
+                        <p className="text-sm">
+                          Your donation will be directed to the project you selected.
+                        </p>
+                      </div>
+                    )}
+                  </CardContent>
+                  <CardFooter className="flex flex-col items-start space-y-4">
+                    <div className="w-full">
+                      <div className="flex justify-between mb-2">
+                        <span className="text-sm font-medium">Your donation</span>
+                        <span className="text-sm font-bold">£{donationAmount}</span>
+                      </div>
+                      <div className={cn(
+                        "bg-primary/10 rounded-full h-2 w-full overflow-hidden",
+                        donationAmount >= 100 && "bg-primary/30"
+                      )}>
+                        <div 
+                          className="bg-primary h-full transition-all duration-500 ease-out"
+                          style={{ width: `${Math.min(donationAmount, 100)}%` }}
+                        />
+                      </div>
+                      <div className="flex justify-between mt-1">
+                        <span className="text-xs text-muted-foreground">£10</span>
+                        <span className="text-xs text-muted-foreground">£100+</span>
+                      </div>
+                    </div>
+                    
+                    <p className="text-xs text-muted-foreground">
+                      We're committed to transparency. 85% of your donation goes directly to programs, 
+                      10% to administration, and 5% to fundraising efforts.
+                    </p>
+                  </CardFooter>
+                </Card>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+      <Footer />
+    </div>
   );
 }
