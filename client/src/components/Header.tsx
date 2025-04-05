@@ -60,6 +60,12 @@ const Header = () => {
           >
             Blog
           </Link>
+          <Link 
+            href="/spinner-demo" 
+            className="font-medium hover:text-[#2A9D8F] dark:text-[#F4F1DE] dark:hover:text-[#38B593] transition-colors"
+          >
+            Spinners
+          </Link>
         </nav>
         
         {/* Theme toggler and mobile menu button */}
@@ -129,6 +135,13 @@ const Header = () => {
               className="py-2 px-4 hover:bg-[#F4F1DE] dark:hover:bg-[#1A323C] dark:text-white rounded transition-colors"
             >
               Blog
+            </Link>
+            <Link 
+              href="/spinner-demo" 
+              onClick={() => setMobileMenuOpen(false)}
+              className="py-2 px-4 hover:bg-[#F4F1DE] dark:hover:bg-[#1A323C] dark:text-white rounded transition-colors"
+            >
+              Spinners
             </Link>
           </nav>
         </div>
