@@ -20,9 +20,20 @@ import {
 } from "@shared/schema";
 
 // Initialize Stripe
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2025-03-31.basil',
+// Log environment variable availability (not the actual value)
+console.log('Stripe key availability:', process.env.STRIPE_SECRET_KEY ? 'Available' : 'Not available');
+
+// Make sure we have a Stripe key
+if (!process.env.STRIPE_SECRET_KEY) {
+  console.error('STRIPE_SECRET_KEY is not set. Donation functionality will not work.');
+}
+
+// Initialize with the proper API version
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', { 
+  apiVersion: '2023-10-16' as any // Use a stable API version with type assertion
 });
+
+// We'll verify Stripe in a test route instead
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Set up session middleware
@@ -619,6 +630,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Stripe Payment Routes
   app.post("/api/create-checkout-session", async (req: Request, res: Response) => {
     try {
+      // Verify Stripe is configured properly
+      if (!process.env.STRIPE_SECRET_KEY) {
+        console.error('STRIPE_SECRET_KEY environment variable is not set or invalid');
+        return res.status(503).json({ 
+          error: "Stripe configuration error", 
+          message: "Donation functionality is currently unavailable. Please try again later." 
+        });
+      }
+
+      // Check if it's a publishable key mistakenly used as secret key
+      if (process.env.STRIPE_SECRET_KEY.startsWith('pk_')) {
+        console.error('Publishable key used where secret key is required');
+        return res.status(503).json({ 
+          error: "Stripe configuration error", 
+          message: "Donation functionality is currently unavailable due to invalid configuration." 
+        });
+      }
+
+      console.log("Starting checkout session creation...");
+
       // Create a Stripe Checkout Session for a £10 donation
       const session = await stripe.checkout.sessions.create({
         payment_method_types: ["card"],
@@ -640,10 +671,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
         cancel_url: `${req.headers.origin}`,
       });
 
+      console.log("Checkout session created successfully");
+      
+      // Verify that we have a valid URL
+      if (!session?.url) {
+        throw new Error('Stripe session created but no redirect URL was provided');
+      }
+      
+      // Return the URL to redirect to
       res.json({ url: session.url });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error creating checkout session:", error);
-      res.status(500).json({ error: "Failed to create checkout session" });
+      
+      // Identify specific error cases for better user feedback
+      let statusCode = 500;
+      let errorMessage = "Failed to process donation. Please try again later.";
+      
+      // Handle specific Stripe errors with more detailed diagnostics
+      if (error.type === 'StripeAuthenticationError') {
+        statusCode = 503;
+        errorMessage = "Payment service authentication error. Please contact support.";
+        console.error('Stripe Authentication Error: This usually means the API key is invalid or revoked.');
+      } else if (error.type === 'StripeInvalidRequestError') {
+        statusCode = 400;
+        errorMessage = "Invalid donation request. Please try again.";
+        console.error('Stripe Invalid Request Error:', error.message);
+      } else if (error.type === 'StripeConnectionError') {
+        statusCode = 503;
+        errorMessage = "Unable to connect to payment service. Please try again later.";
+        console.error('Stripe Connection Error: This could be due to network issues or Stripe service disruption.');
+      } else if (error.type === 'StripeRateLimitError') {
+        statusCode = 429;
+        errorMessage = "Too many donation requests. Please try again in a few minutes.";
+        console.error('Stripe Rate Limit Error: The API request rate limit has been exceeded.');
+      } else {
+        // Log unknown errors with full details for debugging
+        console.error('Unexpected Stripe error:', error);
+      }
+      
+      // Return appropriate error response with helpful context
+      res.status(statusCode).json({ 
+        error: "Checkout session error", 
+        message: errorMessage,
+        code: error.code || 'unknown',
+        recoverable: statusCode < 500, // Indicates if the user can reasonably retry the operation
+        detail: process.env.NODE_ENV === 'development' ? error.message : undefined
+      });
     }
   });
 
