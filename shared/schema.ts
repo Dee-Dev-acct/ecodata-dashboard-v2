@@ -119,37 +119,15 @@ export const users = pgTable("users", {
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
   email: text("email").notNull().unique(),
-  firstName: text("first_name"),
-  lastName: text("last_name"),
   role: text("role").notNull().default("user"),
-  profileImage: text("profile_image"),
-  bio: text("bio"),
-  interests: text("interests").array(),
-  watchlist: text("watchlist").array(),
-  notificationsEnabled: boolean("notifications_enabled").default(true),
-  stripeCustomerId: text("stripe_customer_id"), // For recurring donations and payment info
-  lastLogin: timestamp("last_login"),
-  isEmailVerified: boolean("is_email_verified").default(false),
-  verificationToken: text("verification_token"),
-  resetPasswordToken: text("reset_password_token"),
-  resetPasswordExpires: timestamp("reset_password_expires"),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow()
+  createdAt: timestamp("created_at").defaultNow()
 });
 
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
   password: true,
   email: true,
-  firstName: true,
-  lastName: true,
-  role: true,
-  profileImage: true,
-  bio: true,
-  interests: true,
-  watchlist: true,
-  notificationsEnabled: true,
-  lastLogin: true
+  role: true
 });
 
 // Contact messages schema

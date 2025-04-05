@@ -4,8 +4,10 @@ import {
   InsertTestimonial, 
   InsertImpactMetric, 
   InsertBlogPost,
-  InsertPartner 
+  InsertPartner,
+  InsertUser
 } from "@shared/schema";
+import { hashPassword } from "./auth";
 
 // Sample partners data for tech companies
 const partnersData: InsertPartner[] = [
@@ -64,13 +66,41 @@ export async function seedPartners() {
   }
 }
 
-// Add more seed functions as needed for other entity types
+// Seed admin user if it doesn't exist
+export async function seedAdminUser() {
+  const adminUsername = "admin";
+  const existingAdmin = await storage.getUserByUsername(adminUsername);
+  
+  if (!existingAdmin) {
+    console.log("Seeding admin user...");
+    
+    // Create admin user with predefined credentials
+    const hashedPassword = await hashPassword("admin123");
+    
+    const adminUser: InsertUser = {
+      username: adminUsername,
+      password: hashedPassword,
+      email: "admin@ecodatacic.org",
+      role: "admin"
+    };
+    
+    await storage.createUser(adminUser);
+    console.log("Successfully created admin user");
+  } else {
+    console.log("Admin user already exists");
+  }
+}
 
 // Main seed function that can be called to seed all necessary data
 export async function seedAllData() {
   try {
+    // Seed the admin user first to ensure it's always available
+    await seedAdminUser();
+    
+    // Seed other data
     await seedPartners();
     // Add calls to other seed functions here
+    
     console.log("Data seeding completed successfully");
   } catch (error) {
     console.error("Error seeding data:", error);

@@ -65,6 +65,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     })
   );
 
+  // Debug route for admin login
+  app.get("/api/debug/admin", async (req: Request, res: Response) => {
+    const adminUser = await storage.getUserByUsername("admin");
+    
+    if (!adminUser) {
+      return res.status(404).json({ message: "Admin user not found" });
+    }
+    
+    // Don't return the actual password, just check if it exists
+    const adminInfo = {
+      id: adminUser.id,
+      username: adminUser.username,
+      email: adminUser.email,
+      role: adminUser.role,
+      passwordExists: !!adminUser.password,
+      passwordLength: adminUser.password.length
+    };
+    
+    return res.json(adminInfo);
+  });
+  
   // Authentication routes
   app.post("/api/auth/register", async (req: Request, res: Response) => {
     try {
@@ -102,9 +123,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Generate token
       const token = generateToken(user.id, user.username, user.role);
       
-      // Update last login time
-      await storage.updateUser(user.id, { lastLogin: new Date() });
-      
       // Return the token and user data (excluding password)
       return res.status(201).json({
         token,
@@ -112,9 +130,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           id: user.id,
           username: user.username,
           email: user.email,
-          role: user.role,
-          firstName: user.firstName,
-          lastName: user.lastName
+          role: user.role
         }
       });
     } catch (error) {
@@ -136,9 +152,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!authResult) {
         return res.status(401).json({ message: "Invalid username or password" });
       }
-      
-      // Update last login time
-      await storage.updateUser(authResult.user.id, { lastLogin: new Date() });
       
       return res.json(authResult);
     } catch (error) {
@@ -284,20 +297,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const userId = req.user.userId;
-      const { watchlist } = req.body;
       
-      if (!Array.isArray(watchlist)) {
-        return res.status(400).json({ message: "Watchlist must be an array" });
-      }
-      
-      // Update user's watchlist
-      const updatedUser = await storage.updateUser(userId, { watchlist });
-      
-      if (!updatedUser) {
-        return res.status(500).json({ message: "Failed to update watchlist" });
-      }
-      
-      return res.json({ watchlist: updatedUser.watchlist });
+      // Since we don't have watchlist in our user schema,
+      // we'll need to store this in a separate table or use settings
+      // For now, just return a success response
+      return res.json({ message: "Watchlist feature coming soon" });
     } catch (error) {
       console.error("Error updating watchlist:", error);
       return res.status(500).json({ message: "Failed to update watchlist" });
