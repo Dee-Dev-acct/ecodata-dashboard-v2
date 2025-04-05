@@ -25,7 +25,7 @@ const Contact = () => {
       toast({
         title: "Message sent!",
         description: "Thank you for your message. We'll get back to you soon.",
-        variant: "success",
+        variant: "default",
       });
       // Reset form
       setFormState({
@@ -214,9 +214,8 @@ const Contact = () => {
                 <i className="fas fa-map-marker-alt text-[#2A9D8F] mt-1 mr-3"></i>
                 <div>
                   <p className="dark:text-[#F4F1DE]">
-                    123 Sustainable Street<br />
-                    Eco Quarter<br />
-                    London, EC1A 1BB<br />
+                    128 City Road<br />
+                    London, EC1V 2NX<br />
                     United Kingdom
                   </p>
                 </div>

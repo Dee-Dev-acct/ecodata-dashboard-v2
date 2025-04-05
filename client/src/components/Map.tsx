@@ -8,18 +8,18 @@ const Map = () => {
 
   useEffect(() => {
     if (mapRef.current && !mapInstanceRef.current) {
-      // Create map
-      const map = L.map(mapRef.current).setView([51.505, -0.09], 13);
+      // Create map centered on ECODATA CIC's location
+      const map = L.map(mapRef.current).setView([51.5256, -0.0879], 15);
       
       // Add tile layer
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       }).addTo(map);
       
-      // Add marker for ECODATA CIC office (example location)
-      L.marker([51.505, -0.09])
+      // Add marker for ECODATA CIC office at 128 City Road, London
+      L.marker([51.5256, -0.0879])  // Coordinates for 128 City Road, London
         .addTo(map)
-        .bindPopup('ECODATA CIC<br>123 Sustainable Street')
+        .bindPopup('ECODATA CIC<br>128 City Road, London EC1V 2NX')
         .openPopup();
       
       mapInstanceRef.current = map;

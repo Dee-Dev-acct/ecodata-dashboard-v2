@@ -17,8 +17,9 @@ const Footer = () => {
             </p>
             <p className="text-sm text-gray-300">
               Registered in England & Wales<br />
-              Company No: 12345678<br />
-              ICO Registration: ZA123456
+              Company No: 16034410<br />
+              Registered Office: 128 City Road<br />
+              London, EC1V 2NX
             </p>
           </div>
           
