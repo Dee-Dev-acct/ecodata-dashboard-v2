@@ -22,6 +22,14 @@ interface FundingGoal {
   }[];
   icon: React.ReactNode;
   theme: 'default' | 'forest' | 'ocean' | 'sunset';
+  urgency?: 'low' | 'medium' | 'high' | 'critical';
+  daysRemaining?: number;
+  location?: string;
+  impact?: string;
+  coverImage?: string;
+  suggestedDonations?: number[];
+  iconName?: string;
+  featured?: boolean;
 }
 
 const FundingGoals: React.FC = () => {
@@ -91,11 +99,27 @@ const FundingGoals: React.FC = () => {
         };
       });
 
-      return {
-        ...goal,
+      // Create a properly typed object with all expected properties
+      const processedGoal: FundingGoal = {
+        id: goal.id,
+        title: goal.title,
+        description: goal.description,
+        currentAmount: goal.currentAmount,
+        targetAmount: goal.targetAmount,
         icon: goal.icon || icon,
-        milestones: processedMilestones
+        milestones: processedMilestones,
+        theme: goal.theme || 'default',
+        urgency: goal.urgency,
+        daysRemaining: goal.daysRemaining,
+        location: goal.location,
+        impact: goal.impact,
+        coverImage: goal.coverImage,
+        suggestedDonations: goal.suggestedDonations,
+        iconName: goal.iconName,
+        featured: goal.featured
       };
+      
+      return processedGoal;
     });
   };
 
@@ -160,6 +184,12 @@ const FundingGoals: React.FC = () => {
                 theme={goal.theme}
                 donateButtonText="Contribute to This Goal"
                 onDonateClick={() => handleDonateClick(goal)}
+                urgency={goal.urgency}
+                daysRemaining={goal.daysRemaining}
+                location={goal.location}
+                impact={goal.impact}
+                coverImage={goal.coverImage}
+                suggestedDonations={goal.suggestedDonations || [25, 50, 100, 250]}
               />
             </motion.div>
           ))}

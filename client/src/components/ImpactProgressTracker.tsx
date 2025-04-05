@@ -26,6 +26,12 @@ interface ImpactProgressTrackerProps {
   donateButtonText?: string;
   theme?: 'default' | 'forest' | 'ocean' | 'sunset';
   onDonateClick?: () => void;
+  urgency?: 'low' | 'medium' | 'high' | 'critical';
+  daysRemaining?: number;
+  location?: string;
+  impact?: string;
+  coverImage?: string;
+  suggestedDonations?: number[];
 }
 
 const ImpactProgressTracker: React.FC<ImpactProgressTrackerProps> = ({
@@ -39,6 +45,12 @@ const ImpactProgressTracker: React.FC<ImpactProgressTrackerProps> = ({
   donateButtonText = "Contribute",
   theme = 'default',
   onDonateClick,
+  urgency,
+  daysRemaining,
+  location,
+  impact,
+  coverImage,
+  suggestedDonations,
 }) => {
   const ref = useRef<HTMLDivElement>(null);
   const [inView, setInView] = useState(false);
@@ -134,17 +146,72 @@ const ImpactProgressTracker: React.FC<ImpactProgressTrackerProps> = ({
       className="w-full"
     >
       <Card className={`overflow-hidden ${currentTheme.cardGradient} border shadow-md`}>
-        <CardHeader>
+        {coverImage && (
+          <div className="relative w-full h-32 overflow-hidden">
+            <img 
+              src={coverImage} 
+              alt={title} 
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+            {location && (
+              <div className="absolute bottom-2 left-2 text-white text-sm flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                  <circle cx="12" cy="10" r="3"></circle>
+                </svg>
+                {location}
+              </div>
+            )}
+          </div>
+        )}
+        
+        <CardHeader className={coverImage ? 'pt-3' : ''}>
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-2">
               {icon && <div className={currentTheme.milestoneColor}>{icon}</div>}
-              <CardTitle>{title}</CardTitle>
+              <div>
+                <CardTitle>{title}</CardTitle>
+                {urgency && (
+                  <div className="flex items-center mt-1">
+                    {urgency === 'critical' && (
+                      <Badge variant="destructive" className="text-xs">Urgent: {daysRemaining} days left</Badge>
+                    )}
+                    {urgency === 'high' && (
+                      <Badge variant="destructive" className="text-xs bg-orange-500 hover:bg-orange-600">High Priority: {daysRemaining} days left</Badge>
+                    )}
+                    {urgency === 'medium' && (
+                      <Badge variant="outline" className="text-xs text-yellow-600 border-yellow-300 bg-yellow-50 dark:bg-yellow-900/20 dark:border-yellow-800 dark:text-yellow-400">
+                        {daysRemaining} days remaining
+                      </Badge>
+                    )}
+                    {urgency === 'low' && (
+                      <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <circle cx="12" cy="12" r="10"></circle>
+                          <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                        {daysRemaining} days remaining
+                      </span>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
             <Badge variant="outline" className="font-normal">
               {progressPercentage}% Complete
             </Badge>
           </div>
-          <CardDescription>{description}</CardDescription>
+          <CardDescription className="mt-2">{description}</CardDescription>
+          {impact && (
+            <div className="mt-2 text-sm flex items-start">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1 mt-0.5 text-emerald-500 dark:text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+              </svg>
+              <span className="text-gray-600 dark:text-gray-300">{impact}</span>
+            </div>
+          )}
         </CardHeader>
         
         <CardContent className="space-y-4">
@@ -271,14 +338,58 @@ const ImpactProgressTracker: React.FC<ImpactProgressTrackerProps> = ({
           </div>
         </CardContent>
         
-        <CardFooter>
+        <CardFooter className="flex flex-col space-y-4">
+          {suggestedDonations && suggestedDonations.length > 0 && (
+            <>
+              <div className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 text-center">
+                Suggested donations:
+              </div>
+              <div className="flex flex-wrap gap-2 justify-center">
+                {suggestedDonations.map((amount, idx) => (
+                  <Button 
+                    key={idx} 
+                    variant="outline" 
+                    size="sm" 
+                    className="rounded-full h-10 min-w-20"
+                    onClick={() => onDonateClick?.()}
+                  >
+                    {unit}{amount}
+                  </Button>
+                ))}
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="rounded-full h-10"
+                  onClick={() => onDonateClick?.()}
+                >
+                  Custom
+                </Button>
+              </div>
+              <div className="relative my-2">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t border-gray-200 dark:border-gray-700" />
+                </div>
+                <div className="relative flex justify-center text-xs">
+                  <span className="bg-white dark:bg-gray-900 px-2 text-gray-500 dark:text-gray-400">or</span>
+                </div>
+              </div>
+            </>
+          )}
+          
           <Button 
             onClick={onDonateClick} 
             className="w-full"
+            size="lg"
           >
             <Sparkles className="mr-2 h-4 w-4" />
             {donateButtonText}
           </Button>
+          
+          {urgency === 'critical' && (
+            <div className="text-xs text-red-500 dark:text-red-400 text-center mt-1 animate-pulse">
+              Only {daysRemaining} days left to reach our goal!
+            </div>
+          )}
         </CardFooter>
       </Card>
     </motion.div>

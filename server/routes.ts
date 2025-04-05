@@ -206,26 +206,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
           description: 'Help us fund data collection and analysis for reforestation projects',
           currentAmount: 3750,
           targetAmount: 10000,
+          urgency: 'medium', // Options: low, medium, high, critical
+          daysRemaining: 42,
+          featured: true,
+          location: 'Amazon Basin',
+          iconName: 'TreePine',
+          coverImage: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?q=80&w=1000',
+          impact: 'Track 50,000 trees across 10 reforestation sites with advanced data collection',
+          suggestedDonations: [25, 50, 100, 250],
           milestones: [
             {
               value: 2500,
               label: 'Monitoring Systems',
-              description: 'Fund initial data collection sensors for forest monitoring'
+              description: 'Fund initial data collection sensors for forest monitoring',
+              iconName: 'Leaf'
             },
             {
               value: 5000,
               label: 'Halfway Mark',
-              description: 'Enable expanded data analysis and visualization tools'
+              description: 'Enable expanded data analysis and visualization tools',
+              iconName: 'Target'
             },
             {
               value: 7500,
               label: 'Research Phase',
-              description: 'Launch comprehensive environmental impact assessment studies'
+              description: 'Launch comprehensive environmental impact assessment studies',
+              iconName: 'Award'
             },
             {
               value: 10000,
               label: 'Full Funding',
-              description: 'Complete implementation of the entire data-driven reforestation monitoring system'
+              description: 'Complete implementation of the entire data-driven reforestation monitoring system',
+              iconName: 'Trophy'
             }
           ],
           theme: 'forest'
@@ -236,31 +248,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
           description: 'Support our initiative to build a network of water quality sensors across key waterways',
           currentAmount: 8200,
           targetAmount: 15000,
+          urgency: 'high',
+          daysRemaining: 21,
+          featured: true,
+          location: 'Thames River Basin',
+          iconName: 'Droplets',
+          coverImage: 'https://images.unsplash.com/photo-1581022295087-35e593bcc689?q=80&w=1000',
+          impact: 'Monitor water quality for 3 million residents with real-time data alerts',
+          suggestedDonations: [50, 150, 300, 750],
           milestones: [
             {
               value: 3000,
               label: 'Initial Sensors',
-              description: 'Deploy the first batch of water quality monitoring sensors'
+              description: 'Deploy the first batch of water quality monitoring sensors',
+              iconName: 'Leaf'
             },
             {
               value: 6000,
               label: 'Data Platform',
-              description: 'Develop the data collection and analysis platform'
+              description: 'Develop the data collection and analysis platform',
+              iconName: 'Target'
             },
             {
               value: 9000,
               label: 'Network Expansion',
-              description: 'Expand the sensor network to additional waterways'
+              description: 'Expand the sensor network to additional waterways',
+              iconName: 'Award'
             },
             {
               value: 12000,
               label: 'Community Engagement',
-              description: 'Launch community science program for participatory data collection'
+              description: 'Launch community science program for participatory data collection',
+              iconName: 'Users'
             },
             {
               value: 15000,
               label: 'Full Coverage',
-              description: 'Achieve full regional coverage and real-time monitoring capabilities'
+              description: 'Achieve full regional coverage and real-time monitoring capabilities',
+              iconName: 'Trophy'
             }
           ],
           theme: 'ocean'
@@ -271,29 +296,83 @@ export async function registerRoutes(app: Express): Promise<Server> {
           description: 'Fund our community-focused data collection and impact assessment projects',
           currentAmount: 4500,
           targetAmount: 8000,
+          urgency: 'critical',
+          daysRemaining: 14,
+          featured: false,
+          location: 'London Metropolitan Area',
+          iconName: 'Users',
+          coverImage: 'https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?q=80&w=1000',
+          impact: 'Provide data-driven insights to 25 community organizations serving 100,000 people',
+          suggestedDonations: [20, 50, 100, 200],
           milestones: [
             {
               value: 2000,
               label: 'Research Tools',
-              description: 'Develop community impact assessment methodologies and tools'
+              description: 'Develop community impact assessment methodologies and tools',
+              iconName: 'Leaf'
             },
             {
               value: 4000,
               label: 'Data Collection',
-              description: 'Implement initial community data collection projects'
+              description: 'Implement initial community data collection projects',
+              iconName: 'Target'
             },
             {
               value: 6000,
               label: 'Analysis Framework',
-              description: 'Build comprehensive analytics framework for social impact data'
+              description: 'Build comprehensive analytics framework for social impact data',
+              iconName: 'Award'
             },
             {
               value: 8000,
               label: 'Full Implementation',
-              description: 'Complete the community impact measurement system and dashboards'
+              description: 'Complete the community impact measurement system and dashboards',
+              iconName: 'Trophy'
             }
           ],
           theme: 'sunset'
+        },
+        {
+          id: 'carbon-tracking',
+          title: 'Carbon Impact Monitoring System',
+          description: 'Help build our next-generation carbon impact monitoring and verification platform',
+          currentAmount: 2200,
+          targetAmount: 12000,
+          urgency: 'medium',
+          daysRemaining: 60,
+          featured: true,
+          location: 'Global Initiative',
+          iconName: 'Wind',
+          coverImage: 'https://images.unsplash.com/photo-1523961131990-5ea7c61b2107?q=80&w=1000',
+          impact: 'Enable precise carbon impact measurement across 500 environmental projects',
+          suggestedDonations: [100, 250, 500, 1000],
+          milestones: [
+            {
+              value: 3000,
+              label: 'Data Architecture',
+              description: 'Develop the core data architecture and collection methodology',
+              iconName: 'Database'
+            },
+            {
+              value: 6000,
+              label: 'Sensor Network',
+              description: 'Deploy initial sensor network and data collection systems',
+              iconName: 'Signal'
+            },
+            {
+              value: 9000,
+              label: 'Analytics Platform',
+              description: 'Build comprehensive analytics and visualization platform',
+              iconName: 'BarChart'
+            },
+            {
+              value: 12000,
+              label: 'Verification System',
+              description: 'Complete the carbon impact verification and certification system',
+              iconName: 'CheckCircle'
+            }
+          ],
+          theme: 'default'
         }
       ];
       
