@@ -3,6 +3,7 @@ import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { useMSSQL, mssqlClient } from "./db";
 import { initializeMSSQLDatabase } from "./mssql-helper";
+import { seedAllData } from "./seed-data";
 
 const app = express();
 app.use(express.json());
@@ -93,5 +94,10 @@ app.use((req, res, next) => {
     reusePort: true,
   }, () => {
     log(`serving on port ${port}`);
+    
+    // Seed initial data for the database
+    seedAllData().catch(err => {
+      log(`Error seeding data: ${err}`);
+    });
   });
 })();

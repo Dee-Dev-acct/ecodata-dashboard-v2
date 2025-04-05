@@ -125,6 +125,7 @@ export class MemStorage implements IStorage {
     this.impactMetrics = new Map();
     this.blogPosts = new Map();
     this.settings = new Map();
+    this.partners = new Map();
     
     this.currentUserId = 1;
     this.currentContactMessageId = 1;
@@ -134,6 +135,7 @@ export class MemStorage implements IStorage {
     this.currentImpactMetricId = 1;
     this.currentBlogPostId = 1;
     this.currentSettingId = 1;
+    this.currentPartnerId = 1;
     
     // Initialize with sample data
     this.initializeData();
@@ -148,6 +150,48 @@ export class MemStorage implements IStorage {
       role: "admin"
     };
     this.createUser(adminUser);
+    
+    // Add tech partner logos based on user-provided examples
+    const partners = [
+      {
+        name: "IBM",
+        logoUrl: "https://upload.wikimedia.org/wikipedia/commons/5/51/IBM_logo.svg",
+        websiteUrl: "https://www.ibm.com",
+        category: "technology"
+      },
+      {
+        name: "Google",
+        logoUrl: "https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg",
+        websiteUrl: "https://www.google.com",
+        category: "technology"
+      },
+      {
+        name: "Microsoft",
+        logoUrl: "https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg",
+        websiteUrl: "https://www.microsoft.com",
+        category: "technology"
+      },
+      {
+        name: "Amazon Web Services",
+        logoUrl: "https://upload.wikimedia.org/wikipedia/commons/9/93/Amazon_Web_Services_Logo.svg",
+        websiteUrl: "https://aws.amazon.com",
+        category: "technology"
+      },
+      {
+        name: "Intel",
+        logoUrl: "https://upload.wikimedia.org/wikipedia/commons/7/7d/Intel_logo_%282006-2020%29.svg",
+        websiteUrl: "https://www.intel.com",
+        category: "technology"
+      },
+      {
+        name: "NVIDIA",
+        logoUrl: "https://upload.wikimedia.org/wikipedia/commons/2/21/Nvidia_logo.svg",
+        websiteUrl: "https://www.nvidia.com",
+        category: "technology"
+      }
+    ];
+    
+    partners.forEach(partner => this.createPartner(partner));
     
     // Add authentic services from company website
     const services = [
@@ -702,6 +746,55 @@ export class MemStorage implements IStorage {
   async deleteSetting(id: number): Promise<boolean> {
     return this.settings.delete(id);
   }
+
+  // Partners
+  async getPartners(): Promise<Partner[]> {
+    return Array.from(this.partners.values());
+  }
+
+  async getPartner(id: number): Promise<Partner | undefined> {
+    return this.partners.get(id);
+  }
+
+  async createPartner(partner: InsertPartner): Promise<Partner> {
+    const id = this.currentPartnerId++;
+    const newPartner: Partner = {
+      id,
+      name: partner.name,
+      logoUrl: partner.logoUrl,
+      websiteUrl: partner.websiteUrl ?? null,
+      category: partner.category || "technology", // Default to "technology" if not provided
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.partners.set(id, newPartner);
+    return newPartner;
+  }
+
+  async updatePartner(id: number, partner: Partial<InsertPartner>): Promise<Partner | undefined> {
+    const existingPartner = this.partners.get(id);
+    
+    if (!existingPartner) {
+      return undefined;
+    }
+    
+    // Create a properly typed updated partner object
+    const updatedPartner: Partner = {
+      ...existingPartner,
+      name: partner.name ?? existingPartner.name,
+      logoUrl: partner.logoUrl ?? existingPartner.logoUrl,
+      websiteUrl: partner.websiteUrl !== undefined ? partner.websiteUrl : existingPartner.websiteUrl,
+      category: partner.category ?? existingPartner.category,
+      updatedAt: new Date()
+    };
+    
+    this.partners.set(id, updatedPartner);
+    return updatedPartner;
+  }
+
+  async deletePartner(id: number): Promise<boolean> {
+    return this.partners.delete(id);
+  }
 }
 
 export class DatabaseStorage implements IStorage {
@@ -941,6 +1034,36 @@ export class DatabaseStorage implements IStorage {
 
   async deleteSetting(id: number): Promise<boolean> {
     const result = await db.delete(settings).where(eq(settings.id, id));
+    return result.count > 0;
+  }
+
+  // Partners
+  async getPartners(): Promise<Partner[]> {
+    return db.select().from(partners);
+  }
+
+  async getPartner(id: number): Promise<Partner | undefined> {
+    const [partner] = await db.select().from(partners).where(eq(partners.id, id));
+    return partner || undefined;
+  }
+
+  async createPartner(insertPartner: InsertPartner): Promise<Partner> {
+    const [partner] = await db.insert(partners).values(insertPartner).returning();
+    return partner;
+  }
+
+  async updatePartner(id: number, partnerUpdate: Partial<InsertPartner>): Promise<Partner | undefined> {
+    const now = new Date();
+    const [partner] = await db
+      .update(partners)
+      .set({ ...partnerUpdate, updatedAt: now })
+      .where(eq(partners.id, id))
+      .returning();
+    return partner || undefined;
+  }
+
+  async deletePartner(id: number): Promise<boolean> {
+    const result = await db.delete(partners).where(eq(partners.id, id));
     return result.count > 0;
   }
 }
