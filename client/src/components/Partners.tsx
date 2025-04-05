@@ -113,7 +113,8 @@ const Partners = () => {
                     <img 
                       src={partner.logoUrl} 
                       alt={`${partner.name} logo`} 
-                      className="max-h-20 max-w-full object-contain filter hover:brightness-110 transition-all" 
+                      className="h-16 w-auto object-contain filter hover:brightness-110 transition-all" 
+                      style={{ maxWidth: '100%', objectFit: 'contain' }}
                     />
                   </a>
                 </CardContent>
@@ -138,7 +139,8 @@ const Partners = () => {
                           <img 
                             src={partner.logoUrl} 
                             alt={`${partner.name} logo`} 
-                            className="max-h-20 max-w-full object-contain" 
+                            className="h-16 w-auto object-contain filter hover:brightness-110 transition-all" 
+                            style={{ maxWidth: '100%', objectFit: 'contain' }}
                           />
                         </a>
                       </CardContent>
