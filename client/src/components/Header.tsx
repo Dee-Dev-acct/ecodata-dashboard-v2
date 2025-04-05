@@ -24,12 +24,12 @@ const Header = () => {
         
         {/* Desktop Navigation */}
         <nav className="hidden md:flex space-x-8">
-          <a 
-            href="#services" 
+          <Link 
+            href="/" 
             className="font-medium hover:text-[#2A9D8F] dark:text-[#F4F1DE] dark:hover:text-[#38B593] transition-colors"
           >
-            Services
-          </a>
+            Home
+          </Link>
           <a 
             href="#about" 
             className="font-medium hover:text-[#2A9D8F] dark:text-[#F4F1DE] dark:hover:text-[#38B593] transition-colors"
@@ -37,10 +37,10 @@ const Header = () => {
             About
           </a>
           <a 
-            href="#impact" 
+            href="#services" 
             className="font-medium hover:text-[#2A9D8F] dark:text-[#F4F1DE] dark:hover:text-[#38B593] transition-colors"
           >
-            Impact
+            Services
           </a>
           <a 
             href="#technology" 
@@ -49,10 +49,10 @@ const Header = () => {
             Technology
           </a>
           <a 
-            href="#contact" 
+            href="#impact" 
             className="font-medium hover:text-[#2A9D8F] dark:text-[#F4F1DE] dark:hover:text-[#38B593] transition-colors"
           >
-            Contact
+            Impact
           </a>
           <Link 
             href="/blog" 
@@ -60,6 +60,12 @@ const Header = () => {
           >
             Blog
           </Link>
+          <a 
+            href="#contact" 
+            className="font-medium hover:text-[#2A9D8F] dark:text-[#F4F1DE] dark:hover:text-[#38B593] transition-colors"
+          >
+            Contact
+          </a>
           <Link 
             href="/spinner-demo" 
             className="font-medium hover:text-[#2A9D8F] dark:text-[#F4F1DE] dark:hover:text-[#38B593] transition-colors"
@@ -94,13 +100,13 @@ const Header = () => {
       <div className={`md:hidden ${mobileMenuOpen ? 'block' : 'hidden'} bg-white dark:bg-[#264653] shadow-lg absolute w-full`}>
         <div className="container mx-auto px-4 py-3">
           <nav className="flex flex-col space-y-3">
-            <a 
-              href="#services" 
+            <Link 
+              href="/" 
               onClick={() => setMobileMenuOpen(false)}
               className="py-2 px-4 hover:bg-[#F4F1DE] dark:hover:bg-[#1A323C] dark:text-white rounded transition-colors"
             >
-              Services
-            </a>
+              Home
+            </Link>
             <a 
               href="#about" 
               onClick={() => setMobileMenuOpen(false)}
@@ -109,11 +115,11 @@ const Header = () => {
               About
             </a>
             <a 
-              href="#impact" 
+              href="#services" 
               onClick={() => setMobileMenuOpen(false)}
               className="py-2 px-4 hover:bg-[#F4F1DE] dark:hover:bg-[#1A323C] dark:text-white rounded transition-colors"
             >
-              Impact
+              Services
             </a>
             <a 
               href="#technology" 
@@ -123,11 +129,11 @@ const Header = () => {
               Technology
             </a>
             <a 
-              href="#contact" 
+              href="#impact" 
               onClick={() => setMobileMenuOpen(false)}
               className="py-2 px-4 hover:bg-[#F4F1DE] dark:hover:bg-[#1A323C] dark:text-white rounded transition-colors"
             >
-              Contact
+              Impact
             </a>
             <Link 
               href="/blog" 
@@ -136,6 +142,13 @@ const Header = () => {
             >
               Blog
             </Link>
+            <a 
+              href="#contact" 
+              onClick={() => setMobileMenuOpen(false)}
+              className="py-2 px-4 hover:bg-[#F4F1DE] dark:hover:bg-[#1A323C] dark:text-white rounded transition-colors"
+            >
+              Contact
+            </a>
             <Link 
               href="/spinner-demo" 
               onClick={() => setMobileMenuOpen(false)}
