@@ -36,6 +36,8 @@ export interface MSSQLNewsletterSubscriber {
   id: number;
   email: string;
   consent: boolean;
+  subscription_tier: string; // Basic, Professional, Research
+  interests: string; // Stored as JSON string in SQL Server
   created_at: Date;
 }
 
@@ -153,12 +155,16 @@ export const newsletterSubscribers = pgTable("newsletter_subscribers", {
   id: serial("id").primaryKey(),
   email: text("email").notNull().unique(),
   consent: boolean("consent").notNull(),
+  subscriptionTier: text("subscription_tier").notNull().default("basic"),
+  interests: text("interests").array(),
   createdAt: timestamp("created_at").defaultNow()
 });
 
 export const insertNewsletterSubscriberSchema = createInsertSchema(newsletterSubscribers).pick({
   email: true,
-  consent: true
+  consent: true,
+  subscriptionTier: true,
+  interests: true
 });
 
 // Services schema

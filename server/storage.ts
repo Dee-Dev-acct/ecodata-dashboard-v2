@@ -859,7 +859,14 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createNewsletterSubscriber(insertSubscriber: InsertNewsletterSubscriber): Promise<NewsletterSubscriber> {
-    const [subscriber] = await db.insert(newsletterSubscribers).values(insertSubscriber).returning();
+    // Set default values if not provided
+    const subscriberData = {
+      ...insertSubscriber,
+      subscriptionTier: insertSubscriber.subscriptionTier || "basic",
+      interests: insertSubscriber.interests || []
+    };
+    
+    const [subscriber] = await db.insert(newsletterSubscribers).values(subscriberData).returning();
     return subscriber;
   }
 

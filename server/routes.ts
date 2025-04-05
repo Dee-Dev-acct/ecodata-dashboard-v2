@@ -111,8 +111,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "This email is already subscribed" });
       }
       
+      // Format and handle subscription data
+      const subscriptionData = {
+        ...result.data,
+        subscriptionTier: result.data.subscriptionTier || "basic", // Default to basic if not specified
+        interests: result.data.interests || [] // Default to empty array if not specified
+      };
+      
       // Create newsletter subscriber
-      const subscriber = await storage.createNewsletterSubscriber(result.data);
+      const subscriber = await storage.createNewsletterSubscriber(subscriptionData);
       
       // Send confirmation emails
       sendNewsletterConfirmation(subscriber);
