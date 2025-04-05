@@ -10,6 +10,8 @@ import {
   partners, type Partner, type InsertPartner,
   donations, type Donation, type InsertDonation,
   subscriptions, type Subscription, type InsertSubscription,
+  projectProposals, type ProjectProposal, type InsertProjectProposal,
+  userActivityLogs, type UserActivityLog, type InsertUserActivityLog,
   // MSSQL schemas
   type MSSQLUser,
   type MSSQLContactMessage,
@@ -36,7 +38,21 @@ export interface IStorage {
   // User management
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
+  getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  updateUser(id: number, user: Partial<InsertUser>): Promise<User | undefined>;
+  updateUserStripeInfo(id: number, stripeInfo: { stripeCustomerId: string, stripeSubscriptionId?: string }): Promise<User | undefined>;
+  
+  // User Activity Logs
+  getUserActivityLogs(userId: number): Promise<UserActivityLog[]>;
+  createUserActivityLog(log: InsertUserActivityLog): Promise<UserActivityLog>;
+  
+  // Project Proposals
+  getProjectProposals(userId?: number): Promise<ProjectProposal[]>;
+  getProjectProposal(id: number): Promise<ProjectProposal | undefined>;
+  createProjectProposal(proposal: InsertProjectProposal): Promise<ProjectProposal>;
+  updateProjectProposal(id: number, proposal: Partial<InsertProjectProposal>): Promise<ProjectProposal | undefined>;
+  deleteProjectProposal(id: number): Promise<boolean>;
   
   // Contact messages
   getContactMessages(): Promise<ContactMessage[]>;
@@ -99,6 +115,7 @@ export interface IStorage {
   // Donations
   getDonations(): Promise<Donation[]>;
   getDonationsByEmail(email: string): Promise<Donation[]>;
+  getDonationsByUserId(userId: number): Promise<Donation[]>;
   getDonation(id: number): Promise<Donation | undefined>;
   createDonation(donation: InsertDonation): Promise<Donation>;
   updateDonationStatus(id: number, status: string): Promise<Donation | undefined>;
@@ -106,6 +123,7 @@ export interface IStorage {
   // Subscriptions
   getSubscriptions(): Promise<Subscription[]>;
   getSubscriptionsByEmail(email: string): Promise<Subscription[]>;
+  getSubscriptionsByUserId(userId: number): Promise<Subscription[]>;
   getSubscription(id: number): Promise<Subscription | undefined>;
   getSubscriptionByStripeId(stripeSubscriptionId: string): Promise<Subscription | undefined>;
   createSubscription(subscription: InsertSubscription): Promise<Subscription>;
@@ -125,6 +143,8 @@ export class MemStorage implements IStorage {
   private partners: Map<number, Partner>;
   private donations: Map<number, Donation>;
   private subscriptions: Map<number, Subscription>;
+  private _projectProposals: Map<number, ProjectProposal>;
+  private _userActivityLogs: Map<number, UserActivityLog>;
   
   private currentUserId: number;
   private currentContactMessageId: number;
@@ -137,6 +157,8 @@ export class MemStorage implements IStorage {
   private currentPartnerId: number;
   private currentDonationId: number;
   private currentSubscriptionId: number;
+  private _currentProjectProposalId: number;
+  private _currentUserActivityLogId: number;
 
   constructor() {
     this.users = new Map();
@@ -150,6 +172,8 @@ export class MemStorage implements IStorage {
     this.partners = new Map();
     this.donations = new Map();
     this.subscriptions = new Map();
+    this._projectProposals = new Map();
+    this._userActivityLogs = new Map();
     
     this.currentUserId = 1;
     this.currentContactMessageId = 1;
@@ -162,6 +186,8 @@ export class MemStorage implements IStorage {
     this.currentPartnerId = 1;
     this.currentDonationId = 1;
     this.currentSubscriptionId = 1;
+    this._currentProjectProposalId = 1;
+    this._currentUserActivityLogId = 1;
     
     // Initialize with sample data
     this.initializeData();
@@ -453,6 +479,12 @@ export class MemStorage implements IStorage {
       (user) => user.username === username,
     );
   }
+  
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    return Array.from(this.users.values()).find(
+      (user) => user.email === email,
+    );
+  }
 
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = this.currentUserId++;
@@ -462,9 +494,55 @@ export class MemStorage implements IStorage {
       ...insertUser,
       role: insertUser.role || "user" // Default to "user" if role is not provided
     };
-    const user: User = { ...userWithRole, id, createdAt: now };
+    const user: User = { 
+      ...userWithRole, 
+      id, 
+      firstName: null,
+      lastName: null,
+      profileImage: null,
+      bio: null,
+      interests: null,
+      watchlist: null,
+      notificationsEnabled: true,
+      stripeCustomerId: null,
+      lastLogin: null,
+      isEmailVerified: false,
+      verificationToken: null,
+      resetPasswordToken: null,
+      resetPasswordExpires: null,
+      createdAt: now,
+      updatedAt: now
+    };
     this.users.set(id, user);
     return user;
+  }
+  
+  async updateUser(id: number, userData: Partial<InsertUser>): Promise<User | undefined> {
+    const user = this.users.get(id);
+    if (!user) return undefined;
+    
+    const updatedUser: User = {
+      ...user,
+      ...userData,
+      updatedAt: new Date()
+    };
+    
+    this.users.set(id, updatedUser);
+    return updatedUser;
+  }
+  
+  async updateUserStripeInfo(id: number, stripeInfo: { stripeCustomerId: string, stripeSubscriptionId?: string }): Promise<User | undefined> {
+    const user = this.users.get(id);
+    if (!user) return undefined;
+    
+    const updatedUser: User = {
+      ...user,
+      stripeCustomerId: stripeInfo.stripeCustomerId,
+      updatedAt: new Date()
+    };
+    
+    this.users.set(id, updatedUser);
+    return updatedUser;
   }
 
   // Contact Messages
@@ -836,6 +914,12 @@ export class MemStorage implements IStorage {
     );
   }
   
+  async getDonationsByUserId(userId: number): Promise<Donation[]> {
+    return Array.from(this.donations.values()).filter(
+      donation => donation.userId === userId
+    );
+  }
+  
   async getDonation(id: number): Promise<Donation | undefined> {
     return this.donations.get(id);
   }
@@ -843,8 +927,10 @@ export class MemStorage implements IStorage {
   async createDonation(donation: InsertDonation): Promise<Donation> {
     const newDonation: Donation = {
       id: this.currentDonationId++,
+      userId: donation.userId || null,
       name: donation.name ?? null,
       email: donation.email,
+      fundingGoalId: donation.fundingGoalId || null,
       createdAt: new Date(),
       status: donation.status || 'completed',
       amount: donation.amount,
@@ -886,6 +972,12 @@ export class MemStorage implements IStorage {
     );
   }
   
+  async getSubscriptionsByUserId(userId: number): Promise<Subscription[]> {
+    return Array.from(this.subscriptions.values()).filter(
+      subscription => subscription.userId === userId
+    );
+  }
+  
   async getSubscription(id: number): Promise<Subscription | undefined> {
     return this.subscriptions.get(id);
   }
@@ -899,6 +991,7 @@ export class MemStorage implements IStorage {
   async createSubscription(subscription: InsertSubscription): Promise<Subscription> {
     const newSubscription: Subscription = {
       id: this.currentSubscriptionId++,
+      userId: subscription.userId || null,
       name: subscription.name ?? null,
       email: subscription.email,
       stripeCustomerId: subscription.stripeCustomerId,
@@ -906,6 +999,7 @@ export class MemStorage implements IStorage {
       amount: subscription.amount,
       currency: subscription.currency || 'gbp',
       interval: subscription.interval,
+      tier: subscription.tier || 'standard',
       status: subscription.status || 'active',
       isGiftAid: subscription.isGiftAid || false,
       giftAidName: subscription.giftAidName ?? null,
@@ -951,9 +1045,153 @@ export class MemStorage implements IStorage {
     this.subscriptions.set(id, updatedSubscription);
     return updatedSubscription;
   }
+
+  // User Activity Logs
+  // These properties are moved to the class level declaration
+
+  async getUserActivityLogs(userId: number): Promise<UserActivityLog[]> {
+    return Array.from(this._userActivityLogs.values())
+      .filter(log => log.userId === userId)
+      .sort((a, b) => {
+        const dateA = a.createdAt instanceof Date ? a.createdAt.getTime() : 0;
+        const dateB = b.createdAt instanceof Date ? b.createdAt.getTime() : 0;
+        return dateB - dateA;
+      });
+  }
+
+  async createUserActivityLog(activityLog: InsertUserActivityLog): Promise<UserActivityLog> {
+    const id = this._currentUserActivityLogId++;
+    const now = new Date();
+    const log: UserActivityLog = {
+      id,
+      userId: activityLog.userId,
+      action: activityLog.action,
+      details: activityLog.details || {},
+      ipAddress: activityLog.ipAddress || null,
+      userAgent: activityLog.userAgent || null,
+      createdAt: now
+    };
+    this._userActivityLogs.set(id, log);
+    return log;
+  }
+
+  // Project Proposals
+  // These properties are moved to the class level declaration
+
+  async getProjectProposals(userId?: number): Promise<ProjectProposal[]> {
+    let proposals = Array.from(this._projectProposals.values());
+    
+    if (userId !== undefined) {
+      proposals = proposals.filter(proposal => proposal.userId === userId);
+    }
+    
+    return proposals.sort((a, b) => {
+      const dateA = a.createdAt instanceof Date ? a.createdAt.getTime() : 0;
+      const dateB = b.createdAt instanceof Date ? b.createdAt.getTime() : 0;
+      return dateB - dateA;
+    });
+  }
+
+  async getProjectProposal(id: number): Promise<ProjectProposal | undefined> {
+    return this._projectProposals.get(id);
+  }
+
+  async createProjectProposal(proposal: InsertProjectProposal): Promise<ProjectProposal> {
+    const id = this._currentProjectProposalId++;
+    const now = new Date();
+    const newProposal: ProjectProposal = {
+      id,
+      userId: proposal.userId,
+      title: proposal.title,
+      description: proposal.description,
+      category: proposal.category,
+      fundingNeeded: proposal.fundingNeeded || null,
+      location: proposal.location || null,
+      timeline: proposal.timeline || null,
+      goals: proposal.goals || null,
+      impact: proposal.impact || null,
+      status: proposal.status || 'pending',
+      attachments: proposal.attachments || [],
+      adminNotes: null,
+      createdAt: now,
+      updatedAt: now
+    };
+    this._projectProposals.set(id, newProposal);
+    return newProposal;
+  }
+
+  async updateProjectProposal(id: number, proposalUpdate: Partial<InsertProjectProposal>): Promise<ProjectProposal | undefined> {
+    const proposal = this._projectProposals.get(id);
+    if (!proposal) return undefined;
+    
+    const now = new Date();
+    const updatedProposal = { 
+      ...proposal, 
+      ...proposalUpdate,
+      updatedAt: now
+    };
+    this._projectProposals.set(id, updatedProposal);
+    return updatedProposal;
+  }
+
+  async deleteProjectProposal(id: number): Promise<boolean> {
+    return this._projectProposals.delete(id);
+  }
 }
 
 export class DatabaseStorage implements IStorage {
+  // User Activity Logs
+  async getUserActivityLogs(userId: number): Promise<UserActivityLog[]> {
+    return db.select()
+      .from(userActivityLogs)
+      .where(eq(userActivityLogs.userId, userId))
+      .orderBy(desc(userActivityLogs.createdAt));
+  }
+
+  async createUserActivityLog(log: InsertUserActivityLog): Promise<UserActivityLog> {
+    const [activityLog] = await db.insert(userActivityLogs).values(log).returning();
+    return activityLog;
+  }
+  
+  // Project Proposals
+  async getProjectProposals(userId?: number): Promise<ProjectProposal[]> {
+    let query = db.select().from(projectProposals);
+    
+    if (userId !== undefined) {
+      query = query.where(eq(projectProposals.userId, userId));
+    }
+    
+    return query.orderBy(desc(projectProposals.createdAt));
+  }
+  
+  async getProjectProposal(id: number): Promise<ProjectProposal | undefined> {
+    const [proposal] = await db
+      .select()
+      .from(projectProposals)
+      .where(eq(projectProposals.id, id));
+    return proposal || undefined;
+  }
+  
+  async createProjectProposal(proposalData: InsertProjectProposal): Promise<ProjectProposal> {
+    const [proposal] = await db.insert(projectProposals).values(proposalData).returning();
+    return proposal;
+  }
+  
+  async updateProjectProposal(id: number, proposalUpdate: Partial<InsertProjectProposal>): Promise<ProjectProposal | undefined> {
+    const now = new Date();
+    const [proposal] = await db
+      .update(projectProposals)
+      .set({ ...proposalUpdate, updatedAt: now })
+      .where(eq(projectProposals.id, id))
+      .returning();
+    return proposal || undefined;
+  }
+  
+  async deleteProjectProposal(id: number): Promise<boolean> {
+    const result = await db.delete(projectProposals).where(eq(projectProposals.id, id));
+    return result.count > 0;
+  }
+  
   // User Management
   async getUser(id: number): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.id, id));
@@ -964,10 +1202,38 @@ export class DatabaseStorage implements IStorage {
     const [user] = await db.select().from(users).where(eq(users.username, username));
     return user || undefined;
   }
+  
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.email, email));
+    return user || undefined;
+  }
 
   async createUser(insertUser: InsertUser): Promise<User> {
     const [user] = await db.insert(users).values(insertUser).returning();
     return user;
+  }
+  
+  async updateUser(id: number, userData: Partial<InsertUser>): Promise<User | undefined> {
+    const now = new Date();
+    const [user] = await db
+      .update(users)
+      .set({ ...userData, updatedAt: now })
+      .where(eq(users.id, id))
+      .returning();
+    return user || undefined;
+  }
+  
+  async updateUserStripeInfo(id: number, stripeInfo: { stripeCustomerId: string, stripeSubscriptionId?: string }): Promise<User | undefined> {
+    const now = new Date();
+    const [user] = await db
+      .update(users)
+      .set({ 
+        stripeCustomerId: stripeInfo.stripeCustomerId,
+        updatedAt: now 
+      })
+      .where(eq(users.id, id))
+      .returning();
+    return user || undefined;
   }
 
   // Contact Messages
@@ -1242,6 +1508,13 @@ export class DatabaseStorage implements IStorage {
       .orderBy(desc(donations.createdAt));
   }
   
+  async getDonationsByUserId(userId: number): Promise<Donation[]> {
+    return db.select()
+      .from(donations)
+      .where(eq(donations.userId, userId))
+      .orderBy(desc(donations.createdAt));
+  }
+  
   async getDonation(id: number): Promise<Donation | undefined> {
     const [donation] = await db.select().from(donations).where(eq(donations.id, id));
     return donation || undefined;
@@ -1270,6 +1543,13 @@ export class DatabaseStorage implements IStorage {
     return db.select()
       .from(subscriptions)
       .where(eq(subscriptions.email, email))
+      .orderBy(desc(subscriptions.createdAt));
+  }
+  
+  async getSubscriptionsByUserId(userId: number): Promise<Subscription[]> {
+    return db.select()
+      .from(subscriptions)
+      .where(eq(subscriptions.userId, userId))
       .orderBy(desc(subscriptions.createdAt));
   }
   

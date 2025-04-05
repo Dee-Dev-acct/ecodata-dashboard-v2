@@ -118,16 +118,37 @@ export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
-  email: text("email").notNull(),
+  email: text("email").notNull().unique(),
+  firstName: text("first_name"),
+  lastName: text("last_name"),
   role: text("role").notNull().default("user"),
-  createdAt: timestamp("created_at").defaultNow()
+  profileImage: text("profile_image"),
+  bio: text("bio"),
+  interests: text("interests").array(),
+  watchlist: text("watchlist").array(),
+  notificationsEnabled: boolean("notifications_enabled").default(true),
+  stripeCustomerId: text("stripe_customer_id"), // For recurring donations and payment info
+  lastLogin: timestamp("last_login"),
+  isEmailVerified: boolean("is_email_verified").default(false),
+  verificationToken: text("verification_token"),
+  resetPasswordToken: text("reset_password_token"),
+  resetPasswordExpires: timestamp("reset_password_expires"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
 });
 
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
   password: true,
   email: true,
-  role: true
+  firstName: true,
+  lastName: true,
+  role: true,
+  profileImage: true,
+  bio: true,
+  interests: true,
+  watchlist: true,
+  notificationsEnabled: true
 });
 
 // Contact messages schema
@@ -291,10 +312,12 @@ export const insertPartnerSchema = createInsertSchema(partners).pick({
 // Donations schema
 export const donations = pgTable("donations", {
   id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id), // Optional - for logged in users
   amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
   currency: text("currency").notNull().default("gbp"),
   email: text("email").notNull(),
   name: text("name"),
+  fundingGoalId: text("funding_goal_id"), // Associated funding goal if any
   stripePaymentId: text("stripe_payment_id").notNull(),
   stripeSessionId: text("stripe_session_id").notNull(),
   status: text("status").notNull().default("completed"),
@@ -307,10 +330,12 @@ export const donations = pgTable("donations", {
 });
 
 export const insertDonationSchema = createInsertSchema(donations).pick({
+  userId: true,
   amount: true,
   currency: true,
   email: true,
   name: true,
+  fundingGoalId: true,
   stripePaymentId: true,
   stripeSessionId: true,
   status: true,
@@ -324,6 +349,7 @@ export const insertDonationSchema = createInsertSchema(donations).pick({
 // Subscription Donations schema
 export const subscriptions = pgTable("subscriptions", {
   id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id), // Optional - for logged in users
   email: text("email").notNull(),
   name: text("name"),
   stripeCustomerId: text("stripe_customer_id").notNull(),
@@ -331,6 +357,7 @@ export const subscriptions = pgTable("subscriptions", {
   amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
   currency: text("currency").notNull().default("gbp"),
   interval: text("interval").notNull(), // 'month' or 'year'
+  tier: text("tier").default("standard"), // tier level of subscription
   status: text("status").notNull().default("active"),
   isGiftAid: boolean("is_gift_aid").notNull().default(false),
   giftAidName: text("gift_aid_name"),
@@ -344,6 +371,7 @@ export const subscriptions = pgTable("subscriptions", {
 });
 
 export const insertSubscriptionSchema = createInsertSchema(subscriptions).pick({
+  userId: true,
   email: true,
   name: true,
   stripeCustomerId: true,
@@ -351,6 +379,7 @@ export const insertSubscriptionSchema = createInsertSchema(subscriptions).pick({
   amount: true,
   currency: true,
   interval: true,
+  tier: true,
   status: true,
   isGiftAid: true,
   giftAidName: true,
@@ -394,14 +423,104 @@ export type InsertDonation = z.infer<typeof insertDonationSchema>;
 export type Subscription = typeof subscriptions.$inferSelect;
 export type InsertSubscription = z.infer<typeof insertSubscriptionSchema>;
 
+// Project Proposal schema
+export const projectProposals = pgTable("project_proposals", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  category: text("category").notNull(),
+  fundingNeeded: decimal("funding_needed", { precision: 10, scale: 2 }),
+  location: text("location"),
+  timeline: text("timeline"),
+  goals: text("goals"),
+  impact: text("impact"),
+  attachments: text("attachments").array(),
+  status: text("status").notNull().default("pending"), // pending, approved, rejected, funded
+  adminNotes: text("admin_notes"), 
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+export const insertProjectProposalSchema = createInsertSchema(projectProposals).pick({
+  userId: true,
+  title: true,
+  description: true,
+  category: true,
+  fundingNeeded: true,
+  location: true,
+  timeline: true,
+  goals: true,
+  impact: true,
+  attachments: true,
+  status: true
+});
+
+export type ProjectProposal = typeof projectProposals.$inferSelect;
+export type InsertProjectProposal = z.infer<typeof insertProjectProposalSchema>;
+
+// User Activity Log schema
+export const userActivityLogs = pgTable("user_activity_logs", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  action: text("action").notNull(),
+  details: jsonb("details"),
+  ipAddress: text("ip_address"),
+  userAgent: text("user_agent"),
+  createdAt: timestamp("created_at").defaultNow()
+});
+
+export const insertUserActivityLogSchema = createInsertSchema(userActivityLogs).pick({
+  userId: true,
+  action: true,
+  details: true,
+  ipAddress: true,
+  userAgent: true
+});
+
+export type UserActivityLog = typeof userActivityLogs.$inferSelect;
+export type InsertUserActivityLog = z.infer<typeof insertUserActivityLogSchema>;
+
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
-  blogPosts: many(blogPosts)
+  blogPosts: many(blogPosts),
+  donations: many(donations),
+  subscriptions: many(subscriptions),
+  projectProposals: many(projectProposals),
+  activityLogs: many(userActivityLogs)
 }));
 
 export const blogPostsRelations = relations(blogPosts, ({ one }) => ({
   author: one(users, {
     fields: [blogPosts.authorId],
+    references: [users.id]
+  })
+}));
+
+export const donationsRelations = relations(donations, ({ one }) => ({
+  user: one(users, {
+    fields: [donations.userId],
+    references: [users.id]
+  })
+}));
+
+export const subscriptionsRelations = relations(subscriptions, ({ one }) => ({
+  user: one(users, {
+    fields: [subscriptions.userId],
+    references: [users.id]
+  })
+}));
+
+export const projectProposalsRelations = relations(projectProposals, ({ one }) => ({
+  user: one(users, {
+    fields: [projectProposals.userId],
+    references: [users.id]
+  })
+}));
+
+export const userActivityLogsRelations = relations(userActivityLogs, ({ one }) => ({
+  user: one(users, {
+    fields: [userActivityLogs.userId],
     references: [users.id]
   })
 }));
