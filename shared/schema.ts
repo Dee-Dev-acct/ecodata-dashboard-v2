@@ -119,7 +119,17 @@ export const users = pgTable("users", {
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
   email: text("email").notNull().unique(),
+  firstName: text("first_name"),
+  lastName: text("last_name"),
   role: text("role").notNull().default("user"),
+  profileImage: text("profile_image"),
+  bio: text("bio"),
+  interests: text("interests").array(),
+  watchlist: text("watchlist").array(),
+  notificationsEnabled: boolean("notifications_enabled").default(true),
+  stripeCustomerId: text("stripe_customer_id"),
+  lastLogin: timestamp("last_login"),
+  isEmailVerified: boolean("is_email_verified").default(false),
   createdAt: timestamp("created_at").defaultNow()
 });
 
@@ -127,7 +137,16 @@ export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
   password: true,
   email: true,
-  role: true
+  firstName: true,
+  lastName: true,
+  role: true,
+  profileImage: true,
+  bio: true,
+  interests: true,
+  watchlist: true,
+  notificationsEnabled: true,
+  stripeCustomerId: true,
+  isEmailVerified: true
 });
 
 // Contact messages schema

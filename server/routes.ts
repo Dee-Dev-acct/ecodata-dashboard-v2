@@ -1135,6 +1135,66 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // New API route to create recurring subscription donation via Stripe
+  app.post("/api/create-payment-intent", async (req: Request, res: Response) => {
+    try {
+      // Verify Stripe is configured properly
+      if (!process.env.STRIPE_SECRET_KEY) {
+        console.error('STRIPE_SECRET_KEY environment variable is not set or invalid');
+        return res.status(503).json({ 
+          error: "Stripe configuration error", 
+          message: "Payment functionality is currently unavailable. Please try again later." 
+        });
+      }
+
+      // Get payment details from request body
+      const { amount, isGiftAid, giftAidName, giftAidAddress, giftAidPostcode, goalId, email, name } = req.body;
+      
+      // Validate amount is a number and within acceptable range
+      const donationAmount = parseFloat(amount);
+      if (isNaN(donationAmount) || donationAmount < 1 || donationAmount > 10000) {
+        console.error(`Invalid donation amount: ${amount}`);
+        return res.status(400).json({
+          error: "Invalid amount",
+          message: 'Invalid donation amount. Please enter an amount between £1 and £10,000.'
+        });
+      }
+
+      // Convert to pence (GBP) for Stripe
+      const amountInPence = Math.round(donationAmount * 100);
+      
+      // Create a payment intent
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: amountInPence,
+        currency: 'gbp',
+        metadata: {
+          isGiftAid: isGiftAid ? 'true' : 'false',
+          giftAidName: giftAidName || '',
+          giftAidAddress: giftAidAddress || '',
+          giftAidPostcode: giftAidPostcode || '',
+          goalId: goalId || '',
+          email: email || '',
+          name: name || ''
+        },
+        // Store any user information in the payment intent metadata
+        receipt_email: email,
+        description: `One-time donation to ECODATA CIC${goalId ? ` - ${goalId}` : ''}`,
+      });
+      
+      // Return the client secret to the client to complete the payment
+      res.json({ 
+        clientSecret: paymentIntent.client_secret,
+        paymentIntentId: paymentIntent.id
+      });
+      
+    } catch (error: any) {
+      console.error("Error creating payment intent:", error);
+      return res.status(500).json({ 
+        error: "Payment processing error", 
+        message: error.message || "An error occurred while processing your payment. Please try again." 
+      });
+    }
+  });
+
   app.post("/api/create-subscription", async (req: Request, res: Response) => {
     try {
       // Verify Stripe is configured properly

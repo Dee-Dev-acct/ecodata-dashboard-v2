@@ -1,194 +1,234 @@
-import React, { useEffect, useState } from 'react';
-import { Link, useLocation } from 'wouter';
+import { useState, useEffect } from 'react';
+import { useLocation } from 'wouter';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { AlertTriangle, Check, Loader2, Leaf, CalendarClock } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { CheckCircle, Loader2, Calendar, BarChart, Recycle } from "lucide-react";
-import { apiRequest } from "@/lib/queryClient";
-import { format } from "date-fns";
+import { EcoLoader } from '@/components/ui/eco-loader';
+import { motion } from "framer-motion";
+import { apiRequest } from '@/lib/queryClient';
 
-// Impact component to show the effect of subscriptions
-const SubscriptionImpact = () => {
-  return (
-    <div className="bg-blue-50 dark:bg-blue-900 p-6 rounded-lg my-6">
-      <h3 className="text-lg font-semibold mb-3 text-blue-800 dark:text-blue-200">Your Subscription Impact</h3>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="flex flex-col items-center p-3 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
-          <Calendar className="h-8 w-8 text-blue-600 mb-2" />
-          <span className="text-sm text-center">Provides sustained funding for ongoing projects</span>
-        </div>
-        <div className="flex flex-col items-center p-3 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
-          <BarChart className="h-8 w-8 text-emerald-600 mb-2" />
-          <span className="text-sm text-center">Enables long-term data collection and analysis</span>
-        </div>
-        <div className="flex flex-col items-center p-3 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
-          <Recycle className="h-8 w-8 text-green-600 mb-2" />
-          <span className="text-sm text-center">Supports sustainable growth of our initiatives</span>
-        </div>
-      </div>
-    </div>
-  );
+// Animation variants
+const container = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1
+    }
+  }
 };
 
-interface SubscriptionDetails {
-  status: string;
-  paymentStatus: string;
-  subscription: {
-    id: string;
-    status: string;
-    currentPeriodEnd: string;
-    interval: string;
-  } | null;
-  amount: string | null;
-  currency: string;
-  customerEmail: string;
-  customerName: string;
-  mode: string;
-}
+const item = {
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0 }
+};
 
-const SubscriptionSuccess = () => {
+export default function SubscriptionSuccess() {
+  const [isLoading, setIsLoading] = useState(true);
+  const [status, setStatus] = useState<'success' | 'processing' | 'error'>('processing');
+  const [subscriptionDetails, setSubscriptionDetails] = useState<any>(null);
+  const [, navigate] = useLocation();
   const { toast } = useToast();
-  const [loading, setLoading] = useState(true);
-  const [subscriptionDetails, setSubscriptionDetails] = useState<SubscriptionDetails | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [, params] = useLocation();
-  
+
   useEffect(() => {
-    // Show a toast notification when the page loads
-    toast({
-      title: "Subscription Confirmed!",
-      description: "Thank you for your recurring support of ECODATA CIC.",
-    });
-    
-    // Get session ID from URL query parameters
+    // Extract the session_id from URL query parameters
     const urlParams = new URLSearchParams(window.location.search);
     const sessionId = urlParams.get('session_id');
-    
-    if (sessionId) {
-      // Verify the subscription with our API
-      apiRequest("GET", `/api/subscriptions/verify/${sessionId}`)
-        .then(response => {
-          if (!response.ok) {
-            throw new Error('Failed to verify subscription');
-          }
-          return response.json();
-        })
-        .then(data => {
-          setSubscriptionDetails(data);
-          setLoading(false);
-        })
-        .catch(err => {
-          console.error("Error verifying subscription:", err);
-          setError("We couldn't verify your subscription details. Please contact support.");
-          setLoading(false);
-        });
-    } else {
-      // No session ID provided
-      setError("No subscription information found. Please contact support if you believe this is an error.");
-      setLoading(false);
+
+    if (!sessionId) {
+      setStatus('error');
+      setIsLoading(false);
+      return;
     }
+
+    const verifySubscription = async () => {
+      try {
+        // Make a request to verify the subscription using the session ID
+        const response = await apiRequest('GET', `/api/subscriptions/verify/${sessionId}`);
+        
+        if (!response.ok) {
+          throw new Error('Failed to verify subscription');
+        }
+        
+        const data = await response.json();
+        
+        if (data.paymentStatus === 'paid' || data.status === 'complete') {
+          setStatus('success');
+          setSubscriptionDetails({
+            amount: data.amount,
+            currency: data.currency || 'GBP',
+            interval: data.mode === 'subscription' ? 'recurring' : 'one-time',
+            email: data.customerEmail,
+            name: data.customerName,
+            date: new Date().toLocaleDateString()
+          });
+        } else if (data.paymentStatus === 'unpaid' || data.status === 'incomplete') {
+          setStatus('processing');
+        } else {
+          setStatus('error');
+        }
+      } catch (error) {
+        console.error('Error verifying subscription:', error);
+        setStatus('error');
+        toast({
+          title: "Verification Error",
+          description: "There was a problem verifying your subscription. The subscription may still have been processed.",
+          variant: "destructive"
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    verifySubscription();
   }, [toast]);
 
-  if (loading) {
-    return (
-      <div className="container mx-auto px-4 py-16 flex flex-col items-center justify-center min-h-[60vh]">
-        <Loader2 className="h-16 w-16 text-blue-600 animate-spin mb-6" />
-        <h2 className="text-2xl font-bold text-center">Processing your subscription...</h2>
-        <p className="text-center mt-4 text-gray-600 dark:text-gray-400">
-          Please wait while we confirm your subscription
-        </p>
-      </div>
-    );
-  }
+  // Render appropriate content based on status
+  const renderContent = () => {
+    if (isLoading) {
+      return (
+        <div className="flex flex-col items-center justify-center py-12">
+          <EcoLoader size={48} />
+          <p className="mt-4 text-muted-foreground">Verifying your subscription...</p>
+        </div>
+      );
+    }
 
-  if (error) {
-    return (
-      <div className="container max-w-4xl mx-auto px-4 py-12">
-        <Card className="shadow-lg border-red-300">
-          <CardHeader className="text-center">
-            <CardTitle className="text-2xl">Subscription Verification Error</CardTitle>
+    if (status === 'success') {
+      return (
+        <motion.div
+          variants={container}
+          initial="hidden"
+          animate="show"
+          className="max-w-md mx-auto"
+        >
+          <Card className="border-green-200 bg-green-50 dark:bg-green-950/20">
+            <CardHeader className="pb-4">
+              <motion.div variants={item} className="flex justify-center mb-4">
+                <div className="rounded-full bg-green-100 p-3 dark:bg-green-900">
+                  <Check className="h-8 w-8 text-green-600 dark:text-green-400" />
+                </div>
+              </motion.div>
+              <motion.div variants={item}>
+                <CardTitle className="text-center text-2xl">Subscription Confirmed!</CardTitle>
+                <CardDescription className="text-center mt-2">
+                  Thank you for your recurring support of our environmental data initiatives.
+                </CardDescription>
+              </motion.div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <motion.div variants={item} className="flex justify-center py-4">
+                <div className="flex items-center justify-center gap-2 bg-green-100 dark:bg-green-900/30 px-4 py-2 rounded-full">
+                  <CalendarClock className="h-5 w-5 text-green-600 dark:text-green-400" />
+                  <span className="text-green-800 dark:text-green-200">Recurring Support</span>
+                </div>
+              </motion.div>
+              
+              {subscriptionDetails && (
+                <motion.div variants={item} className="text-center text-muted-foreground">
+                  <p>A receipt has been sent to your email address.</p>
+                  <p className="mt-2">Start Date: {subscriptionDetails.date}</p>
+                </motion.div>
+              )}
+              
+              <motion.div variants={item} className="bg-green-100 dark:bg-green-900/30 p-4 rounded-md mt-2">
+                <h3 className="font-medium text-center mb-2 text-green-800 dark:text-green-200">What happens next?</h3>
+                <ul className="space-y-2 text-sm">
+                  <li className="flex items-start">
+                    <Leaf className="h-4 w-4 text-green-600 dark:text-green-400 mr-2 mt-0.5" />
+                    <span>You'll receive regular updates on the impact your donation is making</span>
+                  </li>
+                  <li className="flex items-start">
+                    <Leaf className="h-4 w-4 text-green-600 dark:text-green-400 mr-2 mt-0.5" />
+                    <span>You can manage your subscription from your account dashboard at any time</span>
+                  </li>
+                  <li className="flex items-start">
+                    <Leaf className="h-4 w-4 text-green-600 dark:text-green-400 mr-2 mt-0.5" />
+                    <span>Your support helps us collect and analyze vital environmental data</span>
+                  </li>
+                </ul>
+              </motion.div>
+            </CardContent>
+            <CardFooter className="flex flex-col gap-2">
+              <motion.div variants={item} className="w-full">
+                <Button className="w-full" onClick={() => navigate("/")}>
+                  Return to Home
+                </Button>
+              </motion.div>
+              <motion.div variants={item} className="w-full">
+                <Button variant="outline" className="w-full" onClick={() => navigate("/dashboard")}>
+                  Go to Dashboard
+                </Button>
+              </motion.div>
+            </CardFooter>
+          </Card>
+        </motion.div>
+      );
+    }
+
+    if (status === 'processing') {
+      return (
+        <Card className="max-w-md mx-auto">
+          <CardHeader>
+            <div className="flex justify-center mb-4">
+              <div className="rounded-full bg-yellow-100 p-3 dark:bg-yellow-900/30">
+                <Loader2 className="h-6 w-6 text-yellow-600 dark:text-yellow-400 animate-spin" />
+              </div>
+            </div>
+            <CardTitle className="text-center">Subscription Processing</CardTitle>
+            <CardDescription className="text-center mt-2">
+              Your subscription is being set up. This may take a few moments.
+            </CardDescription>
           </CardHeader>
-          <CardContent className="text-center">
-            <p className="text-red-600 mb-6">{error}</p>
+          <CardContent>
+            <p className="text-center text-muted-foreground">
+              We'll send you an email confirmation once your subscription is active.
+            </p>
           </CardContent>
-          <CardFooter className="flex justify-center">
-            <Button asChild>
-              <Link to="/">Return to Homepage</Link>
+          <CardFooter>
+            <Button className="w-full" onClick={() => navigate("/")}>
+              Return to Home
             </Button>
           </CardFooter>
         </Card>
-      </div>
-    );
-  }
+      );
+    }
 
-  return (
-    <div className="container max-w-4xl mx-auto px-4 py-12">
-      <Card className="shadow-lg">
-        <CardHeader className="text-center">
+    return (
+      <Card className="max-w-md mx-auto border-destructive/50">
+        <CardHeader>
           <div className="flex justify-center mb-4">
-            <CheckCircle className="h-16 w-16 text-blue-500" />
+            <div className="rounded-full bg-destructive/10 p-3">
+              <AlertTriangle className="h-6 w-6 text-destructive" />
+            </div>
           </div>
-          <CardTitle className="text-3xl">Thank You for Subscribing!</CardTitle>
-          <CardDescription className="text-lg">
-            Your recurring donation has been set up successfully
+          <CardTitle className="text-center">Subscription Error</CardTitle>
+          <CardDescription className="text-center mt-2">
+            We encountered an issue setting up your subscription.
           </CardDescription>
         </CardHeader>
-        <CardContent className="text-center">
-          <div className="mb-6 text-lg">
-            <p>Thank you for your commitment to support ECODATA CIC on a recurring basis. Your sustained support is invaluable to our mission.</p>
-          </div>
-          
-          {subscriptionDetails && subscriptionDetails.subscription && (
-            <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg mb-6">
-              <h3 className="text-lg font-semibold mb-4">Subscription Details</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
-                <div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Amount:</p>
-                  <p className="font-medium">
-                    {subscriptionDetails.amount 
-                      ? `${subscriptionDetails.currency.toUpperCase()} ${subscriptionDetails.amount}` 
-                      : 'Amount not available'}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Billing Cycle:</p>
-                  <p className="font-medium capitalize">{subscriptionDetails.subscription.interval}ly</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Status:</p>
-                  <p className="font-medium capitalize">{subscriptionDetails.subscription.status}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Next Billing Date:</p>
-                  <p className="font-medium">
-                    {format(new Date(subscriptionDetails.subscription.currentPeriodEnd), 'PPP')}
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
-          
-          <SubscriptionImpact />
-          
-          <p className="mb-6">
-            Your recurring support will help us plan and execute long-term initiatives that create lasting positive impact on the environment and communities we serve.
-          </p>
-          
-          <p className="mb-4 font-semibold">
-            A confirmation email has been sent with your subscription details.
+        <CardContent>
+          <p className="text-center text-muted-foreground">
+            Your card may not have been charged. Please try again or contact us for assistance.
           </p>
         </CardContent>
-        <CardFooter className="flex justify-center space-x-4">
-          <Button asChild>
-            <Link to="/">Return to Homepage</Link>
+        <CardFooter className="flex flex-col gap-2">
+          <Button className="w-full" onClick={() => window.history.back()}>
+            Try Again
           </Button>
-          <Button variant="outline" asChild>
-            <Link to="/contact">Contact Us</Link>
+          <Button variant="outline" className="w-full" onClick={() => navigate("/")}>
+            Return to Home
           </Button>
         </CardFooter>
       </Card>
+    );
+  };
+
+  return (
+    <div className="container py-12 px-4">
+      <h1 className="text-3xl font-bold text-center mb-8">Subscription Status</h1>
+      {renderContent()}
     </div>
   );
-};
-
-export default SubscriptionSuccess;
+}

@@ -13,6 +13,7 @@ import BlogPost from "@/pages/BlogPost";
 import DonationSuccess from "@/pages/DonationSuccess";
 import SubscriptionSuccess from "@/pages/SubscriptionSuccess";
 import FundingGoals from "@/pages/FundingGoals";
+import Checkout from "@/pages/Checkout";
 import AuthPage from "@/pages/auth-page";
 import Dashboard from "@/pages/Dashboard";
 
@@ -27,6 +28,7 @@ function Router() {
       <Route path="/blog" component={Blog} />
       <Route path="/blog/:slug" component={BlogPost} />
       <Route path="/funding-goals" component={FundingGoals} />
+      <Route path="/checkout/:goalId?" component={Checkout} />
       <Route path="/donation-success" component={DonationSuccess} />
       <Route path="/subscription-success" component={SubscriptionSuccess} />
       <Route component={NotFound} />
