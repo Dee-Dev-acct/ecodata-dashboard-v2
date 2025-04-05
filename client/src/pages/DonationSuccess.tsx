@@ -3,7 +3,8 @@ import { Link } from 'wouter';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { CheckCircle, Loader2, TreePine, Droplets, Leaf } from "lucide-react";
+import { CheckCircle, Loader2, TreePine, Droplets, Leaf, AlertCircle } from "lucide-react";
+import { apiRequest } from "@/lib/queryClient";
 
 // Impact component to show the effect of donations
 const DonationImpact = () => {
@@ -28,9 +29,21 @@ const DonationImpact = () => {
   );
 };
 
+interface DonationDetails {
+  status: string;
+  paymentStatus: string;
+  amount: string | null;
+  currency: string;
+  customerEmail: string;
+  customerName: string;
+  mode: string;
+}
+
 const DonationSuccess = () => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
+  const [donationDetails, setDonationDetails] = useState<DonationDetails | null>(null);
+  const [error, setError] = useState<string | null>(null);
   
   useEffect(() => {
     // Show a toast notification when the page loads
@@ -39,12 +52,36 @@ const DonationSuccess = () => {
       description: "Thank you for your generous contribution to ECODATA CIC.",
     });
     
-    // Simulate loading time for a brief moment to show the animation
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 1500);
+    // Get session ID from URL query parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const sessionId = urlParams.get('session_id');
     
-    return () => clearTimeout(timer);
+    if (sessionId) {
+      // Verify the donation with our API
+      apiRequest("GET", `/api/donations/verify/${sessionId}`)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Failed to verify donation');
+          }
+          return response.json();
+        })
+        .then(data => {
+          setDonationDetails(data);
+          setLoading(false);
+        })
+        .catch(err => {
+          console.error("Error verifying donation:", err);
+          setError("We couldn't verify your donation details. Please contact support.");
+          setLoading(false);
+        });
+    } else {
+      // No session ID - just show the thank you page with a brief delay
+      const timer = setTimeout(() => {
+        setLoading(false);
+      }, 1500);
+      
+      return () => clearTimeout(timer);
+    }
   }, [toast]);
 
   if (loading) {
@@ -55,6 +92,30 @@ const DonationSuccess = () => {
         <p className="text-center mt-4 text-gray-600 dark:text-gray-400">
           Please wait while we confirm your generous contribution
         </p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container max-w-4xl mx-auto px-4 py-12">
+        <Card className="shadow-lg border-red-300">
+          <CardHeader className="text-center">
+            <div className="flex justify-center mb-4">
+              <AlertCircle className="h-16 w-16 text-red-500" />
+            </div>
+            <CardTitle className="text-2xl">Donation Verification Error</CardTitle>
+          </CardHeader>
+          <CardContent className="text-center">
+            <p className="text-red-600 mb-6">{error}</p>
+            <p>Your donation may still have been processed successfully. If you have any questions, please contact our support team.</p>
+          </CardContent>
+          <CardFooter className="flex justify-center">
+            <Button asChild>
+              <Link to="/">Return to Homepage</Link>
+            </Button>
+          </CardFooter>
+        </Card>
       </div>
     );
   }
@@ -72,6 +133,38 @@ const DonationSuccess = () => {
           </CardDescription>
         </CardHeader>
         <CardContent className="text-center">
+          {donationDetails && (
+            <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg mb-6">
+              <h3 className="text-lg font-semibold mb-4">Donation Details</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
+                <div>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Amount:</p>
+                  <p className="font-medium">
+                    {donationDetails.amount 
+                      ? `${donationDetails.currency.toUpperCase()} ${donationDetails.amount}` 
+                      : 'Amount not available'}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Status:</p>
+                  <p className="font-medium capitalize">{donationDetails.paymentStatus}</p>
+                </div>
+                {donationDetails.customerName && (
+                  <div>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Name:</p>
+                    <p className="font-medium">{donationDetails.customerName}</p>
+                  </div>
+                )}
+                {donationDetails.customerEmail && (
+                  <div>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Email:</p>
+                    <p className="font-medium">{donationDetails.customerEmail}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+          
           <p className="mb-6 text-lg">
             Your donation to ECODATA CIC has been received and will help us continue our mission to provide eco-friendly data solutions for social and environmental impact.
           </p>

@@ -8,6 +8,8 @@ import {
   blogPosts, type BlogPost, type InsertBlogPost,
   settings, type Setting, type InsertSetting,
   partners, type Partner, type InsertPartner,
+  donations, type Donation, type InsertDonation,
+  subscriptions, type Subscription, type InsertSubscription,
   // MSSQL schemas
   type MSSQLUser,
   type MSSQLContactMessage,
@@ -93,6 +95,22 @@ export interface IStorage {
   createPartner(partner: InsertPartner): Promise<Partner>;
   updatePartner(id: number, partner: Partial<InsertPartner>): Promise<Partner | undefined>;
   deletePartner(id: number): Promise<boolean>;
+  
+  // Donations
+  getDonations(): Promise<Donation[]>;
+  getDonationsByEmail(email: string): Promise<Donation[]>;
+  getDonation(id: number): Promise<Donation | undefined>;
+  createDonation(donation: InsertDonation): Promise<Donation>;
+  updateDonationStatus(id: number, status: string): Promise<Donation | undefined>;
+  
+  // Subscriptions
+  getSubscriptions(): Promise<Subscription[]>;
+  getSubscriptionsByEmail(email: string): Promise<Subscription[]>;
+  getSubscription(id: number): Promise<Subscription | undefined>;
+  getSubscriptionByStripeId(stripeSubscriptionId: string): Promise<Subscription | undefined>;
+  createSubscription(subscription: InsertSubscription): Promise<Subscription>;
+  updateSubscriptionStatus(id: number, status: string): Promise<Subscription | undefined>;
+  cancelSubscription(id: number): Promise<Subscription | undefined>;
 }
 
 export class MemStorage implements IStorage {
@@ -105,6 +123,8 @@ export class MemStorage implements IStorage {
   private blogPosts: Map<number, BlogPost>;
   private settings: Map<number, Setting>;
   private partners: Map<number, Partner>;
+  private donations: Map<number, Donation>;
+  private subscriptions: Map<number, Subscription>;
   
   private currentUserId: number;
   private currentContactMessageId: number;
@@ -115,6 +135,8 @@ export class MemStorage implements IStorage {
   private currentBlogPostId: number;
   private currentSettingId: number;
   private currentPartnerId: number;
+  private currentDonationId: number;
+  private currentSubscriptionId: number;
 
   constructor() {
     this.users = new Map();
@@ -126,6 +148,8 @@ export class MemStorage implements IStorage {
     this.blogPosts = new Map();
     this.settings = new Map();
     this.partners = new Map();
+    this.donations = new Map();
+    this.subscriptions = new Map();
     
     this.currentUserId = 1;
     this.currentContactMessageId = 1;
@@ -136,6 +160,8 @@ export class MemStorage implements IStorage {
     this.currentBlogPostId = 1;
     this.currentSettingId = 1;
     this.currentPartnerId = 1;
+    this.currentDonationId = 1;
+    this.currentSubscriptionId = 1;
     
     // Initialize with sample data
     this.initializeData();
@@ -798,6 +824,133 @@ export class MemStorage implements IStorage {
   async deletePartner(id: number): Promise<boolean> {
     return this.partners.delete(id);
   }
+  
+  // Donations
+  async getDonations(): Promise<Donation[]> {
+    return Array.from(this.donations.values());
+  }
+  
+  async getDonationsByEmail(email: string): Promise<Donation[]> {
+    return Array.from(this.donations.values()).filter(
+      donation => donation.email.toLowerCase() === email.toLowerCase()
+    );
+  }
+  
+  async getDonation(id: number): Promise<Donation | undefined> {
+    return this.donations.get(id);
+  }
+  
+  async createDonation(donation: InsertDonation): Promise<Donation> {
+    const newDonation: Donation = {
+      id: this.currentDonationId++,
+      name: donation.name ?? null,
+      email: donation.email,
+      createdAt: new Date(),
+      status: donation.status || 'completed',
+      amount: donation.amount,
+      currency: donation.currency || 'gbp',
+      stripePaymentId: donation.stripePaymentId,
+      stripeSessionId: donation.stripeSessionId,
+      isGiftAid: donation.isGiftAid || false,
+      giftAidName: donation.giftAidName ?? null,
+      giftAidAddress: donation.giftAidAddress ?? null,
+      giftAidPostcode: donation.giftAidPostcode ?? null,
+      metadata: donation.metadata ?? {}
+    };
+    this.donations.set(newDonation.id, newDonation);
+    return newDonation;
+  }
+  
+  async updateDonationStatus(id: number, status: string): Promise<Donation | undefined> {
+    const donation = this.donations.get(id);
+    if (!donation) {
+      return undefined;
+    }
+    
+    const updatedDonation: Donation = {
+      ...donation,
+      status
+    };
+    this.donations.set(id, updatedDonation);
+    return updatedDonation;
+  }
+  
+  // Subscriptions
+  async getSubscriptions(): Promise<Subscription[]> {
+    return Array.from(this.subscriptions.values());
+  }
+  
+  async getSubscriptionsByEmail(email: string): Promise<Subscription[]> {
+    return Array.from(this.subscriptions.values()).filter(
+      subscription => subscription.email.toLowerCase() === email.toLowerCase()
+    );
+  }
+  
+  async getSubscription(id: number): Promise<Subscription | undefined> {
+    return this.subscriptions.get(id);
+  }
+  
+  async getSubscriptionByStripeId(stripeSubscriptionId: string): Promise<Subscription | undefined> {
+    return Array.from(this.subscriptions.values()).find(
+      subscription => subscription.stripeSubscriptionId === stripeSubscriptionId
+    );
+  }
+  
+  async createSubscription(subscription: InsertSubscription): Promise<Subscription> {
+    const newSubscription: Subscription = {
+      id: this.currentSubscriptionId++,
+      name: subscription.name ?? null,
+      email: subscription.email,
+      stripeCustomerId: subscription.stripeCustomerId,
+      stripeSubscriptionId: subscription.stripeSubscriptionId,
+      amount: subscription.amount,
+      currency: subscription.currency || 'gbp',
+      interval: subscription.interval,
+      status: subscription.status || 'active',
+      isGiftAid: subscription.isGiftAid || false,
+      giftAidName: subscription.giftAidName ?? null,
+      giftAidAddress: subscription.giftAidAddress ?? null,
+      giftAidPostcode: subscription.giftAidPostcode ?? null,
+      canceledAt: null,
+      currentPeriodEnd: subscription.currentPeriodEnd ?? null,
+      metadata: subscription.metadata ?? {},
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.subscriptions.set(newSubscription.id, newSubscription);
+    return newSubscription;
+  }
+  
+  async updateSubscriptionStatus(id: number, status: string): Promise<Subscription | undefined> {
+    const subscription = this.subscriptions.get(id);
+    if (!subscription) {
+      return undefined;
+    }
+    
+    const updatedSubscription: Subscription = {
+      ...subscription,
+      status,
+      updatedAt: new Date()
+    };
+    this.subscriptions.set(id, updatedSubscription);
+    return updatedSubscription;
+  }
+  
+  async cancelSubscription(id: number): Promise<Subscription | undefined> {
+    const subscription = this.subscriptions.get(id);
+    if (!subscription) {
+      return undefined;
+    }
+    
+    const updatedSubscription: Subscription = {
+      ...subscription,
+      status: "canceled",
+      canceledAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.subscriptions.set(id, updatedSubscription);
+    return updatedSubscription;
+  }
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1075,6 +1228,91 @@ export class DatabaseStorage implements IStorage {
   async deletePartner(id: number): Promise<boolean> {
     const result = await db.delete(partners).where(eq(partners.id, id));
     return result.count > 0;
+  }
+
+  // Donations
+  async getDonations(): Promise<Donation[]> {
+    return db.select().from(donations).orderBy(desc(donations.createdAt));
+  }
+  
+  async getDonationsByEmail(email: string): Promise<Donation[]> {
+    return db.select()
+      .from(donations)
+      .where(eq(donations.email, email))
+      .orderBy(desc(donations.createdAt));
+  }
+  
+  async getDonation(id: number): Promise<Donation | undefined> {
+    const [donation] = await db.select().from(donations).where(eq(donations.id, id));
+    return donation || undefined;
+  }
+  
+  async createDonation(donationData: InsertDonation): Promise<Donation> {
+    const [donation] = await db.insert(donations).values(donationData).returning();
+    return donation;
+  }
+  
+  async updateDonationStatus(id: number, status: string): Promise<Donation | undefined> {
+    const [donation] = await db
+      .update(donations)
+      .set({ status })
+      .where(eq(donations.id, id))
+      .returning();
+    return donation || undefined;
+  }
+  
+  // Subscriptions
+  async getSubscriptions(): Promise<Subscription[]> {
+    return db.select().from(subscriptions).orderBy(desc(subscriptions.createdAt));
+  }
+  
+  async getSubscriptionsByEmail(email: string): Promise<Subscription[]> {
+    return db.select()
+      .from(subscriptions)
+      .where(eq(subscriptions.email, email))
+      .orderBy(desc(subscriptions.createdAt));
+  }
+  
+  async getSubscription(id: number): Promise<Subscription | undefined> {
+    const [subscription] = await db.select().from(subscriptions).where(eq(subscriptions.id, id));
+    return subscription || undefined;
+  }
+  
+  async getSubscriptionByStripeId(stripeSubscriptionId: string): Promise<Subscription | undefined> {
+    const [subscription] = await db
+      .select()
+      .from(subscriptions)
+      .where(eq(subscriptions.stripeSubscriptionId, stripeSubscriptionId));
+    return subscription || undefined;
+  }
+  
+  async createSubscription(subscriptionData: InsertSubscription): Promise<Subscription> {
+    const [subscription] = await db.insert(subscriptions).values(subscriptionData).returning();
+    return subscription;
+  }
+  
+  async updateSubscriptionStatus(id: number, status: string): Promise<Subscription | undefined> {
+    const now = new Date();
+    const [subscription] = await db
+      .update(subscriptions)
+      .set({ status, updatedAt: now })
+      .where(eq(subscriptions.id, id))
+      .returning();
+    return subscription || undefined;
+  }
+  
+  async cancelSubscription(id: number): Promise<Subscription | undefined> {
+    const now = new Date();
+    const [subscription] = await db
+      .update(subscriptions)
+      .set({ 
+        status: "canceled", 
+        canceledAt: now,
+        updatedAt: now 
+      })
+      .where(eq(subscriptions.id, id))
+      .returning();
+    return subscription || undefined;
   }
 }
 

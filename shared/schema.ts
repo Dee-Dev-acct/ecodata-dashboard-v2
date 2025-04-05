@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, timestamp, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, jsonb, decimal } from "drizzle-orm/pg-core";
 import { sqliteTable, text as sqliteText, integer as sqliteInteger, real } from "drizzle-orm/sqlite-core";
 import { sql } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
@@ -288,6 +288,78 @@ export const insertPartnerSchema = createInsertSchema(partners).pick({
   category: true
 });
 
+// Donations schema
+export const donations = pgTable("donations", {
+  id: serial("id").primaryKey(),
+  amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+  currency: text("currency").notNull().default("gbp"),
+  email: text("email").notNull(),
+  name: text("name"),
+  stripePaymentId: text("stripe_payment_id").notNull(),
+  stripeSessionId: text("stripe_session_id").notNull(),
+  status: text("status").notNull().default("completed"),
+  isGiftAid: boolean("is_gift_aid").notNull().default(false),
+  giftAidName: text("gift_aid_name"),
+  giftAidAddress: text("gift_aid_address"),
+  giftAidPostcode: text("gift_aid_postcode"),
+  metadata: jsonb("metadata"),
+  createdAt: timestamp("created_at").defaultNow()
+});
+
+export const insertDonationSchema = createInsertSchema(donations).pick({
+  amount: true,
+  currency: true,
+  email: true,
+  name: true,
+  stripePaymentId: true,
+  stripeSessionId: true,
+  status: true,
+  isGiftAid: true,
+  giftAidName: true,
+  giftAidAddress: true,
+  giftAidPostcode: true,
+  metadata: true
+});
+
+// Subscription Donations schema
+export const subscriptions = pgTable("subscriptions", {
+  id: serial("id").primaryKey(),
+  email: text("email").notNull(),
+  name: text("name"),
+  stripeCustomerId: text("stripe_customer_id").notNull(),
+  stripeSubscriptionId: text("stripe_subscription_id").notNull(),
+  amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+  currency: text("currency").notNull().default("gbp"),
+  interval: text("interval").notNull(), // 'month' or 'year'
+  status: text("status").notNull().default("active"),
+  isGiftAid: boolean("is_gift_aid").notNull().default(false),
+  giftAidName: text("gift_aid_name"),
+  giftAidAddress: text("gift_aid_address"),
+  giftAidPostcode: text("gift_aid_postcode"),
+  canceledAt: timestamp("canceled_at"),
+  currentPeriodEnd: timestamp("current_period_end"),
+  metadata: jsonb("metadata"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+export const insertSubscriptionSchema = createInsertSchema(subscriptions).pick({
+  email: true,
+  name: true,
+  stripeCustomerId: true,
+  stripeSubscriptionId: true,
+  amount: true,
+  currency: true,
+  interval: true,
+  status: true,
+  isGiftAid: true,
+  giftAidName: true,
+  giftAidAddress: true,
+  giftAidPostcode: true,
+  currentPeriodEnd: true,
+  metadata: true
+});
+
 // Export types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -315,6 +387,12 @@ export type InsertSetting = z.infer<typeof insertSettingSchema>;
 
 export type Partner = typeof partners.$inferSelect;
 export type InsertPartner = z.infer<typeof insertPartnerSchema>;
+
+export type Donation = typeof donations.$inferSelect;
+export type InsertDonation = z.infer<typeof insertDonationSchema>;
+
+export type Subscription = typeof subscriptions.$inferSelect;
+export type InsertSubscription = z.infer<typeof insertSubscriptionSchema>;
 
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({

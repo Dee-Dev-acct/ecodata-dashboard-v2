@@ -1,379 +1,239 @@
-import { useState } from "react";
+import React, { useState } from 'react';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { CheckCircle2, Loader2, Shield, BarChart, Database } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
+import GiftAidForm from '@/components/GiftAidForm';
 
-interface SubscriptionFormData {
-  email: string;
-  consent: boolean;
-  subscriptionTier: string;
-  interests: string[];
+interface TierProps {
+  title: string;
+  price: number;
+  frequency: string;
+  description: string;
+  features: string[];
+  icon: React.ReactNode;
+  popular?: boolean;
 }
 
-const interestOptions = [
-  { id: "sustainability", label: "Sustainability" },
-  { id: "technology", label: "Technology" },
-  { id: "policy", label: "Policy & Regulation" },
-  { id: "research", label: "Research & Innovation" },
-  { id: "caseStudies", label: "Case Studies" }
-];
-
-const tiers = [
-  {
-    id: "basic",
-    name: "Basic",
-    description: "Monthly newsletter with industry updates and ECODATA news",
-    features: [
-      "Monthly newsletter",
-      "Public event invitations",
-      "Blog post notifications"
-    ]
-  },
-  {
-    id: "professional",
-    name: "Professional",
-    description: "Enhanced content for industry professionals",
-    features: [
-      "Bi-weekly newsletter",
-      "Industry trend analysis",
-      "Priority event registration",
-      "Technical insights"
-    ]
-  },
-  {
-    id: "research",
-    name: "Research",
-    description: "In-depth research and analysis for academics and researchers",
-    features: [
-      "Weekly specialized content",
-      "Research paper highlights",
-      "Data analysis reports",
-      "Early access to studies",
-      "Collaboration opportunities"
-    ]
-  }
-];
-
-export default function TieredSubscription() {
+const SubscriptionTier: React.FC<TierProps> = ({
+  title,
+  price,
+  frequency,
+  description,
+  features,
+  icon,
+  popular = false
+}) => {
   const { toast } = useToast();
-  const [formData, setFormData] = useState<SubscriptionFormData>({
-    email: "",
-    consent: false,
-    subscriptionTier: "basic",
-    interests: []
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [currentStep, setCurrentStep] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [isGiftAid, setIsGiftAid] = useState<boolean>(false);
+  const [giftAidName, setGiftAidName] = useState<string>('');
+  const [giftAidAddress, setGiftAidAddress] = useState<string>('');
+  const [giftAidPostcode, setGiftAidPostcode] = useState<string>('');
 
-  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, email: e.target.value });
-  };
-
-  const handleConsentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, consent: e.target.checked });
-  };
-
-  const handleTierChange = (tierId: string) => {
-    setFormData({ ...formData, subscriptionTier: tierId });
-  };
-
-  const handleInterestChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const interestId = e.target.value;
-    if (e.target.checked) {
-      setFormData({ ...formData, interests: [...formData.interests, interestId] });
-    } else {
-      setFormData({
-        ...formData,
-        interests: formData.interests.filter(id => id !== interestId)
-      });
-    }
-  };
-
-  const validateEmail = (email: string) => {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  };
-
-  const goToNextStep = () => {
-    if (currentStep === 1) {
-      // Validate email and consent
-      if (!validateEmail(formData.email)) {
-        toast({
-          title: "Invalid email",
-          description: "Please enter a valid email address.",
-          variant: "destructive"
-        });
-        return;
-      }
-      if (!formData.consent) {
-        toast({
-          title: "Consent required",
-          description: "Please agree to the privacy policy.",
-          variant: "destructive"
-        });
-        return;
-      }
-    }
-    setCurrentStep(currentStep + 1);
-  };
-
-  const goToPreviousStep = () => {
-    setCurrentStep(currentStep - 1);
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-
+  const handleSubscribe = async () => {
     try {
-      const response = await apiRequest("POST", "/api/newsletter/subscribe", formData);
-      const data = await response.json();
+      setLoading(true);
+
+      // Prepare gift aid data if applicable
+      const giftAidData = isGiftAid ? {
+        name: giftAidName,
+        address: giftAidAddress,
+        postcode: giftAidPostcode
+      } : null;
+      
+      const response = await apiRequest("POST", "/api/create-subscription", {
+        amount: price,
+        tier: title.toLowerCase(),
+        giftAid: isGiftAid,
+        giftAidData
+      });
 
       if (!response.ok) {
-        throw new Error(data.message || "Subscription failed");
+        throw new Error('Failed to process subscription');
       }
 
-      toast({
-        title: "Subscription successful!",
-        description: "Thank you for subscribing to our newsletter.",
-      });
+      const data = await response.json();
       
-      // Reset form
-      setFormData({
-        email: "",
-        consent: false,
-        subscriptionTier: "basic",
-        interests: []
-      });
-      setCurrentStep(1);
-      
+      // Redirect to Stripe Checkout
+      window.location.href = data.url;
     } catch (error) {
-      console.error("Subscription error:", error);
+      console.error("Error processing subscription:", error);
+      
       toast({
-        title: "Subscription failed",
-        description: error instanceof Error ? error.message : "An unexpected error occurred",
+        title: "Subscription Failed",
+        description: "There was an error setting up your subscription. Please try again later.",
         variant: "destructive"
       });
     } finally {
-      setIsSubmitting(false);
+      setLoading(false);
     }
   };
 
-  const renderStep1 = () => (
-    <div className="space-y-4">
-      <h3 className="text-xl font-semibold mb-4">Step 1: Your Details</h3>
-      <div>
-        <label className="block text-sm font-medium mb-1" htmlFor="email">
-          Email Address
-        </label>
-        <input
-          type="email"
-          id="email"
-          name="email"
-          value={formData.email}
-          onChange={handleEmailChange}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#2A9D8F] dark:bg-[#1E293B] dark:border-gray-700"
-          placeholder="your@email.com"
-          required
-        />
-      </div>
-      
-      <div className="mt-4">
-        <div className="flex items-start">
-          <input
-            type="checkbox"
-            id="consent"
-            name="consent"
-            checked={formData.consent}
-            onChange={handleConsentChange}
-            className="mt-1 h-4 w-4 rounded border-gray-300 text-[#2A9D8F] focus:ring-[#2A9D8F]"
-            required
-          />
-          <label className="ml-2 block text-sm" htmlFor="consent">
-            I agree to receive news and updates from ECODATA CIC. We value your privacy and will never share your information with third parties.
-          </label>
+  return (
+    <Card className={`h-full flex flex-col ${popular ? 'border-primary shadow-lg' : 'border-muted shadow'}`}>
+      {popular && (
+        <div className="bg-primary text-primary-foreground text-center py-1 text-sm font-medium">
+          Most Popular
         </div>
-      </div>
-      
-      <div className="flex justify-end mt-6">
-        <button
-          type="button"
-          onClick={goToNextStep}
-          className="px-4 py-2 bg-[#2A9D8F] text-white rounded-md hover:bg-[#2A9D8F]/90 transition duration-200"
+      )}
+      <CardHeader>
+        <div className="flex items-center gap-2">
+          {icon}
+          <CardTitle>{title}</CardTitle>
+        </div>
+        <CardDescription>{description}</CardDescription>
+      </CardHeader>
+      <CardContent className="flex-1">
+        <div className="mb-6">
+          <span className="text-3xl font-bold">£{price}</span>
+          <span className="text-muted-foreground">/{frequency}</span>
+        </div>
+        <ul className="space-y-2 mb-6">
+          {features.map((feature, index) => (
+            <li key={index} className="flex items-start gap-2">
+              <CheckCircle2 className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
+              <span>{feature}</span>
+            </li>
+          ))}
+        </ul>
+        <div className="mt-4">
+          <GiftAidForm
+            isGiftAid={isGiftAid}
+            setIsGiftAid={setIsGiftAid}
+            giftAidName={giftAidName}
+            setGiftAidName={setGiftAidName}
+            giftAidAddress={giftAidAddress}
+            setGiftAidAddress={setGiftAidAddress}
+            giftAidPostcode={giftAidPostcode}
+            setGiftAidPostcode={setGiftAidPostcode}
+          />
+        </div>
+      </CardContent>
+      <CardFooter>
+        <Button 
+          className="w-full" 
+          onClick={handleSubscribe}
+          disabled={loading}
+          variant={popular ? "default" : "outline"}
         >
-          Next
-        </button>
-      </div>
-    </div>
-  );
-
-  const renderStep2 = () => (
-    <div className="space-y-4">
-      <h3 className="text-xl font-semibold mb-4">Step 2: Choose Your Subscription</h3>
-      <div className="grid gap-6 md:grid-cols-3">
-        {tiers.map((tier) => (
-          <div 
-            key={tier.id}
-            className={`border rounded-lg p-4 cursor-pointer transition-all hover:shadow-md ${
-              formData.subscriptionTier === tier.id 
-                ? 'border-[#2A9D8F] bg-[#2A9D8F]/10 ring-2 ring-[#2A9D8F]' 
-                : 'border-gray-200 dark:border-gray-700'
-            }`}
-            onClick={() => handleTierChange(tier.id)}
-          >
-            <div className="flex items-center mb-2">
-              <input
-                type="radio"
-                id={`tier-${tier.id}`}
-                name="subscriptionTier"
-                value={tier.id}
-                checked={formData.subscriptionTier === tier.id}
-                onChange={() => handleTierChange(tier.id)}
-                className="h-4 w-4 text-[#2A9D8F] focus:ring-[#2A9D8F]"
-              />
-              <label htmlFor={`tier-${tier.id}`} className="ml-2 text-lg font-medium">
-                {tier.name}
-              </label>
-            </div>
-            <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">{tier.description}</p>
-            <ul className="text-sm space-y-1">
-              {tier.features.map((feature, index) => (
-                <li key={index} className="flex items-start">
-                  <span className="text-[#2A9D8F] mr-2">✓</span>
-                  {feature}
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
-      </div>
-      
-      <div className="flex justify-between mt-6">
-        <button
-          type="button"
-          onClick={goToPreviousStep}
-          className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-800 transition duration-200"
-        >
-          Back
-        </button>
-        <button
-          type="button"
-          onClick={goToNextStep}
-          className="px-4 py-2 bg-[#2A9D8F] text-white rounded-md hover:bg-[#2A9D8F]/90 transition duration-200"
-        >
-          Next
-        </button>
-      </div>
-    </div>
-  );
-
-  const renderStep3 = () => (
-    <div className="space-y-4">
-      <h3 className="text-xl font-semibold mb-4">Step 3: Select Your Interests</h3>
-      <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
-        Choose the topics you're interested in to receive more relevant content.
-      </p>
-      
-      <div className="grid gap-3 md:grid-cols-2">
-        {interestOptions.map((interest) => (
-          <div key={interest.id} className="flex items-center">
-            <input
-              type="checkbox"
-              id={`interest-${interest.id}`}
-              value={interest.id}
-              checked={formData.interests.includes(interest.id)}
-              onChange={handleInterestChange}
-              className="h-4 w-4 rounded border-gray-300 text-[#2A9D8F] focus:ring-[#2A9D8F]"
-            />
-            <label htmlFor={`interest-${interest.id}`} className="ml-2 text-sm">
-              {interest.label}
-            </label>
-          </div>
-        ))}
-      </div>
-      
-      <div className="flex justify-between mt-6">
-        <button
-          type="button"
-          onClick={goToPreviousStep}
-          className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-800 transition duration-200"
-        >
-          Back
-        </button>
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="px-4 py-2 bg-[#2A9D8F] text-white rounded-md hover:bg-[#2A9D8F]/90 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {isSubmitting ? (
-            <span className="flex items-center">
-              <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              Subscribing...
-            </span>
+          {loading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Processing...
+            </>
           ) : (
-            "Subscribe"
+            "Subscribe Now"
           )}
-        </button>
-      </div>
-    </div>
+        </Button>
+      </CardFooter>
+    </Card>
   );
+};
+
+const TieredSubscription: React.FC = () => {
+  const tiers = [
+    {
+      title: "Basic",
+      price: 5,
+      frequency: "month",
+      description: "Essential support for our environmental data initiatives",
+      icon: <Shield className="h-5 w-5 text-blue-500" />,
+      features: [
+        "Monthly project updates",
+        "Name listed on our supporters page",
+        "Access to quarterly reports",
+        "Invitation to annual online event"
+      ]
+    },
+    {
+      title: "Professional",
+      price: 20,
+      frequency: "month",
+      description: "Enhanced engagement with our data-driven environmental projects",
+      icon: <BarChart className="h-5 w-5 text-emerald-500" />,
+      popular: true,
+      features: [
+        "All Basic tier benefits",
+        "Quarterly detailed impact reports",
+        "Bi-monthly project insights newsletter",
+        "Behind-the-scenes project updates",
+        "Recognition in annual reports"
+      ]
+    },
+    {
+      title: "Research",
+      price: 50,
+      frequency: "month",
+      description: "Premium access to our comprehensive environmental data resources",
+      icon: <Database className="h-5 w-5 text-indigo-500" />,
+      features: [
+        "All Professional tier benefits",
+        "Priority access to new datasets",
+        "Monthly deep-dive analysis reports",
+        "Acknowledgement in research publications",
+        "Annual private briefing with our team",
+        "Input on future research priorities"
+      ]
+    }
+  ];
 
   return (
-    <div className="max-w-3xl mx-auto bg-white dark:bg-[#1E293B] rounded-lg shadow-md overflow-hidden">
-      <div className="p-1 bg-gradient-to-r from-[#2A9D8F] via-[#457B9D] to-[#4CAF50]"></div>
-      <div className="p-6 md:p-8">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Subscribe to Our Newsletter</h2>
-        <p className="text-gray-600 dark:text-gray-300 mb-6">
-          Stay informed about sustainable technology, impact metrics, and the latest from ECODATA CIC.
-        </p>
-        
-        {/* Progress indicator */}
-        <div className="relative mb-8">
-          <div className="flex mb-2 justify-between">
-            <div 
-              className={`text-xs font-medium ${
-                currentStep >= 1 ? "text-[#2A9D8F]" : "text-gray-500"
-              }`}
-            >
-              Details
-            </div>
-            <div 
-              className={`text-xs font-medium ${
-                currentStep >= 2 ? "text-[#2A9D8F]" : "text-gray-500"
-              }`}
-            >
-              Subscription
-            </div>
-            <div 
-              className={`text-xs font-medium ${
-                currentStep >= 3 ? "text-[#2A9D8F]" : "text-gray-500"
-              }`}
-            >
-              Interests
-            </div>
-          </div>
-          <div className="overflow-hidden h-2 mb-4 text-xs flex rounded bg-gray-200 dark:bg-gray-700">
-            <div 
-              style={{ width: `${(currentStep - 1) * 50}%` }}
-              className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-[#2A9D8F] transition-all duration-300"
-            ></div>
-          </div>
-        </div>
-        
-        <form onSubmit={handleSubmit}>
-          {currentStep === 1 && renderStep1()}
-          {currentStep === 2 && renderStep2()}
-          {currentStep === 3 && renderStep3()}
-        </form>
-        
-        {/* Social proof counter */}
-        <div className="mt-8 text-center">
-          <p className="text-sm text-gray-500 dark:text-gray-400">
-            Join our community of over <span className="font-semibold text-[#2A9D8F]">1,200</span> subscribers
+    <section className="py-16 bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-950">
+      <div className="container mx-auto px-4">
+        <div className="text-center mb-10">
+          <h2 className="text-3xl font-bold mb-4">Support Our Work</h2>
+          <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+            Choose a subscription tier that aligns with your commitment to supporting environmental data science and our mission.
           </p>
         </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+          {tiers.map((tier, index) => (
+            <SubscriptionTier key={index} {...tier} />
+          ))}
+        </div>
+
+        <div className="mt-16 max-w-3xl mx-auto text-center">
+          <h3 className="text-xl font-semibold mb-4">How Your Subscription Makes a Difference</h3>
+          <p className="text-gray-600 dark:text-gray-300 mb-8">
+            Your recurring support enables us to plan long-term projects, invest in better data collection tools, 
+            and develop innovative approaches to using data for environmental and social impact.
+          </p>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Card className="text-center">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg">Sustained Impact</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm">Regular funding allows us to maintain continuous data collection and analysis across all our projects.</p>
+              </CardContent>
+            </Card>
+            
+            <Card className="text-center">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg">Growth & Innovation</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm">Predictable income helps us invest in new technologies and methodologies that enhance our impact.</p>
+              </CardContent>
+            </Card>
+            
+            <Card className="text-center">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg">Community Building</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm">Our subscribers form a community of supporters who help shape our future direction and priorities.</p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
       </div>
-    </div>
+    </section>
   );
-}
+};
+
+export default TieredSubscription;

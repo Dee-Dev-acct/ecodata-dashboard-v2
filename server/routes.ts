@@ -16,7 +16,9 @@ import {
   insertImpactMetricSchema,
   insertBlogPostSchema,
   insertSettingSchema,
-  insertPartnerSchema
+  insertPartnerSchema,
+  insertDonationSchema,
+  insertSubscriptionSchema
 } from "@shared/schema";
 
 // Initialize Stripe
@@ -648,8 +650,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // Get amount from request body with validation
-      const { amount } = req.body;
+      // Get donation details from request body with validation
+      const { amount, isGiftAid, giftAidName, giftAidAddress, giftAidPostcode, email } = req.body;
       
       // Validate amount is a number and within acceptable range (£1 to £500)
       const donationAmount = parseFloat(amount);
@@ -682,11 +684,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
           },
         ],
         mode: "payment",
-        success_url: `${req.headers.origin}/donation-success`,
+        success_url: `${req.headers.origin}/donation-success?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${req.headers.origin}`,
         metadata: {
-          donationAmount: donationAmount.toFixed(2) // Store formatted amount as metadata for reference
-        }
+          donationAmount: donationAmount.toFixed(2),
+          isGiftAid: isGiftAid ? "true" : "false",
+          giftAidName: giftAidName || "",
+          giftAidAddress: giftAidAddress || "",
+          giftAidPostcode: giftAidPostcode || "",
+          email: email || ""
+        },
+        customer_email: email // Pre-fill the customer's email if provided
       });
 
       console.log("Checkout session created successfully");
@@ -697,7 +705,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Return the URL to redirect to
-      res.json({ url: session.url });
+      res.json({ url: session.url, sessionId: session.id });
     } catch (error: any) {
       console.error("Error creating checkout session:", error);
       
@@ -735,6 +743,428 @@ export async function registerRoutes(app: Express): Promise<Server> {
         recoverable: statusCode < 500, // Indicates if the user can reasonably retry the operation
         detail: process.env.NODE_ENV === 'development' ? error.message : undefined
       });
+    }
+  });
+  
+  // New API route to create recurring subscription donation via Stripe
+  app.post("/api/create-subscription", async (req: Request, res: Response) => {
+    try {
+      // Verify Stripe is configured properly
+      if (!process.env.STRIPE_SECRET_KEY) {
+        console.error('STRIPE_SECRET_KEY environment variable is not set or invalid');
+        return res.status(503).json({ 
+          error: "Stripe configuration error", 
+          message: "Subscription functionality is currently unavailable. Please try again later." 
+        });
+      }
+
+      // Get subscription details from request body
+      const { amount, interval, isGiftAid, giftAidName, giftAidAddress, giftAidPostcode, email, name } = req.body;
+      
+      // Validate amount is a number and within acceptable range
+      const donationAmount = parseFloat(amount);
+      if (isNaN(donationAmount) || donationAmount < 1 || donationAmount > 500) {
+        console.error(`Invalid subscription amount: ${amount}`);
+        return res.status(400).json({
+          error: "Invalid amount",
+          message: 'Invalid subscription amount. Please enter an amount between £1 and £500.'
+        });
+      }
+      
+      // Validate interval
+      if (interval !== 'month' && interval !== 'year') {
+        return res.status(400).json({
+          error: "Invalid interval",
+          message: 'Invalid subscription interval. Please select either monthly or yearly.'
+        });
+      }
+
+      // Convert to pence (GBP) for Stripe
+      const amountInPence = Math.round(donationAmount * 100);
+      
+      // Create a product for this subscription if it doesn't exist
+      const productName = `${interval === 'month' ? 'Monthly' : 'Annual'} Donation to ECODATA CIC`;
+      const product = await stripe.products.create({
+        name: productName,
+        description: `Supporting eco-friendly data initiatives (${interval}ly)`
+      });
+      
+      // Create a price for this product
+      const price = await stripe.prices.create({
+        product: product.id,
+        unit_amount: amountInPence,
+        currency: 'gbp',
+        recurring: {
+          interval: interval
+        }
+      });
+      
+      // Create a checkout session for the subscription
+      const session = await stripe.checkout.sessions.create({
+        payment_method_types: ["card"],
+        line_items: [
+          {
+            price: price.id,
+            quantity: 1
+          }
+        ],
+        mode: "subscription",
+        success_url: `${req.headers.origin}/subscription-success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${req.headers.origin}`,
+        metadata: {
+          donationAmount: donationAmount.toFixed(2),
+          interval: interval,
+          isGiftAid: isGiftAid ? "true" : "false",
+          giftAidName: giftAidName || "",
+          giftAidAddress: giftAidAddress || "",
+          giftAidPostcode: giftAidPostcode || "",
+          email: email || "",
+          name: name || ""
+        },
+        customer_email: email // Pre-fill the customer's email if provided
+      });
+      
+      // Return the session URL and ID
+      res.json({ url: session.url, sessionId: session.id });
+    } catch (error: any) {
+      console.error("Error creating subscription:", error);
+      
+      // Identify specific error cases for better user feedback
+      let statusCode = 500;
+      let errorMessage = "Failed to process subscription. Please try again later.";
+      
+      // Handle specific Stripe errors (same as one-time donations)
+      if (error.type === 'StripeAuthenticationError') {
+        statusCode = 503;
+        errorMessage = "Payment service authentication error. Please contact support.";
+      } else if (error.type === 'StripeInvalidRequestError') {
+        statusCode = 400;
+        errorMessage = "Invalid subscription request. Please try again.";
+      } else if (error.type === 'StripeConnectionError') {
+        statusCode = 503;
+        errorMessage = "Unable to connect to payment service. Please try again later.";
+      } else if (error.type === 'StripeRateLimitError') {
+        statusCode = 429;
+        errorMessage = "Too many subscription requests. Please try again in a few minutes.";
+      }
+      
+      // Return appropriate error response with helpful context
+      res.status(statusCode).json({ 
+        error: "Subscription error", 
+        message: errorMessage,
+        code: error.code || 'unknown',
+        recoverable: statusCode < 500
+      });
+    }
+  });
+  
+  // Webhook endpoint to handle Stripe events
+  app.post('/api/webhook', async (req: Request, res: Response) => {
+    const sig = req.headers['stripe-signature'] as string;
+    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+    
+    let event;
+    
+    // Verify webhook signature
+    try {
+      if (!webhookSecret) {
+        console.warn('No webhook secret configured, skipping signature verification');
+        event = req.body;
+      } else {
+        event = stripe.webhooks.constructEvent(
+          (req as any).rawBody || req.body,
+          sig,
+          webhookSecret
+        );
+      }
+    } catch (err: any) {
+      console.error(`Webhook signature verification failed: ${err.message}`);
+      return res.status(400).send(`Webhook Error: ${err.message}`);
+    }
+    
+    // Handle the event
+    try {
+      switch (event.type) {
+        case 'checkout.session.completed': {
+          const session = event.data.object;
+          
+          if (session.mode === 'payment') {
+            // Handle one-time donation
+            await handleDonationSuccess(session);
+          } else if (session.mode === 'subscription') {
+            // Handle subscription
+            await handleSubscriptionSuccess(session);
+          }
+          break;
+        }
+        case 'invoice.paid': {
+          // Handle subscription renewal payment
+          const invoice = event.data.object;
+          await handleSubscriptionRenewal(invoice);
+          break;
+        }
+        case 'customer.subscription.updated':
+        case 'customer.subscription.deleted': {
+          // Handle subscription status change
+          const subscription = event.data.object;
+          await handleSubscriptionUpdate(subscription);
+          break;
+        }
+      }
+      
+      // Return a 200 response to acknowledge receipt of the event
+      res.json({ received: true });
+    } catch (err) {
+      console.error(`Error processing webhook event: ${err}`);
+      res.status(500).send('Error processing webhook');
+    }
+  });
+  
+  // Function to handle successful one-time donation
+  async function handleDonationSuccess(session: any) {
+    try {
+      // Extract metadata from session
+      const { donationAmount, isGiftAid, giftAidName, giftAidAddress, giftAidPostcode, email } = session.metadata;
+      
+      // Get payment details
+      const paymentIntent = await stripe.paymentIntents.retrieve(session.payment_intent);
+      
+      // Create donation record
+      await storage.createDonation({
+        amount: donationAmount,
+        currency: session.currency || 'gbp',
+        email: email || session.customer_details?.email,
+        name: session.customer_details?.name,
+        stripePaymentId: session.payment_intent,
+        stripeSessionId: session.id,
+        status: 'completed',
+        isGiftAid: isGiftAid === 'true',
+        giftAidName: giftAidName || null,
+        giftAidAddress: giftAidAddress || null,
+        giftAidPostcode: giftAidPostcode || null,
+        metadata: { 
+          paymentMethod: paymentIntent.payment_method_types[0],
+          customerDetails: session.customer_details
+        }
+      });
+      
+      console.log(`Donation record created for session ${session.id}`);
+    } catch (error) {
+      console.error('Error creating donation record:', error);
+      throw error;
+    }
+  }
+  
+  // Function to handle subscription creation success
+  async function handleSubscriptionSuccess(session: any) {
+    try {
+      // Get the subscription details from the session - use any type as the Stripe types aren't matching well
+      const subscription: any = await stripe.subscriptions.retrieve(session.subscription);
+      
+      // Extract metadata
+      const { donationAmount, interval, isGiftAid, giftAidName, giftAidAddress, giftAidPostcode, email, name } = session.metadata;
+      
+      // Get customer ID as string
+      const stripeCustomerId = typeof subscription.customer === 'string' 
+        ? subscription.customer 
+        : subscription.customer.id;
+      
+      // Create subscription record
+      await storage.createSubscription({
+        email: email || session.customer_details?.email,
+        name: name || session.customer_details?.name,
+        stripeCustomerId: stripeCustomerId,
+        stripeSubscriptionId: subscription.id,
+        amount: donationAmount,
+        currency: subscription.currency || 'gbp',
+        interval: interval || 'month',
+        status: subscription.status,
+        isGiftAid: isGiftAid === 'true',
+        giftAidName: giftAidName || null,
+        giftAidAddress: giftAidAddress || null,
+        giftAidPostcode: giftAidPostcode || null,
+        currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+        metadata: {
+          sessionId: session.id,
+          customerDetails: session.customer_details
+        }
+      });
+      
+      console.log(`Subscription record created for subscription ${subscription.id}`);
+    } catch (error) {
+      console.error('Error creating subscription record:', error);
+      throw error;
+    }
+  }
+  
+  // Function to handle subscription renewal
+  async function handleSubscriptionRenewal(invoice: any) {
+    try {
+      // Get the subscription - use any type for Stripe API consistency
+      const subscription: any = await stripe.subscriptions.retrieve(invoice.subscription);
+      
+      // Find the subscription in our database
+      const existingSubscription = await storage.getSubscriptionByStripeId(subscription.id);
+      
+      if (existingSubscription) {
+        // Update the subscription status and current period end
+        await storage.updateSubscriptionStatus(existingSubscription.id, subscription.status);
+        
+        console.log(`Subscription ${subscription.id} renewal processed`);
+      } else {
+        console.warn(`Subscription ${subscription.id} not found in database for renewal event`);
+      }
+    } catch (error) {
+      console.error('Error processing subscription renewal:', error);
+      throw error;
+    }
+  }
+  
+  // Function to handle subscription status updates
+  async function handleSubscriptionUpdate(subscription: any) {
+    try {
+      // Find the subscription in our database
+      const existingSubscription = await storage.getSubscriptionByStripeId(subscription.id);
+      
+      if (existingSubscription) {
+        // Update subscription status
+        if (subscription.status === 'canceled' || subscription.status === 'unpaid') {
+          await storage.cancelSubscription(existingSubscription.id);
+        } else {
+          await storage.updateSubscriptionStatus(existingSubscription.id, subscription.status);
+        }
+        
+        console.log(`Subscription ${subscription.id} status updated to ${subscription.status}`);
+      } else {
+        console.warn(`Subscription ${subscription.id} not found in database for status update event`);
+      }
+    } catch (error) {
+      console.error('Error updating subscription status:', error);
+      throw error;
+    }
+  }
+  
+  // Donation endpoints
+  
+  // Public API for donation success verification
+  app.get("/api/donations/verify/:sessionId", async (req: Request, res: Response) => {
+    try {
+      const { sessionId } = req.params;
+      
+      if (!sessionId) {
+        return res.status(400).json({ error: "Missing session ID" });
+      }
+      
+      // Retrieve the checkout session from Stripe
+      const session: any = await stripe.checkout.sessions.retrieve(sessionId);
+      
+      if (!session) {
+        return res.status(404).json({ error: "Session not found" });
+      }
+      
+      // Return appropriate data based on session status
+      return res.json({
+        status: session.status,
+        paymentStatus: session.payment_status,
+        amount: session.amount_total ? (session.amount_total / 100).toFixed(2) : null,
+        currency: session.currency,
+        customerEmail: session.customer_details?.email,
+        customerName: session.customer_details?.name,
+        mode: session.mode
+      });
+    } catch (error) {
+      console.error("Error verifying donation:", error);
+      return res.status(500).json({ error: "Failed to verify donation" });
+    }
+  });
+  
+  // Admin API for donations
+  app.get("/api/admin/donations", authenticateToken, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const donations = await storage.getDonations();
+      return res.json(donations);
+    } catch (error) {
+      console.error("Error fetching donations:", error);
+      return res.status(500).json({ message: "Failed to fetch donations" });
+    }
+  });
+  
+  // Admin API for subscriptions
+  app.get("/api/admin/subscriptions", authenticateToken, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const subscriptions = await storage.getSubscriptions();
+      return res.json(subscriptions);
+    } catch (error) {
+      console.error("Error fetching subscriptions:", error);
+      return res.status(500).json({ message: "Failed to fetch subscriptions" });
+    }
+  });
+  
+  // Public API for subscription success verification
+  app.get("/api/subscriptions/verify/:sessionId", async (req: Request, res: Response) => {
+    try {
+      const { sessionId } = req.params;
+      
+      if (!sessionId) {
+        return res.status(400).json({ error: "Missing session ID" });
+      }
+      
+      // Retrieve the checkout session from Stripe
+      const session: any = await stripe.checkout.sessions.retrieve(sessionId);
+      
+      if (!session) {
+        return res.status(404).json({ error: "Session not found" });
+      }
+      
+      // Get subscription details if available
+      let subscriptionDetails = null;
+      if (session.subscription) {
+        const subscription: any = await stripe.subscriptions.retrieve(session.subscription);
+        subscriptionDetails = {
+          id: subscription.id,
+          status: subscription.status,
+          currentPeriodEnd: new Date(subscription.current_period_end * 1000).toISOString(),
+          interval: subscription.items.data[0].plan.interval,
+        };
+      }
+      
+      // Return appropriate data based on session status
+      return res.json({
+        status: session.status,
+        paymentStatus: session.payment_status,
+        subscription: subscriptionDetails,
+        amount: session.amount_total ? (session.amount_total / 100).toFixed(2) : null,
+        currency: session.currency,
+        customerEmail: session.customer_details?.email,
+        customerName: session.customer_details?.name,
+        mode: session.mode
+      });
+    } catch (error) {
+      console.error("Error verifying subscription:", error);
+      return res.status(500).json({ error: "Failed to verify subscription" });
+    }
+  });
+  
+  // Admin API for cancelling subscriptions
+  app.post("/api/admin/subscriptions/:id/cancel", authenticateToken, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const subscription = await storage.getSubscription(parseInt(id));
+      
+      if (!subscription) {
+        return res.status(404).json({ message: "Subscription not found" });
+      }
+      
+      // Cancel in Stripe first
+      await stripe.subscriptions.cancel(subscription.stripeSubscriptionId);
+      
+      // Then update our record
+      const updatedSubscription = await storage.cancelSubscription(parseInt(id));
+      
+      return res.json(updatedSubscription);
+    } catch (error) {
+      console.error("Error cancelling subscription:", error);
+      return res.status(500).json({ message: "Failed to cancel subscription" });
     }
   });
 
