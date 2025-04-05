@@ -1,12 +1,28 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
-import { TreePine, Droplets, Wind, Users, Building, Leaf, Target, Award, Trophy, Star, Sparkles } from 'lucide-react';
+import { 
+  TreePine, Droplets, Wind, Users, Building, Leaf, Target, Award, Trophy, Star, Sparkles,
+  SlidersHorizontal, AlertCircle, Bell, BellOff, BookmarkPlus, CircleCheck, Filter, ArrowUpDown
+} from 'lucide-react';
 import ImpactProgressTracker from '../components/ImpactProgressTracker';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { useToast } from "@/hooks/use-toast";
 
 interface FundingGoal {
   id: string;
@@ -33,6 +49,18 @@ interface FundingGoal {
 }
 
 const FundingGoals: React.FC = () => {
+  // State for filtering and sorting 
+  const [filterByUrgency, setFilterByUrgency] = useState<string>("all");
+  const [sortBy, setSortBy] = useState<string>("urgency");
+  const [showWatchlist, setShowWatchlist] = useState<boolean>(false);
+  const [watchlist, setWatchlist] = useState<string[]>(() => {
+    // Get watchlist from localStorage if available
+    const saved = localStorage.getItem('fundingGoalsWatchlist');
+    return saved ? JSON.parse(saved) : [];
+  });
+  const [activeTab, setActiveTab] = useState<string>("all");
+  const { toast } = useToast();
+
   // Fetch funding goals data
   const { data: fundingGoalsData, isLoading } = useQuery({
     queryKey: ['/api/funding-goals'],
@@ -123,6 +151,11 @@ const FundingGoals: React.FC = () => {
     });
   };
 
+  // Save watchlist to localStorage when it changes
+  useEffect(() => {
+    localStorage.setItem('fundingGoalsWatchlist', JSON.stringify(watchlist));
+  }, [watchlist]);
+
   const handleDonateClick = (goal: FundingGoal) => {
     // Scroll to support section for donation
     const supportSection = document.getElementById('support');
@@ -132,7 +165,66 @@ const FundingGoals: React.FC = () => {
     }
   };
 
+  const toggleWatchlist = (goalId: string) => {
+    if (watchlist.includes(goalId)) {
+      setWatchlist(watchlist.filter(id => id !== goalId));
+      toast({
+        title: "Removed from watchlist",
+        description: "Project removed from your notifications list.",
+        variant: "default",
+      });
+    } else {
+      setWatchlist([...watchlist, goalId]);
+      toast({
+        title: "Added to watchlist",
+        description: "You'll receive reminders about this project's deadline.",
+        variant: "default",
+      });
+    }
+  };
+
+  const isWatched = (goalId: string) => watchlist.includes(goalId);
+
+  // Process and filter the goals
   const processedGoals = fundingGoalsData ? processGoals(fundingGoalsData) : [];
+  
+  // Apply filters and sorting
+  const filteredGoals = processedGoals.filter(goal => {
+    // Apply urgency filter if not set to "all"
+    if (filterByUrgency !== "all" && goal.urgency !== filterByUrgency) {
+      return false;
+    }
+    
+    // Filter by watchlist if it's enabled
+    if (showWatchlist && !watchlist.includes(goal.id)) {
+      return false;
+    }
+    
+    // Filter by active tab (could be categories like "water", "forest", etc.)
+    if (activeTab !== "all" && !goal.id.includes(activeTab)) {
+      return false;
+    }
+    
+    return true;
+  });
+  
+  // Sort the filtered goals
+  const sortedGoals = [...filteredGoals].sort((a, b) => {
+    const urgencyOrder = { critical: 0, high: 1, medium: 2, low: 3, undefined: 4 };
+    
+    if (sortBy === "urgency") {
+      return (urgencyOrder[a.urgency as keyof typeof urgencyOrder] || 4) - 
+             (urgencyOrder[b.urgency as keyof typeof urgencyOrder] || 4);
+    } else if (sortBy === "progress") {
+      const progressA = (a.currentAmount / a.targetAmount) * 100;
+      const progressB = (b.currentAmount / b.targetAmount) * 100;
+      return progressB - progressA; // Highest progress first
+    } else if (sortBy === "amount") {
+      return b.targetAmount - a.targetAmount; // Highest amount first
+    } else {
+      return 0;
+    }
+  });
 
   return (
     <div className="container mx-auto px-4 py-16">
@@ -140,13 +232,87 @@ const FundingGoals: React.FC = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="text-center mb-12"
+        className="text-center mb-6"
       >
         <h1 className="text-4xl font-bold mb-4">Our Funding Goals</h1>
         <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
           Join us in supporting critical environmental data initiatives. Your contribution directly 
           helps advance our mission through these targeted funding campaigns.
         </p>
+      </motion.div>
+      
+      {/* Filter and sorting controls */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
+        className="mb-8 bg-white dark:bg-gray-800 border rounded-lg p-4 shadow-sm"
+      >
+        <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center mb-4">
+          <div className="flex flex-wrap items-center gap-2">
+            <h3 className="text-lg font-medium flex items-center gap-2">
+              <Filter className="h-4 w-4" /> 
+              Filter by:
+            </h3>
+            
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full sm:w-auto">
+              <TabsList>
+                <TabsTrigger value="all">All</TabsTrigger>
+                <TabsTrigger value="reforestation">
+                  <TreePine className="h-4 w-4 mr-1" /> Forest
+                </TabsTrigger>
+                <TabsTrigger value="water">
+                  <Droplets className="h-4 w-4 mr-1" /> Water
+                </TabsTrigger>
+                <TabsTrigger value="community">
+                  <Users className="h-4 w-4 mr-1" /> Community
+                </TabsTrigger>
+                <TabsTrigger value="carbon">
+                  <Wind className="h-4 w-4 mr-1" /> Carbon
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
+          </div>
+            
+          <div className="flex items-center gap-3">
+            <div className="flex items-center space-x-2">
+              <Switch 
+                id="watchlist-toggle" 
+                checked={showWatchlist}
+                onCheckedChange={setShowWatchlist}
+              />
+              <Label htmlFor="watchlist-toggle" className="flex items-center whitespace-nowrap">
+                <Bell className="h-4 w-4 mr-1" /> My Watchlist
+              </Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Select value={sortBy} onValueChange={setSortBy}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Sort by" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="urgency">Urgency</SelectItem>
+                  <SelectItem value="progress">Progress</SelectItem>
+                  <SelectItem value="amount">Target Amount</SelectItem>
+                </SelectContent>
+              </Select>
+              <ArrowUpDown className="h-4 w-4" />
+            </div>
+          </div>
+        </div>
+        
+        <div className="pt-2">
+          <p className="mb-2 text-sm font-medium flex items-center gap-2">
+            <AlertCircle className="h-4 w-4" /> Urgency:
+          </p>
+          <ToggleGroup type="single" value={filterByUrgency} onValueChange={(value) => setFilterByUrgency(value || "all")}>
+            <ToggleGroupItem value="all">All</ToggleGroupItem>
+            <ToggleGroupItem value="critical" className="text-red-500">Critical</ToggleGroupItem>
+            <ToggleGroupItem value="high" className="text-orange-500">High</ToggleGroupItem>
+            <ToggleGroupItem value="medium" className="text-yellow-600">Medium</ToggleGroupItem>
+            <ToggleGroupItem value="low" className="text-green-600">Low</ToggleGroupItem>
+          </ToggleGroup>
+        </div>
       </motion.div>
 
       {isLoading ? (
@@ -165,35 +331,176 @@ const FundingGoals: React.FC = () => {
           ))}
         </div>
       ) : (
-        <div className="space-y-10">
-          {processedGoals.map((goal: FundingGoal, index: number) => (
+        <>
+          {/* Display counts of filtered items */}
+          <div className="mb-6 flex flex-wrap items-center justify-between gap-2">
+            <div className="text-sm text-gray-500 dark:text-gray-400">
+              Showing {sortedGoals.length} of {processedGoals.length} funding goals
+              {filterByUrgency !== "all" && (
+                <span> — filtered by <Badge variant="outline" className="ml-1 font-normal">{filterByUrgency} urgency</Badge></span>
+              )}
+              {showWatchlist && watchlist.length > 0 && (
+                <span> — from your <Badge variant="outline" className="ml-1 font-normal">watchlist</Badge></span>
+              )}
+              {activeTab !== "all" && (
+                <span> — in category <Badge variant="outline" className="ml-1 font-normal">{activeTab}</Badge></span>
+              )}
+            </div>
+            
+            {sortedGoals.length === 0 && (
+              <div className="w-full mt-4 p-8 text-center border border-dashed rounded-lg bg-gray-50 dark:bg-gray-800/50">
+                <div className="text-gray-500 dark:text-gray-400 mb-2">No funding goals match your filters</div>
+                <Button variant="outline" size="sm" onClick={() => {
+                  setFilterByUrgency("all");
+                  setActiveTab("all");
+                  setShowWatchlist(false);
+                }}>
+                  Reset Filters
+                </Button>
+              </div>
+            )}
+          </div>
+
+          {/* Circular progress visualization for goals requiring immediate attention */}
+          {filterByUrgency === "all" && !showWatchlist && activeTab === "all" && (
             <motion.div 
-              key={goal.id}
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="mb-8"
             >
-              <ImpactProgressTracker
-                title={goal.title}
-                description={goal.description}
-                currentValue={goal.currentAmount}
-                targetValue={goal.targetAmount}
-                unit="£"
-                icon={goal.icon}
-                milestones={goal.milestones}
-                theme={goal.theme}
-                donateButtonText="Contribute to This Goal"
-                onDonateClick={() => handleDonateClick(goal)}
-                urgency={goal.urgency}
-                daysRemaining={goal.daysRemaining}
-                location={goal.location}
-                impact={goal.impact}
-                coverImage={goal.coverImage}
-                suggestedDonations={goal.suggestedDonations || [25, 50, 100, 250]}
-              />
+              <h3 className="text-lg font-medium mb-4">Critical Needs at a Glance</h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {processedGoals
+                  .filter(goal => goal.urgency === 'critical' || goal.urgency === 'high')
+                  .slice(0, 4)
+                  .map((goal, idx) => {
+                    const progress = (goal.currentAmount / goal.targetAmount) * 100;
+                    const remaining = 100 - progress;
+                    const strokeDasharray = `${progress} ${remaining}`;
+                    
+                    return (
+                      <div key={idx} className="relative">
+                        <Card className="p-4 flex flex-col items-center cursor-pointer hover:shadow-md transition-shadow"
+                              onClick={() => {
+                                const element = document.getElementById(goal.id);
+                                if (element) element.scrollIntoView({ behavior: 'smooth' });
+                              }}>
+                          <div className="relative w-20 h-20 mb-2">
+                            <svg className="w-full h-full" viewBox="0 0 36 36">
+                              {/* Background circle */}
+                              <circle 
+                                cx="18" cy="18" r="15.91549430918954" 
+                                fill="transparent" 
+                                stroke="#e9ecef" 
+                                strokeWidth="2.5"
+                              />
+                              {/* Progress arc */}
+                              <circle 
+                                cx="18" cy="18" r="15.91549430918954" 
+                                fill="transparent" 
+                                stroke={goal.urgency === 'critical' ? '#ef4444' : '#f59e0b'}
+                                strokeWidth="2.5"
+                                strokeDasharray={strokeDasharray} 
+                                strokeDashoffset="25"
+                                className="transition-all duration-1000 ease-out" 
+                              />
+                              {/* Add days remaining count in the center */}
+                              <text x="18" y="17" textAnchor="middle" fontSize="7" fill="currentColor" fontWeight="bold">
+                                {goal.daysRemaining}
+                              </text>
+                              <text x="18" y="23" textAnchor="middle" fontSize="3.5" fill="currentColor">
+                                days left
+                              </text>
+                            </svg>
+                            <div className="absolute top-0 right-0 -mt-2 -mr-2">
+                              {goal.urgency === 'critical' ? (
+                                <span className="h-5 w-5 rounded-full bg-red-500 flex items-center justify-center text-white">
+                                  <AlertCircle className="h-3 w-3" />
+                                </span>
+                              ) : (
+                                <span className="h-5 w-5 rounded-full bg-orange-500 flex items-center justify-center text-white">
+                                  <AlertCircle className="h-3 w-3" />
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                          <p className="text-sm font-medium text-center line-clamp-1">{goal.title}</p>
+                          <p className="text-xs text-gray-500 text-center">{Math.round(progress)}% funded</p>
+                        </Card>
+                      </div>
+                    );
+                  })}
+              </div>
             </motion.div>
-          ))}
-        </div>
+          )}
+
+          {/* Main goal cards */}
+          <div className="space-y-10">
+            {sortedGoals.map((goal: FundingGoal, index: number) => (
+              <motion.div 
+                id={goal.id}
+                key={goal.id}
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                className="relative"
+              >
+                {/* Watchlist toggle button */}
+                <div className="absolute top-4 right-4 z-10">
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className={`rounded-full bg-white/80 backdrop-blur-sm hover:bg-white dark:bg-gray-900/80 dark:hover:bg-gray-900 ${
+                      isWatched(goal.id) ? 'text-yellow-500 border-yellow-500' : 'text-gray-500'
+                    }`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleWatchlist(goal.id);
+                    }}
+                  >
+                    {isWatched(goal.id) ? <Bell className="h-4 w-4" /> : <BellOff className="h-4 w-4" />}
+                  </Button>
+                </div>
+                
+                <ImpactProgressTracker
+                  title={goal.title}
+                  description={goal.description}
+                  currentValue={goal.currentAmount}
+                  targetValue={goal.targetAmount}
+                  unit="£"
+                  icon={goal.icon}
+                  milestones={goal.milestones}
+                  theme={goal.theme}
+                  donateButtonText="Contribute to This Goal"
+                  onDonateClick={() => handleDonateClick(goal)}
+                  urgency={goal.urgency}
+                  daysRemaining={goal.daysRemaining}
+                  location={goal.location}
+                  impact={goal.impact}
+                  coverImage={goal.coverImage}
+                  suggestedDonations={goal.suggestedDonations || [25, 50, 100, 250]}
+                />
+              </motion.div>
+            ))}
+          </div>
+          
+          {/* Empty state for watchlist */}
+          {showWatchlist && watchlist.length === 0 && (
+            <div className="w-full p-12 text-center border border-dashed rounded-lg bg-gray-50 dark:bg-gray-800/50">
+              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400 mb-4">
+                <Bell className="h-6 w-6" />
+              </div>
+              <h3 className="text-lg font-medium mb-2">Your watchlist is empty</h3>
+              <p className="text-gray-500 dark:text-gray-400 max-w-md mx-auto mb-4">
+                Add funding goals to your watchlist to get reminders about their deadlines and track their progress.
+              </p>
+              <Button variant="outline" size="sm" onClick={() => setShowWatchlist(false)}>
+                Browse All Goals
+              </Button>
+            </div>
+          )}
+        </>
       )}
 
       <motion.div 
