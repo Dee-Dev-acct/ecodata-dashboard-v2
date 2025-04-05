@@ -7,6 +7,7 @@ import {
   impactMetrics, type ImpactMetric, type InsertImpactMetric,
   blogPosts, type BlogPost, type InsertBlogPost,
   settings, type Setting, type InsertSetting,
+  partners, type Partner, type InsertPartner,
   // MSSQL schemas
   type MSSQLUser,
   type MSSQLContactMessage,
@@ -15,7 +16,8 @@ import {
   type MSSQLTestimonial,
   type MSSQLImpactMetric,
   type MSSQLBlogPost,
-  type MSSQLSetting
+  type MSSQLSetting,
+  type MSSQLPartner
 } from "@shared/schema";
 import { db, mssqlClient } from "./db";
 import { 
@@ -84,6 +86,13 @@ export interface IStorage {
   createSetting(setting: InsertSetting): Promise<Setting>;
   updateSetting(id: number, setting: Partial<InsertSetting>): Promise<Setting | undefined>;
   deleteSetting(id: number): Promise<boolean>;
+  
+  // Partners
+  getPartners(): Promise<Partner[]>;
+  getPartner(id: number): Promise<Partner | undefined>;
+  createPartner(partner: InsertPartner): Promise<Partner>;
+  updatePartner(id: number, partner: Partial<InsertPartner>): Promise<Partner | undefined>;
+  deletePartner(id: number): Promise<boolean>;
 }
 
 export class MemStorage implements IStorage {
@@ -95,6 +104,7 @@ export class MemStorage implements IStorage {
   private impactMetrics: Map<number, ImpactMetric>;
   private blogPosts: Map<number, BlogPost>;
   private settings: Map<number, Setting>;
+  private partners: Map<number, Partner>;
   
   private currentUserId: number;
   private currentContactMessageId: number;
@@ -104,6 +114,7 @@ export class MemStorage implements IStorage {
   private currentImpactMetricId: number;
   private currentBlogPostId: number;
   private currentSettingId: number;
+  private currentPartnerId: number;
 
   constructor() {
     this.users = new Map();

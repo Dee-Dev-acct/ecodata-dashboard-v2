@@ -14,7 +14,8 @@ import {
   insertTestimonialSchema,
   insertImpactMetricSchema,
   insertBlogPostSchema,
-  insertSettingSchema
+  insertSettingSchema,
+  insertPartnerSchema
 } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -155,6 +156,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching impact metrics:", error);
       return res.status(500).json({ message: "Failed to fetch impact metrics" });
+    }
+  });
+  
+  app.get("/api/partners", async (req: Request, res: Response) => {
+    try {
+      const partners = await storage.getPartners();
+      return res.json(partners);
+    } catch (error) {
+      console.error("Error fetching partners:", error);
+      return res.status(500).json({ message: "Failed to fetch partners" });
     }
   });
 
@@ -524,6 +535,71 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error creating/updating setting:", error);
       return res.status(500).json({ message: "Failed to create/update setting" });
+    }
+  });
+  
+  // CMS Routes - Partners
+  app.get("/api/admin/partners", authenticateToken, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const partners = await storage.getPartners();
+      return res.json(partners);
+    } catch (error) {
+      console.error("Error fetching partners:", error);
+      return res.status(500).json({ message: "Failed to fetch partners" });
+    }
+  });
+  
+  app.post("/api/admin/partners", authenticateToken, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const result = insertPartnerSchema.safeParse(req.body);
+      
+      if (!result.success) {
+        return res.status(400).json({ message: "Invalid partner data", errors: result.error.errors });
+      }
+      
+      const partner = await storage.createPartner(result.data);
+      return res.status(201).json(partner);
+    } catch (error) {
+      console.error("Error creating partner:", error);
+      return res.status(500).json({ message: "Failed to create partner" });
+    }
+  });
+  
+  app.put("/api/admin/partners/:id", authenticateToken, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const result = insertPartnerSchema.partial().safeParse(req.body);
+      
+      if (!result.success) {
+        return res.status(400).json({ message: "Invalid partner data", errors: result.error.errors });
+      }
+      
+      const partner = await storage.updatePartner(parseInt(id), result.data);
+      
+      if (!partner) {
+        return res.status(404).json({ message: "Partner not found" });
+      }
+      
+      return res.json(partner);
+    } catch (error) {
+      console.error("Error updating partner:", error);
+      return res.status(500).json({ message: "Failed to update partner" });
+    }
+  });
+  
+  app.delete("/api/admin/partners/:id", authenticateToken, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const success = await storage.deletePartner(parseInt(id));
+      
+      if (!success) {
+        return res.status(404).json({ message: "Partner not found" });
+      }
+      
+      return res.json({ message: "Partner deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting partner:", error);
+      return res.status(500).json({ message: "Failed to delete partner" });
     }
   });
 

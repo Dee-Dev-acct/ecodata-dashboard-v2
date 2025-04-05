@@ -100,6 +100,17 @@ export interface MSSQLSetting {
   updated_at: Date;
 }
 
+// Partners MSSQL schema interface
+export interface MSSQLPartner {
+  id: number;
+  name: string;
+  logo_url: string;
+  website_url: string | null;
+  category: string;
+  created_at: Date;
+  updated_at: Date;
+}
+
 // User schema
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
@@ -253,6 +264,24 @@ export const insertSettingSchema = createInsertSchema(settings).pick({
   value: true
 });
 
+// Partners schema
+export const partners = pgTable("partners", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  logoUrl: text("logo_url").notNull(),
+  websiteUrl: text("website_url"),
+  category: text("category").notNull().default("general"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+export const insertPartnerSchema = createInsertSchema(partners).pick({
+  name: true,
+  logoUrl: true,
+  websiteUrl: true,
+  category: true
+});
+
 // Export types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -277,6 +306,9 @@ export type InsertBlogPost = z.infer<typeof insertBlogPostSchema>;
 
 export type Setting = typeof settings.$inferSelect;
 export type InsertSetting = z.infer<typeof insertSettingSchema>;
+
+export type Partner = typeof partners.$inferSelect;
+export type InsertPartner = z.infer<typeof insertPartnerSchema>;
 
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
