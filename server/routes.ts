@@ -384,6 +384,94 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.status(500).json({ message: "Failed to fetch impact metrics" });
     }
   });
+
+  // Impact Projects and Timeline Events public routes
+
+  app.get("/api/impact-projects", async (req: Request, res: Response) => {
+    try {
+      // Extract query parameters
+      const { featured, category } = req.query;
+      const options: { featured?: boolean, category?: string } = {};
+      
+      // Parse query parameters
+      if (featured !== undefined) {
+        options.featured = featured === 'true';
+      }
+      
+      if (category) {
+        options.category = category as string;
+      }
+      
+      const projects = await storage.getImpactProjects(options);
+      return res.json(projects);
+    } catch (error) {
+      console.error("Error fetching impact projects:", error);
+      return res.status(500).json({ message: "Failed to fetch impact projects" });
+    }
+  });
+
+  app.get("/api/impact-projects/:id", async (req: Request, res: Response) => {
+    try {
+      const projectId = parseInt(req.params.id);
+      
+      if (isNaN(projectId)) {
+        return res.status(400).json({ message: "Invalid project ID" });
+      }
+      
+      const project = await storage.getImpactProject(projectId);
+      
+      if (!project) {
+        return res.status(404).json({ message: "Project not found" });
+      }
+      
+      return res.json(project);
+    } catch (error) {
+      console.error("Error fetching impact project:", error);
+      return res.status(500).json({ message: "Failed to fetch impact project" });
+    }
+  });
+
+  app.get("/api/impact-timeline-events", async (req: Request, res: Response) => {
+    try {
+      const { projectId } = req.query;
+      let projectIdNum: number | undefined;
+      
+      if (projectId !== undefined) {
+        projectIdNum = parseInt(projectId as string);
+        
+        if (isNaN(projectIdNum)) {
+          return res.status(400).json({ message: "Invalid project ID" });
+        }
+      }
+      
+      const events = await storage.getImpactTimelineEvents(projectIdNum);
+      return res.json(events);
+    } catch (error) {
+      console.error("Error fetching impact timeline events:", error);
+      return res.status(500).json({ message: "Failed to fetch impact timeline events" });
+    }
+  });
+
+  app.get("/api/impact-timeline-events/:id", async (req: Request, res: Response) => {
+    try {
+      const eventId = parseInt(req.params.id);
+      
+      if (isNaN(eventId)) {
+        return res.status(400).json({ message: "Invalid event ID" });
+      }
+      
+      const event = await storage.getImpactTimelineEvent(eventId);
+      
+      if (!event) {
+        return res.status(404).json({ message: "Timeline event not found" });
+      }
+      
+      return res.json(event);
+    } catch (error) {
+      console.error("Error fetching impact timeline event:", error);
+      return res.status(500).json({ message: "Failed to fetch impact timeline event" });
+    }
+  });
   
   app.get("/api/partners", async (req: Request, res: Response) => {
     try {
@@ -851,6 +939,117 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error deleting impact metric:", error);
       return res.status(500).json({ message: "Failed to delete impact metric" });
+    }
+  });
+
+  // CMS Routes - Impact Projects
+  app.get("/api/admin/impact-projects", authenticateToken, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const projects = await storage.getImpactProjects();
+      return res.json(projects);
+    } catch (error) {
+      console.error("Error fetching impact projects:", error);
+      return res.status(500).json({ message: "Failed to fetch impact projects" });
+    }
+  });
+
+  app.post("/api/admin/impact-projects", authenticateToken, isAdmin, async (req: Request, res: Response) => {
+    try {
+      // We should validate the request body here
+      // For now, we'll just pass it to the storage layer
+      const project = await storage.createImpactProject(req.body);
+      return res.status(201).json(project);
+    } catch (error) {
+      console.error("Error creating impact project:", error);
+      return res.status(500).json({ message: "Failed to create impact project" });
+    }
+  });
+
+  app.put("/api/admin/impact-projects/:id", authenticateToken, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const project = await storage.updateImpactProject(parseInt(id), req.body);
+      
+      if (!project) {
+        return res.status(404).json({ message: "Impact project not found" });
+      }
+      
+      return res.json(project);
+    } catch (error) {
+      console.error("Error updating impact project:", error);
+      return res.status(500).json({ message: "Failed to update impact project" });
+    }
+  });
+
+  app.delete("/api/admin/impact-projects/:id", authenticateToken, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const success = await storage.deleteImpactProject(parseInt(id));
+      
+      if (!success) {
+        return res.status(404).json({ message: "Impact project not found" });
+      }
+      
+      return res.json({ message: "Impact project deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting impact project:", error);
+      return res.status(500).json({ message: "Failed to delete impact project" });
+    }
+  });
+
+  // CMS Routes - Impact Timeline Events
+  app.get("/api/admin/impact-timeline-events", authenticateToken, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const projectId = req.query.projectId ? parseInt(req.query.projectId as string) : undefined;
+      const events = await storage.getImpactTimelineEvents(projectId);
+      return res.json(events);
+    } catch (error) {
+      console.error("Error fetching impact timeline events:", error);
+      return res.status(500).json({ message: "Failed to fetch impact timeline events" });
+    }
+  });
+
+  app.post("/api/admin/impact-timeline-events", authenticateToken, isAdmin, async (req: Request, res: Response) => {
+    try {
+      // We should validate the request body here
+      // For now, we'll just pass it to the storage layer
+      const event = await storage.createImpactTimelineEvent(req.body);
+      return res.status(201).json(event);
+    } catch (error) {
+      console.error("Error creating impact timeline event:", error);
+      return res.status(500).json({ message: "Failed to create impact timeline event" });
+    }
+  });
+
+  app.put("/api/admin/impact-timeline-events/:id", authenticateToken, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const event = await storage.updateImpactTimelineEvent(parseInt(id), req.body);
+      
+      if (!event) {
+        return res.status(404).json({ message: "Impact timeline event not found" });
+      }
+      
+      return res.json(event);
+    } catch (error) {
+      console.error("Error updating impact timeline event:", error);
+      return res.status(500).json({ message: "Failed to update impact timeline event" });
+    }
+  });
+
+  app.delete("/api/admin/impact-timeline-events/:id", authenticateToken, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const success = await storage.deleteImpactTimelineEvent(parseInt(id));
+      
+      if (!success) {
+        return res.status(404).json({ message: "Impact timeline event not found" });
+      }
+      
+      return res.json({ message: "Impact timeline event deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting impact timeline event:", error);
+      return res.status(500).json({ message: "Failed to delete impact timeline event" });
     }
   });
 

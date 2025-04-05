@@ -522,3 +522,83 @@ export const userActivityLogsRelations = relations(userActivityLogs, ({ one }) =
     references: [users.id]
   })
 }));
+
+// Impact Projects schema
+export const impactProjects = pgTable("impact_projects", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  category: text("category").notNull(), // Climate, Housing, Health, Education, etc.
+  location: text("location").notNull(),
+  latitude: decimal("latitude", { precision: 10, scale: 6 }).notNull(),
+  longitude: decimal("longitude", { precision: 10, scale: 6 }).notNull(),
+  startDate: timestamp("start_date").notNull(),
+  endDate: timestamp("end_date"),
+  status: text("status").notNull().default("active"), // active, completed, planned
+  imageUrl: text("image_url"),
+  partners: text("partners").array(),
+  impactDescription: text("impact_description"),
+  metricsAchieved: jsonb("metrics_achieved"), // Store achievements as JSON
+  featured: boolean("featured").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+export const insertImpactProjectSchema = createInsertSchema(impactProjects).pick({
+  title: true,
+  description: true,
+  category: true,
+  location: true,
+  latitude: true,
+  longitude: true,
+  startDate: true,
+  endDate: true,
+  status: true,
+  imageUrl: true,
+  partners: true,
+  impactDescription: true,
+  metricsAchieved: true,
+  featured: true
+});
+
+// Impact Timeline Events schema
+export const impactTimelineEvents = pgTable("impact_timeline_events", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  date: timestamp("date").notNull(),
+  category: text("category").notNull(),
+  imageUrl: text("image_url"),
+  projectId: integer("project_id").references(() => impactProjects.id),
+  importance: integer("importance").default(1), // 1-5 scale for sorting/highlighting
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+export const insertImpactTimelineEventSchema = createInsertSchema(impactTimelineEvents).pick({
+  title: true,
+  description: true,
+  date: true,
+  category: true,
+  imageUrl: true,
+  projectId: true,
+  importance: true
+});
+
+export type ImpactProject = typeof impactProjects.$inferSelect;
+export type InsertImpactProject = z.infer<typeof insertImpactProjectSchema>;
+
+export type ImpactTimelineEvent = typeof impactTimelineEvents.$inferSelect;
+export type InsertImpactTimelineEvent = z.infer<typeof insertImpactTimelineEventSchema>;
+
+// Add relationship between impact projects and timeline events
+export const impactProjectsRelations = relations(impactProjects, ({ many }) => ({
+  timelineEvents: many(impactTimelineEvents)
+}));
+
+export const impactTimelineEventsRelations = relations(impactTimelineEvents, ({ one }) => ({
+  project: one(impactProjects, {
+    fields: [impactTimelineEvents.projectId],
+    references: [impactProjects.id]
+  })
+}));

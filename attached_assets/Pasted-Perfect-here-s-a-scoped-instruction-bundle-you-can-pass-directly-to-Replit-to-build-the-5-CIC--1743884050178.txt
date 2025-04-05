@@ -1,0 +1,95 @@
+Perfect — here’s a **scoped instruction bundle** you can pass directly to Replit to build the 5 CIC-specific value-driven pages.
+
+---
+
+### ✅ ECODATA CIC — Feature Scope for Replit Build
+
+> **Goal**: Build 5 mission-driven pages that align with ECODATA CIC’s values, increasing transparency, trust, and engagement.
+
+---
+
+#### 1. 🌍 Our Impact Page
+
+**Purpose**: Visually showcase the real-world difference ECODATA CIC is making.
+
+**Scope**:
+- [ ] Full-width banner with short mission statement
+- [ ] Impact categories (e.g. Climate, Housing, Health, Education)
+- [ ] Animated impact metrics (e.g. "Trees Planted", "Data Projects Delivered")
+- [ ] Interactive map (use Leaflet) to show project locations
+- [ ] Timeline or carousel of project highlights
+- [ ] Testimonials slider (reusable from homepage)
+
+---
+
+#### 2. 📊 Data Insights Page
+
+**Purpose**: Provide open access to ECODATA’s curated insights and dashboards.
+
+**Scope**:
+- [ ] Sectioned layout: “Dashboards”, “Reports”, “Downloadables”
+- [ ] Chart components (Recharts or similar) showing real-time stats
+- [ ] Filters: Category, Year, Topic
+- [ ] Dataset download buttons (CSV, JSON, PDF)
+- [ ] Optional blog-style cards to explain each insight
+- [ ] Add share buttons for social and citation
+
+---
+
+#### 3. 📚 Publications Page
+
+**Purpose**: List ECODATA’s whitepapers, reports, and policy briefs.
+
+**Scope**:
+- [ ] Grid of publication cards with:
+  - Title
+  - Description
+  - Tags (e.g. Environment, Equity, Policy)
+  - Download button
+- [ ] Upload mechanism (admin side) for new publications
+- [ ] Support for external links or hosted PDF viewer
+- [ ] Sort by newest, topic, popularity
+
+---
+
+#### 4. 🧪 Case Studies Page
+
+**Purpose**: Tell compelling stories of data-for-good in action.
+
+**Scope**:
+- [ ] Card layout or vertical scroll format
+- [ ] Each case includes:
+  - Title, summary
+  - Problem → Data Action → Measurable Result
+  - Location + Partner (optional)
+  - Before/after or impact image
+- [ ] Tags or filters by sector
+- [ ] Button to “Submit a story” (could link to a form)
+
+---
+
+#### 5. ❓ FAQs Page
+
+**Purpose**: Answer common questions about ECODATA, its work, and how people can engage.
+
+**Scope**:
+- [ ] Accordion-style FAQ (expand/collapse)
+- [ ] Group questions by category:
+  - General
+  - Donations & Support
+  - Data Ethics & Privacy
+  - Working with ECODATA
+- [ ] Highlight most-asked or trending questions
+- [ ] Optional: link to live chat or support email
+
+---
+
+### 💡 Replit Build Notes:
+- Use TypeScript and existing layout components
+- Integrate with Admin dashboard for content updates
+- Keep route naming consistent: `/impact`, `/insights`, `/publications`, `/case-studies`, `/faq`
+- Optional: Animate sections with framer-motion
+
+---
+
+Let me know if you'd like me to prep example content or wireframes for any of the pages.

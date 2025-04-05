@@ -12,6 +12,8 @@ import {
   subscriptions, type Subscription, type InsertSubscription,
   projectProposals, type ProjectProposal, type InsertProjectProposal,
   userActivityLogs, type UserActivityLog, type InsertUserActivityLog,
+  impactProjects, type ImpactProject, type InsertImpactProject,
+  impactTimelineEvents, type ImpactTimelineEvent, type InsertImpactTimelineEvent,
   // MSSQL schemas
   type MSSQLUser,
   type MSSQLContactMessage,
@@ -129,6 +131,20 @@ export interface IStorage {
   createSubscription(subscription: InsertSubscription): Promise<Subscription>;
   updateSubscriptionStatus(id: number, status: string): Promise<Subscription | undefined>;
   cancelSubscription(id: number): Promise<Subscription | undefined>;
+  
+  // Impact Projects
+  getImpactProjects(options?: { featured?: boolean, category?: string }): Promise<ImpactProject[]>;
+  getImpactProject(id: number): Promise<ImpactProject | undefined>;
+  createImpactProject(project: InsertImpactProject): Promise<ImpactProject>;
+  updateImpactProject(id: number, project: Partial<InsertImpactProject>): Promise<ImpactProject | undefined>;
+  deleteImpactProject(id: number): Promise<boolean>;
+  
+  // Impact Timeline Events
+  getImpactTimelineEvents(projectId?: number): Promise<ImpactTimelineEvent[]>;
+  getImpactTimelineEvent(id: number): Promise<ImpactTimelineEvent | undefined>;
+  createImpactTimelineEvent(event: InsertImpactTimelineEvent): Promise<ImpactTimelineEvent>;
+  updateImpactTimelineEvent(id: number, event: Partial<InsertImpactTimelineEvent>): Promise<ImpactTimelineEvent | undefined>;
+  deleteImpactTimelineEvent(id: number): Promise<boolean>;
 }
 
 export class MemStorage implements IStorage {
@@ -145,6 +161,8 @@ export class MemStorage implements IStorage {
   private subscriptions: Map<number, Subscription>;
   private _projectProposals: Map<number, ProjectProposal>;
   private _userActivityLogs: Map<number, UserActivityLog>;
+  private _impactProjects: Map<number, ImpactProject>;
+  private _impactTimelineEvents: Map<number, ImpactTimelineEvent>;
   
   private currentUserId: number;
   private currentContactMessageId: number;
@@ -159,6 +177,8 @@ export class MemStorage implements IStorage {
   private currentSubscriptionId: number;
   private _currentProjectProposalId: number;
   private _currentUserActivityLogId: number;
+  private _currentImpactProjectId: number;
+  private _currentImpactTimelineEventId: number;
 
   constructor() {
     this.users = new Map();
@@ -174,6 +194,8 @@ export class MemStorage implements IStorage {
     this.subscriptions = new Map();
     this._projectProposals = new Map();
     this._userActivityLogs = new Map();
+    this._impactProjects = new Map();
+    this._impactTimelineEvents = new Map();
     
     this.currentUserId = 1;
     this.currentContactMessageId = 1;
@@ -188,6 +210,8 @@ export class MemStorage implements IStorage {
     this.currentSubscriptionId = 1;
     this._currentProjectProposalId = 1;
     this._currentUserActivityLogId = 1;
+    this._currentImpactProjectId = 1;
+    this._currentImpactTimelineEventId = 1;
     
     // Initialize with sample data
     this.initializeData();
@@ -344,6 +368,228 @@ export class MemStorage implements IStorage {
     ];
     
     impactMetrics.forEach(metric => this.createImpactMetric(metric));
+    
+    // Add sample impact projects
+    const impactProjects = [
+      {
+        title: "Urban Green Data Initiative",
+        description: "A collaborative project to collect and analyze environmental data in urban areas to inform sustainable city planning and green space development.",
+        category: "environmental",
+        location: "Manchester, UK",
+        latitude: 53.4808,
+        longitude: -2.2426,
+        featuredImage: "https://images.unsplash.com/photo-1610036615665-09c7edf27288?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
+        status: "active",
+        startDate: new Date("2022-03-15"),
+        endDate: null,
+        impact: "Improved green space planning in 5 urban districts",
+        partners: ["Manchester City Council", "University of Manchester"],
+        budget: 75000,
+        featured: true
+      },
+      {
+        title: "Rural Digital Inclusion",
+        description: "Bringing technology training and internet access to underserved rural communities to bridge the digital divide and create economic opportunities.",
+        category: "social",
+        location: "Yorkshire Dales, UK",
+        latitude: 54.3097,
+        longitude: -2.2088,
+        featuredImage: "https://images.unsplash.com/photo-1586769412527-f3d9d8211867?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1473&q=80",
+        status: "active",
+        startDate: new Date("2022-06-10"),
+        endDate: null,
+        impact: "Connected 12 rural communities with training for over 800 residents",
+        partners: ["Yorkshire Rural Network", "BT Group"],
+        budget: 120000,
+        featured: true
+      },
+      {
+        title: "Green Tech Innovation Hub",
+        description: "An incubator for startups focused on developing technology solutions to environmental challenges, providing mentorship, technical resources, and funding opportunities.",
+        category: "technology",
+        location: "Bristol, UK",
+        latitude: 51.4545,
+        longitude: -2.5879,
+        featuredImage: "https://images.unsplash.com/photo-1569098644584-210bcd375b59?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
+        status: "planning",
+        startDate: new Date("2023-01-10"),
+        endDate: null,
+        impact: "Supported 8 environmental tech startups in their early stages",
+        partners: ["Bristol University", "Tech Nation", "Future Planet Capital"],
+        budget: 350000,
+        featured: true
+      },
+      {
+        title: "Community Air Quality Monitoring",
+        description: "Installing low-cost air quality sensors in partnership with community organizations to collect data, raise awareness about air pollution, and advocate for cleaner air policies.",
+        category: "environmental",
+        location: "Birmingham, UK",
+        latitude: 52.4862,
+        longitude: -1.8904,
+        featuredImage: "https://images.unsplash.com/photo-1573511860302-28c11ff60a20?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
+        status: "completed",
+        startDate: new Date("2021-09-20"),
+        endDate: new Date("2022-10-30"),
+        impact: "Installed 120 sensors and collected over 200,000 data points on urban air quality",
+        partners: ["Clean Air Birmingham", "University of Birmingham"],
+        budget: 95000,
+        featured: false
+      },
+      {
+        title: "Data Ethics Education Platform",
+        description: "An online learning platform to educate organizations and individuals about ethical data practices, privacy considerations, and responsible AI.",
+        category: "education",
+        location: "Online",
+        latitude: 51.5074,
+        longitude: -0.1278,
+        featuredImage: "https://images.unsplash.com/photo-1516321497487-e288fb19713f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
+        status: "active",
+        startDate: new Date("2022-11-05"),
+        endDate: null,
+        impact: "Trained over 3,000 professionals in ethical data practices",
+        partners: ["Open Data Institute", "Alan Turing Institute"],
+        budget: 185000,
+        featured: false
+      }
+    ];
+    
+    // Add the impact projects to the storage
+    impactProjects.forEach(project => this.createImpactProject(project));
+    
+    // Add sample timeline events for the projects
+    const impactTimelineEvents = [
+      {
+        projectId: 1, // Urban Green Data Initiative
+        title: "Project Launch",
+        description: "Official launch of the Urban Green Data Initiative with community stakeholders and city officials.",
+        date: new Date("2022-03-15"),
+        importance: 5,
+        mediaUrl: "https://images.unsplash.com/photo-1629111462456-06fb9368de7d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1471&q=80"
+      },
+      {
+        projectId: 1,
+        title: "Sensor Deployment Phase 1",
+        description: "First batch of environmental sensors deployed across Manchester's city center.",
+        date: new Date("2022-04-20"),
+        importance: 3,
+        mediaUrl: "https://images.unsplash.com/photo-1576153192621-7a3be10b356e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1374&q=80"
+      },
+      {
+        projectId: 1,
+        title: "Data Dashboard Release",
+        description: "Public release of the real-time data dashboard showing environmental metrics across the city.",
+        date: new Date("2022-08-10"),
+        importance: 4,
+        mediaUrl: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"
+      },
+      {
+        projectId: 1,
+        title: "City Planning Integration",
+        description: "Integration of collected data with Manchester's urban planning department for future green space development.",
+        date: new Date("2023-01-25"),
+        importance: 4,
+        mediaUrl: null
+      },
+      {
+        projectId: 2, // Rural Digital Inclusion
+        title: "Project Kick-off",
+        description: "Rural Digital Inclusion project begins with community meetings in the Yorkshire Dales.",
+        date: new Date("2022-06-10"),
+        importance: 5,
+        mediaUrl: "https://images.unsplash.com/photo-1578932750295-f5075e86f9bc?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"
+      },
+      {
+        projectId: 2,
+        title: "First Training Center",
+        description: "Opening of the first digital skills training center in Hawes, Yorkshire.",
+        date: new Date("2022-09-05"),
+        importance: 4,
+        mediaUrl: "https://images.unsplash.com/photo-1551963831-b3b1ca40c98e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"
+      },
+      {
+        projectId: 2,
+        title: "Broadband Installation Complete",
+        description: "High-speed internet installation completed in 5 villages, connecting over 300 households.",
+        date: new Date("2023-02-15"),
+        importance: 5,
+        mediaUrl: null
+      },
+      {
+        projectId: 3, // Green Tech Innovation Hub
+        title: "Hub Planning Workshop",
+        description: "Initial planning workshop with key stakeholders to define the scope and mission of the Green Tech Innovation Hub.",
+        date: new Date("2023-01-10"),
+        importance: 3,
+        mediaUrl: "https://images.unsplash.com/photo-1558403194-611308249627?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"
+      },
+      {
+        projectId: 3,
+        title: "Funding Secured",
+        description: "Major funding milestone reached with investment from Future Planet Capital and public sector grants.",
+        date: new Date("2023-04-20"),
+        importance: 5,
+        mediaUrl: null
+      },
+      {
+        projectId: 4, // Community Air Quality Monitoring
+        title: "Project Launch",
+        description: "Launch of the Community Air Quality Monitoring project in Birmingham with citizen science volunteers.",
+        date: new Date("2021-09-20"),
+        importance: 4,
+        mediaUrl: "https://images.unsplash.com/photo-1573511860302-28c11ff60a20?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"
+      },
+      {
+        projectId: 4,
+        title: "Sensor Network Complete",
+        description: "Installation of all 120 air quality sensors completed across Birmingham.",
+        date: new Date("2022-01-30"),
+        importance: 3,
+        mediaUrl: null
+      },
+      {
+        projectId: 4,
+        title: "Research Paper Published",
+        description: "Publication of research findings in the Journal of Environmental Monitoring, highlighting areas of concern for urban air quality.",
+        date: new Date("2022-07-15"),
+        importance: 4,
+        mediaUrl: null
+      },
+      {
+        projectId: 4,
+        title: "Project Completion",
+        description: "Official completion of the project with handover of monitoring systems to local community organizations for ongoing use.",
+        date: new Date("2022-10-30"),
+        importance: 5,
+        mediaUrl: "https://images.unsplash.com/photo-1544383835-bda2bc66a55d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1436&q=80"
+      },
+      {
+        projectId: 5, // Data Ethics Education Platform
+        title: "Platform Development Begins",
+        description: "Start of development for the online education platform on data ethics and responsible AI.",
+        date: new Date("2022-11-05"),
+        importance: 3,
+        mediaUrl: null
+      },
+      {
+        projectId: 5,
+        title: "Beta Launch",
+        description: "Beta version of the platform launched with initial courses on data privacy and ethical AI principles.",
+        date: new Date("2023-02-20"),
+        importance: 4,
+        mediaUrl: "https://images.unsplash.com/photo-1516321497487-e288fb19713f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"
+      },
+      {
+        projectId: 5,
+        title: "Corporate Partnership Program",
+        description: "Launch of the corporate training partnership program with five major companies enrolled.",
+        date: new Date("2023-05-15"),
+        importance: 5,
+        mediaUrl: null
+      }
+    ];
+    
+    // Add the timeline events to the storage
+    impactTimelineEvents.forEach(event => this.createImpactTimelineEvent(event));
 
     // Add blog posts with authentic ECODATA CIC content
     const blogPosts = [
@@ -1137,9 +1383,195 @@ export class MemStorage implements IStorage {
   async deleteProjectProposal(id: number): Promise<boolean> {
     return this._projectProposals.delete(id);
   }
+  
+  // Impact Projects
+  async getImpactProjects(options?: { featured?: boolean, category?: string }): Promise<ImpactProject[]> {
+    let projects = Array.from(this._impactProjects.values());
+    
+    if (options?.featured !== undefined) {
+      projects = projects.filter(project => project.featured === options.featured);
+    }
+    
+    if (options?.category) {
+      projects = projects.filter(project => project.category === options.category);
+    }
+    
+    return projects;
+  }
+  
+  async getImpactProject(id: number): Promise<ImpactProject | undefined> {
+    return this._impactProjects.get(id);
+  }
+  
+  async createImpactProject(project: InsertImpactProject): Promise<ImpactProject> {
+    const id = this._currentImpactProjectId++;
+    const now = new Date();
+    const newProject: ImpactProject = {
+      id,
+      ...project,
+      createdAt: now,
+      updatedAt: now
+    };
+    this._impactProjects.set(id, newProject);
+    return newProject;
+  }
+  
+  async updateImpactProject(id: number, projectUpdate: Partial<InsertImpactProject>): Promise<ImpactProject | undefined> {
+    const project = this._impactProjects.get(id);
+    if (!project) return undefined;
+    
+    const now = new Date();
+    const updatedProject = { 
+      ...project, 
+      ...projectUpdate,
+      updatedAt: now
+    };
+    this._impactProjects.set(id, updatedProject);
+    return updatedProject;
+  }
+  
+  async deleteImpactProject(id: number): Promise<boolean> {
+    return this._impactProjects.delete(id);
+  }
+  
+  // Impact Timeline Events
+  async getImpactTimelineEvents(projectId?: number): Promise<ImpactTimelineEvent[]> {
+    let events = Array.from(this._impactTimelineEvents.values());
+    
+    if (projectId !== undefined) {
+      events = events.filter(event => event.projectId === projectId);
+    }
+    
+    // Sort by date and then by importance (descending)
+    return events.sort((a, b) => {
+      // First, sort by date (newest first)
+      const dateComparison = new Date(b.date).getTime() - new Date(a.date).getTime();
+      if (dateComparison !== 0) return dateComparison;
+      
+      // If dates are equal, sort by importance (highest first)
+      return (b.importance || 1) - (a.importance || 1);
+    });
+  }
+  
+  async getImpactTimelineEvent(id: number): Promise<ImpactTimelineEvent | undefined> {
+    return this._impactTimelineEvents.get(id);
+  }
+  
+  async createImpactTimelineEvent(event: InsertImpactTimelineEvent): Promise<ImpactTimelineEvent> {
+    const id = this._currentImpactTimelineEventId++;
+    const now = new Date();
+    const newEvent: ImpactTimelineEvent = {
+      id,
+      ...event,
+      createdAt: now,
+      updatedAt: now
+    };
+    this._impactTimelineEvents.set(id, newEvent);
+    return newEvent;
+  }
+  
+  async updateImpactTimelineEvent(id: number, eventUpdate: Partial<InsertImpactTimelineEvent>): Promise<ImpactTimelineEvent | undefined> {
+    const event = this._impactTimelineEvents.get(id);
+    if (!event) return undefined;
+    
+    const now = new Date();
+    const updatedEvent = { 
+      ...event, 
+      ...eventUpdate,
+      updatedAt: now
+    };
+    this._impactTimelineEvents.set(id, updatedEvent);
+    return updatedEvent;
+  }
+  
+  async deleteImpactTimelineEvent(id: number): Promise<boolean> {
+    return this._impactTimelineEvents.delete(id);
+  }
 }
 
 export class DatabaseStorage implements IStorage {
+  // Impact Projects
+  async getImpactProjects(options?: { featured?: boolean, category?: string }): Promise<ImpactProject[]> {
+    let query = db.select().from(impactProjects);
+    
+    if (options?.featured !== undefined) {
+      query = query.where(eq(impactProjects.featured, options.featured));
+    }
+    
+    if (options?.category) {
+      query = query.where(eq(impactProjects.category, options.category));
+    }
+    
+    return query.orderBy(desc(impactProjects.startDate));
+  }
+  
+  async getImpactProject(id: number): Promise<ImpactProject | undefined> {
+    const [project] = await db
+      .select()
+      .from(impactProjects)
+      .where(eq(impactProjects.id, id));
+    return project || undefined;
+  }
+  
+  async createImpactProject(projectData: InsertImpactProject): Promise<ImpactProject> {
+    const [project] = await db.insert(impactProjects).values(projectData).returning();
+    return project;
+  }
+  
+  async updateImpactProject(id: number, projectUpdate: Partial<InsertImpactProject>): Promise<ImpactProject | undefined> {
+    const now = new Date();
+    const [project] = await db
+      .update(impactProjects)
+      .set({ ...projectUpdate, updatedAt: now })
+      .where(eq(impactProjects.id, id))
+      .returning();
+    return project || undefined;
+  }
+  
+  async deleteImpactProject(id: number): Promise<boolean> {
+    const result = await db.delete(impactProjects).where(eq(impactProjects.id, id));
+    return result.count > 0;
+  }
+  
+  // Impact Timeline Events
+  async getImpactTimelineEvents(projectId?: number): Promise<ImpactTimelineEvent[]> {
+    let query = db.select().from(impactTimelineEvents);
+    
+    if (projectId !== undefined) {
+      query = query.where(eq(impactTimelineEvents.projectId, projectId));
+    }
+    
+    return query.orderBy(desc(impactTimelineEvents.date), desc(impactTimelineEvents.importance));
+  }
+  
+  async getImpactTimelineEvent(id: number): Promise<ImpactTimelineEvent | undefined> {
+    const [event] = await db
+      .select()
+      .from(impactTimelineEvents)
+      .where(eq(impactTimelineEvents.id, id));
+    return event || undefined;
+  }
+  
+  async createImpactTimelineEvent(eventData: InsertImpactTimelineEvent): Promise<ImpactTimelineEvent> {
+    const [event] = await db.insert(impactTimelineEvents).values(eventData).returning();
+    return event;
+  }
+  
+  async updateImpactTimelineEvent(id: number, eventUpdate: Partial<InsertImpactTimelineEvent>): Promise<ImpactTimelineEvent | undefined> {
+    const now = new Date();
+    const [event] = await db
+      .update(impactTimelineEvents)
+      .set({ ...eventUpdate, updatedAt: now })
+      .where(eq(impactTimelineEvents.id, id))
+      .returning();
+    return event || undefined;
+  }
+  
+  async deleteImpactTimelineEvent(id: number): Promise<boolean> {
+    const result = await db.delete(impactTimelineEvents).where(eq(impactTimelineEvents.id, id));
+    return result.count > 0;
+  }
+  
   // User Activity Logs
   async getUserActivityLogs(userId: number): Promise<UserActivityLog[]> {
     return db.select()
