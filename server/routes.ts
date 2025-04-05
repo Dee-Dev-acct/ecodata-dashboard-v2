@@ -5,6 +5,7 @@ import MemoryStore from "memorystore";
 import { storage } from "./storage";
 import { hashPassword, comparePassword, generateToken, authenticateToken, isAdmin, login } from "./auth";
 import { sendContactNotification, sendContactConfirmation, sendNewsletterConfirmation, sendNewSubscriberNotification } from "./emailService";
+import Stripe from "stripe";
 import { z } from "zod";
 import {
   insertContactMessageSchema,
@@ -17,6 +18,11 @@ import {
   insertSettingSchema,
   insertPartnerSchema
 } from "@shared/schema";
+
+// Initialize Stripe
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
+  apiVersion: '2025-03-31.basil',
+});
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Set up session middleware
@@ -607,6 +613,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error deleting partner:", error);
       return res.status(500).json({ message: "Failed to delete partner" });
+    }
+  });
+
+  // Stripe Payment Routes
+  app.post("/api/create-checkout-session", async (req: Request, res: Response) => {
+    try {
+      // Create a Stripe Checkout Session for a £10 donation
+      const session = await stripe.checkout.sessions.create({
+        payment_method_types: ["card"],
+        line_items: [
+          {
+            price_data: {
+              currency: "gbp",
+              product_data: {
+                name: "Donation to ECODATA CIC",
+                description: "Supporting eco-friendly data initiatives",
+              },
+              unit_amount: 1000, // £10.00 in pence
+            },
+            quantity: 1,
+          },
+        ],
+        mode: "payment",
+        success_url: `${req.headers.origin}/donation-success`,
+        cancel_url: `${req.headers.origin}`,
+      });
+
+      res.json({ url: session.url });
+    } catch (error) {
+      console.error("Error creating checkout session:", error);
+      res.status(500).json({ error: "Failed to create checkout session" });
     }
   });
 

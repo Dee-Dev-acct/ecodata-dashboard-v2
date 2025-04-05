@@ -9,6 +9,7 @@ import AdminLogin from "@/pages/AdminLogin";
 import Admin from "@/pages/Admin";
 import Blog from "@/pages/Blog";
 import BlogPost from "@/pages/BlogPost";
+import DonationSuccess from "@/pages/DonationSuccess";
 
 function Router() {
   return (
@@ -18,6 +19,7 @@ function Router() {
       <Route path="/admin/:panel*" component={Admin} />
       <Route path="/blog" component={Blog} />
       <Route path="/blog/:slug" component={BlogPost} />
+      <Route path="/donation-success" component={DonationSuccess} />
       <Route component={NotFound} />
     </Switch>
   );

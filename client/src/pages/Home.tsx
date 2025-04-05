@@ -7,6 +7,7 @@ import Technology from "@/components/Technology";
 import Partners from "@/components/Partners";
 import Testimonials from "@/components/Testimonials";
 import Newsletter from "@/components/Newsletter";
+import Support from "@/components/Support";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
 
@@ -22,6 +23,7 @@ const Home = () => {
         <Technology />
         <Partners />
         <Testimonials />
+        <Support />
         <Newsletter />
         <Contact />
       </main>

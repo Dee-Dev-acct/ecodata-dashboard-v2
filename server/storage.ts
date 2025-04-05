@@ -498,10 +498,13 @@ export class MemStorage implements IStorage {
   async createNewsletterSubscriber(insertSubscriber: InsertNewsletterSubscriber): Promise<NewsletterSubscriber> {
     const id = this.currentNewsletterSubscriberId++;
     const now = new Date();
+    // Ensure subscriptionTier is always set
     const subscriber: NewsletterSubscriber = { 
       ...insertSubscriber, 
       id, 
-      createdAt: now 
+      createdAt: now,
+      subscriptionTier: insertSubscriber.subscriptionTier || "basic",
+      interests: insertSubscriber.interests || null
     };
     this.newsletterSubscribers.set(id, subscriber);
     return subscriber;
