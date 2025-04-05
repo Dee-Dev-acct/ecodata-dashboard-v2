@@ -4,9 +4,9 @@ const About = () => {
       <div className="container mx-auto px-4">
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <div>
-            <h2 className="text-3xl font-heading font-bold mb-6 relative inline-block">
-              <span className="relative z-10">About ECODATA CIC</span>
-              <span className="absolute bottom-0 left-0 w-full h-3 bg-[#2A9D8F] opacity-20 -rotate-1"></span>
+            <h2 className="text-3xl font-heading font-bold mb-9 relative inline-block">
+              <span>About ECODATA CIC</span>
+              <span className="absolute -bottom-3 left-0 w-full h-2 bg-[#2A9D8F] opacity-40"></span>
             </h2>
             <p className="text-lg mb-4 dark:text-[#F4F1DE]">
               Founded in 2020, ECODATA CIC is a Community Interest Company dedicated to using data analytics and technology to create positive environmental and social impact.

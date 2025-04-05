@@ -1,20 +1,23 @@
 import { useQuery } from "@tanstack/react-query";
 import { Testimonial } from "@shared/schema";
+import { FC } from "react";
 
-const TestimonialCard = ({ 
+interface TestimonialCardProps {
+  name: string;
+  position: string;
+  company: string;
+  testimonial: string;
+  rating: number;
+  imageUrl: string | null | undefined;
+}
+
+const TestimonialCard: FC<TestimonialCardProps> = ({ 
   name, 
   position, 
   company, 
   testimonial, 
   rating, 
   imageUrl 
-}: { 
-  name: string;
-  position: string;
-  company: string;
-  testimonial: string;
-  rating: number;
-  imageUrl?: string;
 }) => {
   return (
     <div className="bg-[#F4F1DE] dark:bg-[#264653] rounded-lg shadow-md p-6">
@@ -53,9 +56,9 @@ const Testimonials = () => {
     <section className="py-16 bg-white dark:bg-[#333333]">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-heading font-bold mb-4 relative inline-block">
-            <span className="relative z-10">Client Testimonials</span>
-            <span className="absolute bottom-0 left-0 w-full h-3 bg-[#2A9D8F] opacity-20 -rotate-1"></span>
+          <h2 className="text-3xl font-heading font-bold mb-7 relative inline-block">
+            <span>Client Testimonials</span>
+            <span className="absolute -bottom-3 left-0 w-full h-2 bg-[#2A9D8F] opacity-40"></span>
           </h2>
           <p className="text-lg max-w-2xl mx-auto dark:text-[#F4F1DE]">
             Hear from our partners about the impact of our data-driven solutions.

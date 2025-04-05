@@ -17,9 +17,9 @@ const Technology = () => {
     <section id="technology" className="py-16 bg-[#F4F1DE] dark:bg-[#264653]">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-heading font-bold mb-4 relative inline-block">
-            <span className="relative z-10">Our Technology Framework</span>
-            <span className="absolute bottom-0 left-0 w-full h-3 bg-[#2A9D8F] opacity-20 -rotate-1"></span>
+          <h2 className="text-3xl font-heading font-bold mb-7 relative inline-block">
+            <span>Our Technology Framework</span>
+            <span className="absolute -bottom-3 left-0 w-full h-2 bg-[#2A9D8F] opacity-40"></span>
           </h2>
           <p className="text-lg max-w-2xl mx-auto dark:text-[#F4F1DE]">
             We leverage cutting-edge technologies to deliver sustainable solutions with measurable impact.
