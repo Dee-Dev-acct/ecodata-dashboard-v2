@@ -12,7 +12,22 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { motion, AnimatePresence } from "framer-motion";
-import { UserCheck, UserPlus, Key, Mail, User, Sparkles, Leaf, Loader2, AlertTriangle, Shield, Check, AlertCircle } from "lucide-react";
+import { 
+  UserCheck, 
+  UserPlus, 
+  Key, 
+  Mail, 
+  User, 
+  Sparkles, 
+  Leaf, 
+  Loader2, 
+  AlertTriangle, 
+  Shield, 
+  Check, 
+  AlertCircle, 
+  Sprout, 
+  TreeDeciduous 
+} from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 // Login form schema
@@ -138,8 +153,28 @@ export default function AuthPage() {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900">
         <div className="text-center space-y-4">
-          <Loader2 className="h-12 w-12 animate-spin mx-auto text-emerald-500" />
-          <p className="text-gray-500 dark:text-gray-400">Loading...</p>
+          <motion.div
+            animate={{ 
+              scale: [1, 1.1, 1],
+              rotate: [0, 5, -5, 5, 0],
+            }}
+            transition={{
+              duration: 2.5,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+            className="mx-auto bg-gradient-to-br from-green-400 to-emerald-600 rounded-full p-3 shadow-lg"
+          >
+            <Leaf className="h-10 w-10 text-white" />
+          </motion.div>
+          <motion.p 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5, duration: 0.8 }}
+            className="text-gray-600 dark:text-gray-300 font-medium"
+          >
+            Connecting to ECODATA CIC...
+          </motion.p>
         </div>
       </div>
     );
@@ -252,7 +287,14 @@ export default function AuthPage() {
                     >
                       {loginForm.formState.isSubmitting || loginMutation.isPending ? (
                         <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Please wait
+                          <motion.div 
+                            animate={{ rotate: [0, 360] }}
+                            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                            className="mr-2 text-white"
+                          >
+                            <Leaf className="h-4 w-4" />
+                          </motion.div>
+                          Signing in...
                         </>
                       ) : (
                         "Sign In"
@@ -381,7 +423,20 @@ export default function AuthPage() {
                     >
                       {registerForm.formState.isSubmitting || registerMutation.isPending ? (
                         <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Creating Account
+                          <motion.div 
+                            animate={{ 
+                              scale: [1, 1.2, 1],
+                            }}
+                            transition={{ 
+                              duration: 1.5, 
+                              repeat: Infinity,
+                              ease: "easeInOut" 
+                            }}
+                            className="mr-2 text-white"
+                          >
+                            <Sprout className="h-4 w-4" />
+                          </motion.div>
+                          Growing your account...
                         </>
                       ) : (
                         "Create Account"
