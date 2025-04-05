@@ -1,5 +1,6 @@
 import React from 'react';
 import DonateButton from './DonateButton';
+import { HeartHandshake, Shield, LineChart } from 'lucide-react';
 
 const Support = () => {
   return (
@@ -21,14 +22,37 @@ const Support = () => {
               solutions to environmental challenges.
             </p>
             
-            <div className="flex justify-center">
+            {/* Benefits of donating */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+              <div className="flex flex-col items-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <HeartHandshake className="h-8 w-8 text-emerald-500 mb-2" />
+                <h4 className="font-medium text-sm mb-1">Support Communities</h4>
+                <p className="text-xs text-gray-600 dark:text-gray-300">Help fund social impact initiatives</p>
+              </div>
+              <div className="flex flex-col items-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <Shield className="h-8 w-8 text-emerald-500 mb-2" />
+                <h4 className="font-medium text-sm mb-1">Protect Environment</h4>
+                <p className="text-xs text-gray-600 dark:text-gray-300">Support sustainability research</p>
+              </div>
+              <div className="flex flex-col items-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <LineChart className="h-8 w-8 text-emerald-500 mb-2" />
+                <h4 className="font-medium text-sm mb-1">Drive Innovation</h4>
+                <p className="text-xs text-gray-600 dark:text-gray-300">Help develop new data tools</p>
+              </div>
+            </div>
+            
+            <div className="mt-6 mb-4">
               <DonateButton />
             </div>
             
-            <p className="mt-6 text-sm text-gray-600 dark:text-gray-400">
-              All donations are secure and encrypted. ECODATA CIC is a registered 
-              Community Interest Company in the United Kingdom.
-            </p>
+            <div className="mt-6 text-sm text-gray-600 dark:text-gray-400 flex flex-col gap-2">
+              <p>
+                All donations are secure and encrypted through Stripe payment processing.
+              </p>
+              <p>
+                ECODATA CIC is a registered Community Interest Company in the United Kingdom.
+              </p>
+            </div>
           </div>
         </div>
       </div>

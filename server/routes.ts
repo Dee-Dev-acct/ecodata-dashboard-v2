@@ -648,9 +648,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      console.log("Starting checkout session creation...");
+      // Get amount from request body with validation
+      const { amount } = req.body;
+      
+      // Validate amount is a number and within acceptable range (£1 to £500)
+      const donationAmount = parseFloat(amount);
+      if (isNaN(donationAmount) || donationAmount < 1 || donationAmount > 500) {
+        console.error(`Invalid donation amount: ${amount}`);
+        return res.status(400).json({
+          error: "Invalid amount",
+          message: 'Invalid donation amount. Please enter an amount between £1 and £500.'
+        });
+      }
 
-      // Create a Stripe Checkout Session for a £10 donation
+      // Convert to pence (GBP) for Stripe
+      const amountInPence = Math.round(donationAmount * 100);
+      console.log(`Starting checkout session creation for £${donationAmount} (${amountInPence} pence)...`);
+
+      // Create a Stripe Checkout Session with the custom donation amount
       const session = await stripe.checkout.sessions.create({
         payment_method_types: ["card"],
         line_items: [
@@ -661,7 +676,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 name: "Donation to ECODATA CIC",
                 description: "Supporting eco-friendly data initiatives",
               },
-              unit_amount: 1000, // £10.00 in pence
+              unit_amount: amountInPence, // Amount in pence
             },
             quantity: 1,
           },
@@ -669,6 +684,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         mode: "payment",
         success_url: `${req.headers.origin}/donation-success`,
         cancel_url: `${req.headers.origin}`,
+        metadata: {
+          donationAmount: donationAmount.toFixed(2) // Store formatted amount as metadata for reference
+        }
       });
 
       console.log("Checkout session created successfully");

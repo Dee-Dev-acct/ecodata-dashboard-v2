@@ -73,7 +73,7 @@ const DonationSuccess = () => {
         </CardHeader>
         <CardContent className="text-center">
           <p className="mb-6 text-lg">
-            Your donation of <span className="font-bold">£10</span> to ECODATA CIC has been received and will help us continue our mission to provide eco-friendly data solutions for social and environmental impact.
+            Your donation to ECODATA CIC has been received and will help us continue our mission to provide eco-friendly data solutions for social and environmental impact.
           </p>
           
           <DonationImpact />
