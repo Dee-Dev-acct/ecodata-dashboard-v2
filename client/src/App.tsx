@@ -3,6 +3,7 @@ import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "./context/AuthContext";
+import { ProtectedRoute } from "./components/ProtectedRoute";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
 import AdminLogin from "@/pages/AdminLogin";
@@ -12,11 +13,15 @@ import BlogPost from "@/pages/BlogPost";
 import DonationSuccess from "@/pages/DonationSuccess";
 import SubscriptionSuccess from "@/pages/SubscriptionSuccess";
 import FundingGoals from "@/pages/FundingGoals";
+import AuthPage from "@/pages/auth-page";
+import Dashboard from "@/pages/Dashboard";
 
 function Router() {
   return (
     <Switch>
       <Route path="/" component={Home} />
+      <Route path="/auth" component={AuthPage} />
+      <ProtectedRoute path="/dashboard" component={Dashboard} />
       <Route path="/admin/login" component={AdminLogin} />
       <Route path="/admin/:panel*" component={Admin} />
       <Route path="/blog" component={Blog} />
