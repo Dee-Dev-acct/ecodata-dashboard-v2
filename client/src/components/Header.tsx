@@ -13,7 +13,11 @@ const Header = () => {
   return (
     <header className="sticky top-0 z-50 bg-white dark:bg-[#333333] shadow-md">
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-        <Link href="/" className="flex items-center space-x-2">
+        <Link 
+          href="/" 
+          onClick={() => window.scrollTo(0, 0)}
+          className="flex items-center space-x-2"
+        >
           <div className="w-10 h-10 rounded-full bg-[#2A9D8F] flex items-center justify-center">
             <span className="text-white font-bold text-lg">E</span>
           </div>
@@ -26,6 +30,7 @@ const Header = () => {
         <nav className="hidden md:flex space-x-8">
           <Link 
             href="/" 
+            onClick={() => window.scrollTo(0, 0)}
             className="font-medium hover:text-[#2A9D8F] dark:text-[#F4F1DE] dark:hover:text-[#38B593] transition-colors"
           >
             Home
@@ -102,7 +107,10 @@ const Header = () => {
           <nav className="flex flex-col space-y-3">
             <Link 
               href="/" 
-              onClick={() => setMobileMenuOpen(false)}
+              onClick={() => {
+                setMobileMenuOpen(false);
+                window.scrollTo(0, 0);
+              }}
               className="py-2 px-4 hover:bg-[#F4F1DE] dark:hover:bg-[#1A323C] dark:text-white rounded transition-colors"
             >
               Home
