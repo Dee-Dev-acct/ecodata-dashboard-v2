@@ -7,6 +7,7 @@ import { motion } from 'framer-motion';
 import { Leaf, Loader2, ArrowLeft } from 'lucide-react';
 import { Link, useLocation } from 'wouter';
 import { QuickFeedbackButton } from '@/components/FeedbackDialog';
+import SustainableDevelopmentGoals from '@/components/SustainableDevelopmentGoals';
 import { 
   CarbonReductionIcon,
   CommunityEngagementIcon,
@@ -532,6 +533,11 @@ const ImpactPage = () => {
                 </div>
               </div>
             </motion.div>
+          )}
+          
+          {/* Sustainable Development Goals */}
+          {!selectedProject && (
+            <SustainableDevelopmentGoals />
           )}
         </>
       )}
