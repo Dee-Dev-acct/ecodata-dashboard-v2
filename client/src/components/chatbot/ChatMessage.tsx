@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { MessageSquare, User } from "lucide-react";
 import DOMPurify from "dompurify";
 import { cn } from "@/lib/utils";
+import { useLocation } from "wouter";
 
 type MessageType = {
   id: string;
@@ -18,23 +19,39 @@ type ChatMessageProps = {
 const linkifyText = (text: string): string => {
   // URL regex
   const urlRegex = /(https?:\/\/[^\s]+)/g;
-  // Page path regex (e.g., /services, /impact)
-  const pathRegex = /(\s|\()(\/([\w-]+)(\/[\w-]+)*)/g;
+  
+  // Page path regex with word boundaries to avoid matching in the middle of words
+  // This matches /path or /path/subpath patterns
+  const pathRegex = /(\s|\(|^)(\/([\w-]+)(\/[\w-]+)*)\b/g;
   
   // Convert URLs to links
   let processed = text.replace(urlRegex, '<a href="$1" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline">$1</a>');
   
-  // Convert paths to links
-  processed = processed.replace(pathRegex, '$1<a href="$2" class="text-primary hover:underline">$2</a>');
+  // Convert paths to links with data attributes that we'll use for navigation
+  processed = processed.replace(pathRegex, '$1<a href="javascript:void(0)" data-internal-link="$2" class="text-primary hover:underline">$2</a>');
   
   return processed;
 };
 
 const ChatMessage = ({ message }: ChatMessageProps) => {
   const isBot = message.sender === "bot";
+  const [, setLocation] = useLocation();
   
   // Use DOMPurify to sanitize the HTML after linkification
   const sanitizedContent = DOMPurify.sanitize(linkifyText(message.content));
+  
+  // Handle clicking on internal links
+  const handleMessageClick = (e: React.MouseEvent) => {
+    const target = e.target as HTMLElement;
+    
+    if (target.tagName === 'A' && target.hasAttribute('data-internal-link')) {
+      e.preventDefault();
+      const path = target.getAttribute('data-internal-link');
+      if (path) {
+        setLocation(path);
+      }
+    }
+  };
   
   return (
     <motion.div
@@ -64,6 +81,7 @@ const ChatMessage = ({ message }: ChatMessageProps) => {
         <div
           className="text-sm"
           dangerouslySetInnerHTML={{ __html: sanitizedContent }}
+          onClick={handleMessageClick}
         />
         <div
           className={cn(
