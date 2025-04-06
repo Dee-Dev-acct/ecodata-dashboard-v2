@@ -37,6 +37,20 @@ const ItConsultancyPage = () => {
           buttonText: "Book a free strategy session"
         }}
         icon="fa-server"
+        impactStories={[
+          {
+            title: "Nonprofit Cloud Transformation",
+            description: "We helped a small environmental nonprofit transition to cloud infrastructure, dramatically reducing their IT costs while improving reliability and enabling remote work capabilities.",
+            metrics: "42% reduction in IT expenditure | 99.9% system uptime | 30% decrease in energy consumption",
+            imageUrl: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80"
+          },
+          {
+            title: "Sustainable IT Implementation",
+            description: "Our green IT assessment and implementation program helped a medium-sized business reduce their carbon footprint while modernizing their infrastructure.",
+            metrics: "25% energy reduction | E-waste properly recycled: 350kg | £15,000 annual savings on energy costs",
+            imageUrl: "https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80"
+          }
+        ]}
       />
       <Footer />
     </>

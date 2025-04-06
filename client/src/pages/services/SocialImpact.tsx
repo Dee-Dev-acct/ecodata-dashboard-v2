@@ -37,6 +37,20 @@ const SocialImpactPage = () => {
           buttonText: "Start your project"
         }}
         icon="fa-hands-helping"
+        impactStories={[
+          {
+            title: "Homelessness Support Network",
+            description: "Our digital platform connecting homeless individuals with available shelter beds and support services has transformed emergency response and resource allocation in the city.",
+            metrics: "87% reduction in unused shelter beds | 450+ individuals connected to services monthly",
+            imageUrl: "https://images.unsplash.com/photo-1509059852496-f3822ae057bf?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80"
+          },
+          {
+            title: "Youth Civic Engagement Platform",
+            description: "We co-designed a digital platform with young people from underserved communities, creating pathways for civic participation and community leadership development.",
+            metrics: "1,200+ active youth users | 25 community projects launched | 85% reported increased sense of agency",
+            imageUrl: "https://images.unsplash.com/photo-1531545514256-b1400bc00f31?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80"
+          }
+        ]}
       />
       <Footer />
     </>

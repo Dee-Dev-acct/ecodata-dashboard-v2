@@ -37,6 +37,20 @@ const WebDevelopmentPage = () => {
           buttonText: "Let's talk"
         }}
         icon="fa-code"
+        impactStories={[
+          {
+            title: "Conservation Trust Digital Transformation",
+            description: "We rebuilt the digital presence of a wildlife conservation trust, creating a low-carbon website that showcases their work while dramatically improving engagement and funding.",
+            metrics: "68% reduction in page carbon emissions | 125% increase in online donations | 40% boost in volunteer sign-ups",
+            imageUrl: "https://images.unsplash.com/photo-1550645612-83f5d594b671?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80"
+          },
+          {
+            title: "Accessible Community Portal",
+            description: "Our team developed a fully accessible community engagement platform that connects residents and local government, enabling inclusive participation in local decision-making.",
+            metrics: "WCAG AAA compliance achieved | 3,500+ active community users | 85% user satisfaction rating",
+            imageUrl: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80"
+          }
+        ]}
       />
       <Footer />
     </>

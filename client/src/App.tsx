@@ -24,6 +24,9 @@ import DigitalLiteracy from "@/pages/services/DigitalLiteracy";
 import SocialImpact from "@/pages/services/SocialImpact";
 import ItConsultancy from "@/pages/services/ItConsultancy";
 import WebDevelopment from "@/pages/services/WebDevelopment";
+import EnvironmentalResearch from "@/pages/services/EnvironmentalResearch";
+import DataAnalytics from "@/pages/services/DataAnalytics";
+import CommunityInnovation from "@/pages/services/CommunityInnovation";
 
 function Router() {
   return (
@@ -47,6 +50,9 @@ function Router() {
       <Route path="/services/social-impact" component={SocialImpact} />
       <Route path="/services/it-consultancy" component={ItConsultancy} />
       <Route path="/services/web-development" component={WebDevelopment} />
+      <Route path="/services/environmental-research" component={EnvironmentalResearch} />
+      <Route path="/services/data-analytics" component={DataAnalytics} />
+      <Route path="/services/community-innovation" component={CommunityInnovation} />
       
       <Route component={NotFound} />
     </Switch>

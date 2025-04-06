@@ -7,12 +7,12 @@ const ServiceCard = ({ title, description, icon }: { title: string; description:
   // Define links for each service
   const serviceLinks: Record<string, { href: string; linkText: string }> = {
     "Data Analytics": { 
-      href: "/data-insights", 
-      linkText: "Learn more about our data insights" 
+      href: "/services/data-analytics", 
+      linkText: "Learn more about our data analytics" 
     },
     "Environmental Research": { 
-      href: "/impact", 
-      linkText: "Explore our environmental impact" 
+      href: "/services/environmental-research", 
+      linkText: "Explore our environmental research" 
     },
     "Digital Literacy & Tech Training": { 
       href: "/services/digital-literacy", 
