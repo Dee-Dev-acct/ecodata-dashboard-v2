@@ -2376,7 +2376,7 @@ export class DatabaseStorage implements IStorage {
       query = query.where(eq(caseStudies.published, options.published));
     }
     
-    return query.orderBy(desc(caseStudies.publishDate));
+    return query.orderBy(desc(caseStudies.createdAt));
   }
   
   async getCaseStudyById(id: number): Promise<CaseStudy | undefined> {
@@ -2419,7 +2419,7 @@ export class DatabaseStorage implements IStorage {
       query = query.where(eq(publications.published, options.published));
     }
     
-    return query.orderBy(desc(publications.year));
+    return query.orderBy(desc(publications.createdAt));
   }
   
   async getPublicationById(id: number): Promise<Publication | undefined> {
@@ -2451,11 +2451,11 @@ export class DatabaseStorage implements IStorage {
   
   // FAQs
   async getFAQs(): Promise<FAQ[]> {
-    return db.select().from(faqs).orderBy(asc(faqs.order));
+    return db.select().from(faqs).orderBy(asc(faqs.id));
   }
   
   async getFAQsByCategory(category: string): Promise<FAQ[]> {
-    return db.select().from(faqs).where(eq(faqs.category, category)).orderBy(asc(faqs.order));
+    return db.select().from(faqs).where(eq(faqs.category, category)).orderBy(asc(faqs.id));
   }
   
   async getFAQById(id: number): Promise<FAQ | undefined> {

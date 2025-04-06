@@ -705,8 +705,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Case Studies routes
   app.get("/api/case-studies", async (req: Request, res: Response) => {
     try {
-      const published = req.query.published === 'true';
-      const caseStudies = await storage.getCaseStudies({ published });
+      // Only filter by published status if the parameter is explicitly provided
+      const options = req.query.published !== undefined 
+        ? { published: req.query.published === 'true' } 
+        : {};
+      const caseStudies = await storage.getCaseStudies(options);
       return res.json(caseStudies);
     } catch (error) {
       console.error("Error fetching case studies:", error);
@@ -733,8 +736,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Publications routes
   app.get("/api/publications", async (req: Request, res: Response) => {
     try {
-      const published = req.query.published === 'true';
-      const publications = await storage.getPublications({ published });
+      // Only filter by published status if the parameter is explicitly provided
+      const options = req.query.published !== undefined 
+        ? { published: req.query.published === 'true' } 
+        : {};
+      const publications = await storage.getPublications(options);
       return res.json(publications);
     } catch (error) {
       console.error("Error fetching publications:", error);
