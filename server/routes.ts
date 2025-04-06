@@ -18,6 +18,8 @@ import MemoryStore from "memorystore";
 import { storage } from "./storage";
 import { hashPassword, comparePassword, generateToken, authenticateToken, isAdmin, login } from "./auth";
 import { sendContactNotification, sendContactConfirmation, sendNewsletterConfirmation, sendNewSubscriberNotification } from "./emailService";
+import { processChatMessage, isRateLimited } from "./services/openaiService";
+import { sdgData } from "./services/sdgData";
 import Stripe from "stripe";
 import { z } from "zod";
 import {
@@ -2224,6 +2226,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error cancelling subscription:", error);
       return res.status(500).json({ message: "Failed to cancel subscription" });
+    }
+  });
+
+  // Chatbot API endpoint
+  app.post("/api/chatbot", async (req: Request, res: Response) => {
+    try {
+      const { message, sessionId } = req.body;
+      
+      if (!message || typeof message !== 'string') {
+        return res.status(400).json({ message: "Message is required and must be a string" });
+      }
+      
+      // Rate limiting to prevent abuse
+      const userId = sessionId || req.ip || 'anonymous';
+      
+      if (isRateLimited(userId)) {
+        return res.status(429).json({ 
+          message: "Rate limit exceeded. Please try again later.",
+          retryAfter: 60
+        });
+      }
+      
+      // Clean input to prevent injection attacks
+      const cleanMessage = message.trim();
+      
+      // Fetch context data for chatbot
+      const [faqs, services, impactMetrics] = await Promise.all([
+        storage.getFAQs(),
+        storage.getServices(),
+        storage.getImpactMetrics()
+      ]);
+      
+      // Process the message
+      const botResponse = await processChatMessage(cleanMessage, {
+        faqs,
+        services,
+        impactMetrics,
+        sdgs: sdgData
+      });
+      
+      // Return bot response
+      return res.json({ 
+        response: botResponse 
+      });
+    } catch (error) {
+      console.error("Chatbot error:", error);
+      return res.status(500).json({ 
+        message: "I'm having trouble processing your request right now. Please try again later or contact ECODATA directly through our contact page." 
+      });
     }
   });
 

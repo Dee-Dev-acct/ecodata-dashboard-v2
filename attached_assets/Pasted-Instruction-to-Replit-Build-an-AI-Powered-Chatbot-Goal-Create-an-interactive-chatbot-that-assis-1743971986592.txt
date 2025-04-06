@@ -1,0 +1,84 @@
+Instruction to Replit: Build an AI-Powered Chatbot
+📌 Goal: Create an interactive chatbot that assists users with:
+
+Exploring services and impact areas
+
+Answering FAQs
+
+Providing SDG-aligned project insights
+
+Guiding users to donate, subscribe, or book appointments
+
+🔧 1. Frontend Chatbot UI
+Add a floating chatbot widget in the bottom-right corner of all pages.
+
+Style with Tailwind or matching your existing theme (dark, rounded, animated open/close).
+
+Show a friendly welcome message like:
+
+“Hi 👋 I’m EcodataBot. Need help exploring our services or finding the right impact info?”
+
+💬 2. Chat Functionality
+Use a state-managed chat box with the following features:
+
+User input field with “Enter” send
+
+Bot typing animation
+
+Collapsible chat window
+
+Display conversation history
+
+🧠 3. Backend Logic – Basic Bot First
+Create a /api/chatbot endpoint in server/routes.ts.
+
+Accept POST request with user message.
+
+Return predefined responses using keyword matching for:
+
+“services”, “impact”, “donation”, “volunteer”, “SDG”, “how can I help?”, etc.
+
+ts
+Copy
+Edit
+// Sample logic (to be placed in chatbot route)
+if (message.includes("impact")) return "You can view our impact dashboard here: /impact";
+if (message.includes("donate")) return "You can support us with a donation via /support";
+🔄 4. (Optional) Integrate with OpenAI GPT API
+Add OPENAI_API_KEY to .env
+
+Use openai Node.js SDK to send user queries and return responses.
+
+Limit token usage and keep context concise.
+
+ts
+Copy
+Edit
+const response = await openai.chat.completions.create({
+  model: "gpt-3.5-turbo",
+  messages: [{ role: "user", content: userMessage }],
+  max_tokens: 150,
+});
+📚 5. FAQ + SDG Integration
+Link chatbot logic to:
+
+Dynamic FAQ page (fetch content from /api/faqs)
+
+SDG highlights (“Tell me about SDG 13” → return summary and project examples)
+
+🔒 6. Security + Abuse Protection
+Rate limit user requests (e.g., max 10/min)
+
+Strip unsafe inputs
+
+Add fallback if the response fails:
+
+“Sorry, something went wrong. Try again later or email us via the Contact page.”
+
+🔁 7. Future Enhancements
+Admin dashboard to monitor questions asked
+
+Auto-tag FAQs for future improvement
+
+Use vector search with embeddings to match questions with your documents (via Chroma or Pinecone)
+
