@@ -1,12 +1,60 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { FAQ } from '@shared/schema';
-import { Loader2, Search, HelpCircle, Mail } from 'lucide-react';
+import { Loader2, Search, HelpCircle, Mail, Calendar, Phone, ArrowRight, Info, Book, BadgeHelp, FileQuestion, Lightbulb } from 'lucide-react';
 import FAQAccordion from '@/components/resources/FAQAccordion';
 import { motion } from 'framer-motion';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Link } from 'wouter';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { QuickFeedbackButton } from '@/components/FeedbackDialog';
+
+// Define category icons for visual representation
+const categoryIcons: Record<string, React.ReactNode> = {
+  'General': <Info className="w-5 h-5" />,
+  'Services': <Lightbulb className="w-5 h-5" />,
+  'Impact': <ArrowRight className="w-5 h-5" />,
+  'Involvement': <Book className="w-5 h-5" />,
+  'Partnerships': <Phone className="w-5 h-5" />,
+  'Research': <FileQuestion className="w-5 h-5" />,
+  'Community': <BadgeHelp className="w-5 h-5" />,
+};
+
+// Define suggested questions for each major section
+const popularQuestions = [
+  {
+    id: 1,
+    question: "What is ECODATA CIC and what does it do?",
+    category: "General",
+    link: "#faq-1"
+  },
+  {
+    id: 5,
+    question: "What services does ECODATA CIC offer?",
+    category: "Services",
+    link: "#faq-5"
+  },
+  {
+    id: 7,
+    question: "What impact has ECODATA CIC achieved so far?",
+    category: "Impact",
+    link: "#faq-7" 
+  },
+  {
+    id: 6,
+    question: "How can my organisation partner with ECODATA CIC?",
+    category: "Partnerships",
+    link: "#faq-6"
+  },
+  {
+    id: 3,
+    question: "Do you offer volunteer or internship opportunities?",
+    category: "Involvement",
+    link: "#faq-3"
+  }
+];
 
 const FAQs: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -19,6 +67,13 @@ const FAQs: React.FC = () => {
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
+  };
+
+  const scrollToFAQ = (id: string) => {
+    document.getElementById(id)?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start'
+    });
   };
 
   if (isLoading) {
@@ -51,8 +106,8 @@ const FAQs: React.FC = () => {
     );
   }
 
-  // Extract unique categories
-  const categories = ['all', ...new Set(faqs.map(faq => faq.category))];
+  // Extract unique categories and sort them alphabetically
+  const categories = ['all', ...Array.from(new Set(faqs.map(faq => faq.category))).sort()];
 
   // Filter FAQs based on search query
   const filteredFAQs = faqs.filter(faq => {
@@ -79,10 +134,39 @@ const FAQs: React.FC = () => {
         </p>
       </motion.div>
 
+      {/* Popular Questions Section */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.1 }}
+        className="max-w-5xl mx-auto mb-12"
+      >
+        <h2 className="text-2xl font-semibold mb-6 text-center">Popular Questions</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {popularQuestions.map((q) => (
+            <Card key={q.id} className="cursor-pointer hover:bg-muted/50 transition-colors" onClick={() => scrollToFAQ(`faq-${q.id}`)}>
+              <CardHeader className="p-5 pb-2">
+                <div className="flex items-start gap-3">
+                  <div className="mt-1 text-primary">
+                    {categoryIcons[q.category] || <HelpCircle className="w-5 h-5" />}
+                  </div>
+                  <CardTitle className="text-base font-medium">{q.question}</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent className="p-5 pt-2">
+                <CardDescription className="mt-2 flex items-center text-primary">
+                  View answer <ArrowRight size={14} className="ml-1" />
+                </CardDescription>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </motion.div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
         className="max-w-lg mx-auto mb-12"
       >
         <div className="relative">
@@ -110,7 +194,10 @@ const FAQs: React.FC = () => {
               value={category}
               className="capitalize"
             >
-              {category === 'all' ? 'All Categories' : category}
+              <span className="flex items-center gap-2">
+                {category !== 'all' && categoryIcons[category]}
+                {category === 'all' ? 'All Categories' : category}
+              </span>
             </TabsTrigger>
           ))}
         </TabsList>
@@ -153,23 +240,47 @@ const FAQs: React.FC = () => {
         </TabsContent>
       </Tabs>
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.3 }}
-        className="max-w-2xl mx-auto bg-muted p-8 rounded-lg text-center"
-      >
-        <h2 className="text-2xl font-semibold mb-4">Still Have Questions?</h2>
-        <p className="mb-6 text-muted-foreground">
-          If you couldn't find the answer you were looking for, please contact us directly and we'll be happy to help.
-        </p>
-        <Button className="flex items-center" asChild>
-          <a href="/contact">
-            <Mail size={18} className="mr-2" />
-            Contact Us
-          </a>
-        </Button>
-      </motion.div>
+      <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+          className="bg-muted p-8 rounded-lg text-center"
+        >
+          <h2 className="text-2xl font-semibold mb-4">Have Technical Questions?</h2>
+          <p className="mb-6 text-muted-foreground">
+            Book a call with our technical team to discuss your specific data requirements or project needs.
+          </p>
+          <Button className="flex items-center" asChild>
+            <Link to="/book-appointment">
+              <Calendar size={18} className="mr-2" />
+              Book Appointment
+            </Link>
+          </Button>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
+          className="bg-muted p-8 rounded-lg text-center"
+        >
+          <h2 className="text-2xl font-semibold mb-4">Still Have Questions?</h2>
+          <p className="mb-6 text-muted-foreground">
+            If you couldn't find the answer you were looking for, please contact us directly and we'll be happy to help.
+          </p>
+          <Button className="flex items-center" asChild>
+            <Link to="/contact">
+              <Mail size={18} className="mr-2" />
+              Contact Us
+            </Link>
+          </Button>
+        </motion.div>
+      </div>
+
+      <div className="flex justify-center mt-12">
+        <QuickFeedbackButton />
+      </div>
     </div>
   );
 };
