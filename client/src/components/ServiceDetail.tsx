@@ -126,7 +126,7 @@ const ServiceDetail = ({
           <h3 className="text-2xl md:text-3xl font-heading font-semibold mb-6">
             {cta.text}
           </h3>
-          <Link href="/contact">
+          <Link href="/#contact">
             <button className="px-8 py-3 bg-[#2A9D8F] hover:bg-[#38B593] text-white font-medium rounded-md transition-colors">
               {cta.buttonText}
             </button>
