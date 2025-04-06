@@ -11,6 +11,7 @@ import Support from "@/components/Support";
 import BookAppointment from "@/components/BookAppointment";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
+import SustainableDevelopmentGoalsHome from "@/components/SustainableDevelopmentGoalsHome";
 
 const Home = () => {
   return (
@@ -22,6 +23,7 @@ const Home = () => {
         <About />
         <Impact />
         <Technology />
+        <SustainableDevelopmentGoalsHome />
         <Partners />
         <Testimonials />
         <Support />
