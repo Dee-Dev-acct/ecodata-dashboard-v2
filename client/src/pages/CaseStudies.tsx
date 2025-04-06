@@ -46,12 +46,23 @@ const CaseStudies: React.FC = () => {
   }
 
   // Get all unique impact types for filtering
-  const impactTypes = ['all', ...new Set(caseStudies.map(cs => cs.impactType.toLowerCase()))];
+  const impactTypesArray = caseStudies
+    .filter(cs => cs.impactType) // Filter out items without impactType
+    .map(cs => cs.impactType.toLowerCase()) // Get lowercase impactType
+    .reduce((acc: string[], curr) => {
+      // Only add if not already in array
+      if (!acc.includes(curr)) {
+        acc.push(curr);
+      }
+      return acc;
+    }, []);
+  
+  const impactTypes = ['all', ...impactTypesArray];
 
   // Filter case studies based on current selection
   const filteredCaseStudies = currentFilter === 'all'
     ? caseStudies
-    : caseStudies.filter(cs => cs.impactType.toLowerCase() === currentFilter);
+    : caseStudies.filter(cs => cs.impactType && cs.impactType.toLowerCase() === currentFilter);
 
   return (
     <div className="container mx-auto px-4 py-16">
