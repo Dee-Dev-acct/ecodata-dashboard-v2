@@ -7,6 +7,11 @@ import { motion } from 'framer-motion';
 import { Leaf, Loader2, ArrowLeft } from 'lucide-react';
 import { Link, useLocation } from 'wouter';
 import { 
+  CarbonReductionIcon,
+  CommunityEngagementIcon,
+  ResourceEfficiencyIcon
+} from '@/components/icons';
+import { 
   ImpactProject, 
   ImpactTimelineEvent,
   ImpactMetric 
@@ -234,7 +239,13 @@ const ImpactPage = () => {
                   variants={fadeIn}
                 >
                   <div className="flex justify-center">
-                    {metric.category === 'environmental' ? (
+                    {metric.title.includes('Carbon') ? (
+                      <CarbonReductionIcon className="h-10 w-10 text-primary mb-4" />
+                    ) : metric.title.includes('Community') ? (
+                      <CommunityEngagementIcon className="h-10 w-10 text-primary mb-4" />
+                    ) : metric.title.includes('Resource') ? (
+                      <ResourceEfficiencyIcon className="h-10 w-10 text-primary mb-4" />
+                    ) : metric.category === 'environmental' ? (
                       <Leaf className="h-10 w-10 text-primary mb-4" />
                     ) : (
                       <div className="h-10 w-10 rounded-full bg-primary/20 text-primary flex items-center justify-center mb-4">
