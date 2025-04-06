@@ -1,17 +1,30 @@
 import { useQuery } from "@tanstack/react-query";
 import { Service } from "@shared/schema";
 import React, { useMemo } from "react";
+import { Link } from "wouter";
 
 const ServiceCard = ({ title, description, icon }: { title: string; description: string; icon: string }) => {
+  // Check if this is the Data Analytics service to add a special link
+  const isDataAnalytics = title === "Data Analytics";
+  
   return (
     <div className="bg-[#F4F1DE] dark:bg-[#264653] rounded-lg shadow-md p-6 transition-transform hover:translate-y-[-5px]">
       <div className="w-14 h-14 bg-[#2A9D8F] bg-opacity-10 rounded-lg flex items-center justify-center mb-4">
         <i className={`fas ${icon} text-2xl text-[#2A9D8F]`}></i>
       </div>
       <h3 className="text-xl font-heading font-semibold mb-3">{title}</h3>
-      <p className="dark:text-[#F4F1DE]">
+      <p className="dark:text-[#F4F1DE] mb-4">
         {description}
       </p>
+      
+      {isDataAnalytics && (
+        <Link href="/data-insights" className="inline-flex items-center text-[#2A9D8F] hover:text-[#38B593] font-medium">
+          Learn more about our data insights
+          <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
+          </svg>
+        </Link>
+      )}
     </div>
   );
 };
