@@ -3,10 +3,19 @@ import { BlogPost } from "@shared/schema";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import BlogCard from "@/components/blog/BlogCard";
+import { Link } from "wouter";
+import { Home } from "lucide-react";
 
 const Blog = () => {
   const { data: posts, isLoading, error } = useQuery<BlogPost[]>({
     queryKey: ['/api/blog/posts', { published: true }],
+    queryFn: async () => {
+      const response = await fetch('/api/blog/posts?published=true');
+      if (!response.ok) {
+        throw new Error('Failed to fetch blog posts');
+      }
+      return response.json();
+    },
   });
 
   return (
@@ -16,6 +25,12 @@ const Blog = () => {
       <main className="flex-grow">
         <section className="bg-gradient-to-br from-[#E6F7F4] to-[#D1F5EE] dark:bg-gradient-to-br dark:from-[#1A4D5C] dark:to-[#0F3540] py-16">
           <div className="container mx-auto px-4">
+            <div className="relative mb-4 flex justify-start">
+              <Link href="/" className="inline-flex items-center text-primary hover:text-primary/80 transition-colors">
+                <Home className="h-4 w-4 mr-1" />
+                <span>Back to Home</span>
+              </Link>
+            </div>
             <div className="text-center mb-12">
               <h1 className="text-4xl font-heading font-bold mb-7 relative inline-block">
                 <span>Our Blog</span>

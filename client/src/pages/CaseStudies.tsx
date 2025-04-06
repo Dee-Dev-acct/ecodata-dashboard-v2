@@ -1,10 +1,11 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { CaseStudy } from '@shared/schema';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Home } from 'lucide-react';
 import CaseStudyCard from '@/components/resources/CaseStudyCard';
 import { motion } from 'framer-motion';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Link } from 'wouter';
 
 const CaseStudies: React.FC = () => {
   const [currentFilter, setCurrentFilter] = React.useState<string>('all');
@@ -54,6 +55,12 @@ const CaseStudies: React.FC = () => {
 
   return (
     <div className="container mx-auto px-4 py-16">
+      <div className="relative mb-2">
+        <Link href="/" className="inline-flex items-center text-primary hover:text-primary/80 transition-colors">
+          <Home className="h-4 w-4 mr-1" />
+          <span>Back to Home</span>
+        </Link>
+      </div>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
