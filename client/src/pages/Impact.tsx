@@ -4,7 +4,8 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import { Icon } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { motion } from 'framer-motion';
-import { Leaf, Loader2 } from 'lucide-react';
+import { Leaf, Loader2, ArrowLeft } from 'lucide-react';
+import { Link } from 'wouter';
 import { 
   ImpactProject, 
   ImpactTimelineEvent,
@@ -146,6 +147,14 @@ const ImpactPage = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-12">
+      {/* Back navigation */}
+      <div className="mb-8">
+        <Link href="/#services" className="inline-flex items-center text-[#2A9D8F] hover:text-[#38B593]">
+          <ArrowLeft className="w-4 h-4 mr-1" />
+          Back to Services
+        </Link>
+      </div>
+      
       {/* Hero Section */}
       <motion.div 
         className="text-center mb-16"

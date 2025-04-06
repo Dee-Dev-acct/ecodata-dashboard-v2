@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import { Link } from 'wouter';
+import { ArrowLeft } from 'lucide-react';
 import { 
   BarChart,
   Bar,
@@ -139,6 +141,14 @@ const DataInsights = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-12">
+      {/* Back navigation */}
+      <div className="mb-8">
+        <Link href="/#services" className="inline-flex items-center text-[#2A9D8F] hover:text-[#38B593]">
+          <ArrowLeft className="w-4 h-4 mr-1" />
+          Back to Services
+        </Link>
+      </div>
+      
       {/* Hero Section */}
       <motion.div 
         className="text-center mb-16"
