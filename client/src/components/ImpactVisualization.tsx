@@ -65,22 +65,44 @@ const industryComparisonData = [
 const categoryColors = {
   environmental: '#2A9D8F',
   social: '#457B9D',
-  efficiency: '#4CAF50'
+  efficiency: '#4CAF50',
+  literacy: '#2A9D8F',
+  engagement: '#457B9D',
+  dashboards: '#4CAF50',
+  opendata: '#E76F51'
 };
 
-// Converting data for visualization
-const prepareMetricsForChart = (metrics: ImpactMetric[]) => {
-  return metrics.map(metric => {
-    // Extract numeric value from the string (e.g., "247 tonnes" -> 247)
-    const numericValue = parseInt(metric.value.replace(/[^0-9]/g, ''));
-    
-    return {
-      name: metric.title,
-      value: isNaN(numericValue) ? 0 : numericValue,
-      category: metric.category,
-      fill: categoryColors[metric.category as keyof typeof categoryColors] || '#2A9D8F'
-    };
-  });
+// Fixed data for alternative metrics chart
+const alternativeMetricsChart = [
+  {
+    name: "Community Engagement",
+    value: 3420,
+    category: "engagement",
+    fill: '#457B9D'
+  },
+  {
+    name: "Digital Literacy",
+    value: 248,
+    category: "literacy",
+    fill: '#2A9D8F'
+  },
+  {
+    name: "Decision Dashboards",
+    value: 12,
+    category: "dashboards",
+    fill: '#4CAF50'
+  },
+  {
+    name: "Open Data",
+    value: 19,
+    category: "opendata",
+    fill: '#E76F51'
+  }
+];
+
+// Converting data for visualization - now uses fixed data
+const prepareMetricsForChart = (_metrics: ImpactMetric[]) => {
+  return alternativeMetricsChart;
 };
 
 const ImpactVisualization = () => {
@@ -191,8 +213,17 @@ const ImpactVisualization = () => {
                     <YAxis />
                     <Tooltip 
                       formatter={(value, name, props) => {
-                        const metric = metrics.find(m => m.title === props.payload.name);
-                        return [metric?.value || value, 'Value'];
+                        const entry = props.payload;
+                        if (entry.category === 'engagement') {
+                          return [`${value} hours`, entry.name];
+                        } else if (entry.category === 'literacy') {
+                          return [`${value} participants`, entry.name];
+                        } else if (entry.category === 'dashboards') {
+                          return [`${value} dashboards`, entry.name];
+                        } else if (entry.category === 'opendata') {
+                          return [`${value} datasets`, entry.name];
+                        }
+                        return [value, entry.name];
                       }}
                     />
                     <Legend />
