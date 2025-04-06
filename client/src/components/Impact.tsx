@@ -104,25 +104,6 @@ const Impact = () => {
           
           <ImpactVisualization />
         </div>
-        
-        {/* SDG Goals Section */}
-        <div className="mt-16">
-          <h3 className="text-xl font-heading font-semibold mb-6 text-center">Supporting UN Sustainable Development Goals</h3>
-          <div className="flex flex-wrap justify-center gap-4">
-            <div className="h-20 w-20 bg-[#E5243B] rounded-md shadow-sm flex items-center justify-center text-white font-bold">
-              SDG 11
-            </div>
-            <div className="h-20 w-20 bg-[#DDA63A] rounded-md shadow-sm flex items-center justify-center text-white font-bold">
-              SDG 12
-            </div>
-            <div className="h-20 w-20 bg-[#4C9F38] rounded-md shadow-sm flex items-center justify-center text-white font-bold">
-              SDG 13
-            </div>
-            <div className="h-20 w-20 bg-[#19486A] rounded-md shadow-sm flex items-center justify-center text-white font-bold">
-              SDG 17
-            </div>
-          </div>
-        </div>
       </div>
     </section>
   );
