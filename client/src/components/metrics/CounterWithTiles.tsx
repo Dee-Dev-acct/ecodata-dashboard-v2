@@ -1,50 +1,26 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
+import CountUp from 'react-countup';
 
-interface Project {
-  title: string;
-  description: string;
-  imageUrl?: string;
+interface Tile {
+  label: string;
+  value: number;
+  icon?: string | React.ReactNode;
 }
 
 interface CounterWithTilesProps {
-  value: number;
   title: string;
-  description: string;
-  projects: Project[];
+  subtitle?: string;
+  tiles: Tile[];
   className?: string;
 }
 
 const CounterWithTiles: React.FC<CounterWithTilesProps> = ({
-  value,
   title,
-  description,
-  projects,
+  subtitle,
+  tiles,
   className = ''
 }) => {
-  const [count, setCount] = useState(0);
-  
-  useEffect(() => {
-    let start = 0;
-    const end = value;
-    const incrementTime = 2000 / end;
-    
-    let timer: NodeJS.Timeout;
-    
-    const updateCount = () => {
-      start += 1;
-      setCount(start);
-      
-      if (start < end) {
-        timer = setTimeout(updateCount, incrementTime);
-      }
-    };
-    
-    timer = setTimeout(updateCount, incrementTime);
-    
-    return () => clearTimeout(timer);
-  }, [value]);
-
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -69,29 +45,26 @@ const CounterWithTiles: React.FC<CounterWithTilesProps> = ({
       animate="visible"
     >
       <div className="text-center mb-6">
-        <h3 className="text-4xl font-bold mb-2">{count}</h3>
         <h4 className="text-xl font-medium mb-2">{title}</h4>
-        <p className="text-muted-foreground">{description}</p>
+        {subtitle && (
+          <p className="text-muted-foreground">{subtitle}</p>
+        )}
       </div>
       
-      <motion.div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {projects.map((project, index) => (
+      <motion.div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {tiles.map((tile, index) => (
           <motion.div 
             key={index}
-            className="bg-muted/50 rounded-lg p-4 hover:shadow-md transition-shadow"
+            className="bg-muted/50 rounded-lg p-4 hover:shadow-md transition-shadow text-center"
             variants={itemVariants}
           >
-            {project.imageUrl && (
-              <div className="h-32 overflow-hidden rounded-md mb-3">
-                <img 
-                  src={project.imageUrl} 
-                  alt={project.title} 
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            )}
-            <h5 className="font-medium mb-1">{project.title}</h5>
-            <p className="text-sm text-muted-foreground">{project.description}</p>
+            <div className="text-4xl text-primary mb-2">
+              {typeof tile.icon === 'string' ? tile.icon : tile.icon}
+            </div>
+            <h3 className="text-2xl font-bold mb-1">
+              <CountUp end={tile.value} duration={2} />
+            </h3>
+            <p className="text-sm text-muted-foreground">{tile.label}</p>
           </motion.div>
         ))}
       </motion.div>

@@ -2,12 +2,14 @@ import React from 'react';
 import { motion } from 'framer-motion';
 
 interface ContributionDay {
-  date: string;
+  day?: string;
+  date?: string;
   count: number;
 }
 
 interface GitHubActivityProps {
-  data: ContributionDay[];
+  data?: ContributionDay[];
+  contributions?: ContributionDay[];
   title?: string;
   subtitle?: string;
   className?: string;
@@ -15,12 +17,16 @@ interface GitHubActivityProps {
 
 const GitHubActivity: React.FC<GitHubActivityProps> = ({
   data,
+  contributions,
   title,
   subtitle,
   className = ''
 }) => {
+  // Use the data or contributions prop
+  const contributionsData = data || contributions || [];
+  
   // Find the max contribution count to determine color intensity
-  const maxCount = Math.max(...data.map(day => day.count));
+  const maxCount = Math.max(...contributionsData.map(day => day.count));
   
   // Function to determine intensity of the color based on count
   const getIntensity = (count: number) => {
@@ -41,11 +47,11 @@ const GitHubActivity: React.FC<GitHubActivityProps> = ({
   const weeks: ContributionDay[][] = [];
   let currentWeek: ContributionDay[] = [];
   
-  data.forEach((day, index) => {
+  contributionsData.forEach((day, index) => {
     currentWeek.push(day);
     
     // Every 7 days (or at the end), start a new week
-    if ((index + 1) % 7 === 0 || index === data.length - 1) {
+    if ((index + 1) % 7 === 0 || index === contributionsData.length - 1) {
       weeks.push([...currentWeek]);
       currentWeek = [];
     }
@@ -94,10 +100,10 @@ const GitHubActivity: React.FC<GitHubActivityProps> = ({
       
       <div className="mt-4 text-center">
         <div className="font-medium text-xl">
-          {data.reduce((sum, day) => sum + day.count, 0)} contributions
+          {contributionsData.reduce((sum, day) => sum + day.count, 0)} contributions
         </div>
         <div className="text-sm text-muted-foreground">
-          in the last {data.length} days
+          in the last {contributionsData.length} days
         </div>
       </div>
     </motion.div>
