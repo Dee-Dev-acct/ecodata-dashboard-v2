@@ -242,44 +242,63 @@ const ImpactPage = () => {
             ))}
           </div>
 
-          {/* Impact Metrics */}
-          {filteredMetrics && filteredMetrics.length > 0 && (
-            <motion.div 
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16"
-              variants={staggerContainer}
-              initial="hidden"
-              animate="visible"
-            >
-              {filteredMetrics.map(metric => (
-                <motion.div 
-                  key={metric.id} 
-                  className="bg-card rounded-xl p-6 shadow-sm border text-center"
-                  variants={fadeIn}
-                >
-                  <div className="flex justify-center">
-                    {metric.title.includes('Carbon') ? (
-                      <CarbonReductionIcon className="h-10 w-10 text-primary mb-4" />
-                    ) : metric.title.includes('Community') ? (
-                      <CommunityEngagementIcon className="h-10 w-10 text-primary mb-4" />
-                    ) : metric.title.includes('Resource') ? (
-                      <ResourceEfficiencyIcon className="h-10 w-10 text-primary mb-4" />
-                    ) : metric.category === 'environmental' ? (
-                      <Leaf className="h-10 w-10 text-primary mb-4" />
-                    ) : (
-                      <div className="h-10 w-10 rounded-full bg-primary/20 text-primary flex items-center justify-center mb-4">
-                        {metric.category.charAt(0).toUpperCase()}
-                      </div>
-                    )}
-                  </div>
-                  <h3 className="font-bold text-3xl mb-2">
-                    <CounterAnimation value={metric.value} />
-                  </h3>
-                  <h4 className="font-medium text-xl mb-2">{metric.title}</h4>
-                  <p className="text-muted-foreground text-sm">{metric.description}</p>
-                </motion.div>
-              ))}
+          {/* Alternative Impact Metrics */}
+          <motion.div 
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-16"
+            variants={staggerContainer}
+            initial="hidden"
+            animate="visible"
+          >
+            <motion.div variants={fadeIn}>
+              <AnimatedCounter 
+                value={3420}
+                title="Community Engagement Hours"
+                description="Total hours spent in workshops and training"
+                icon={<CommunityEngagementHoursIcon className="h-10 w-10" />}
+                suffix=" hrs"
+              />
             </motion.div>
-          )}
+            
+            <motion.div variants={fadeIn}>
+              <AnimatedCounter 
+                value={248}
+                title="Digital Literacy"
+                description="Participants with improved digital skills"
+                icon={<DigitalLiteracyIcon className="h-10 w-10" />}
+                suffix=" trained"
+              />
+            </motion.div>
+            
+            <motion.div variants={fadeIn}>
+              <AnimatedCounter 
+                value={12}
+                title="Decision Dashboards"
+                description="Evidence-based dashboards deployed"
+                icon={<DashboardsDeployedIcon className="h-10 w-10" />}
+                prefix=""
+              />
+            </motion.div>
+            
+            <motion.div variants={fadeIn}>
+              <AnimatedCounter 
+                value={19}
+                title="Open Data Contributions"
+                description="Datasets contributed to public domain"
+                icon={<OpenDataIcon className="h-10 w-10" />}
+                prefix=""
+              />
+            </motion.div>
+            
+            <motion.div variants={fadeIn}>
+              <AnimatedCounter 
+                value={5}
+                title="Policy Recommendations"
+                description="Policy briefs delivered to local government"
+                icon={<PolicyRecommendationsIcon className="h-10 w-10" />}
+                prefix=""
+              />
+            </motion.div>
+          </motion.div>
 
           {/* Projects Map */}
           {filteredProjects && filteredProjects.length > 0 && (
@@ -400,14 +419,14 @@ const ImpactPage = () => {
             </motion.div>
           )}
 
-          {/* Alternative Impact Metrics */}
+          {/* Data Visualization Section */}
           <motion.div
             className="mb-16"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5 }}
           >
-            <h2 className="text-3xl font-bold mb-8 text-center">Alternative Impact Metrics</h2>
+            <h2 className="text-3xl font-bold mb-8 text-center">Impact Visualization</h2>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
               {/* Community Engagement Hours - Bar Chart */}
@@ -433,30 +452,6 @@ const ImpactPage = () => {
                 title="Digital Literacy Improvements"
                 subtitle="248 participants improved digital skills across three levels"
                 centerLabel="248"
-              />
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
-              {/* Animated Counters for different metrics */}
-              <AnimatedCounter 
-                value={12}
-                title="Decision-Making Dashboards Deployed"
-                description="Evidence-based dashboards deployed in the past year"
-                icon={<DashboardsDeployedIcon className="h-12 w-12" />}
-              />
-              
-              <AnimatedCounter 
-                value={19}
-                title="Open Data Contributions"
-                description="Datasets contributed to the public domain"
-                icon={<OpenDataIcon className="h-12 w-12" />}
-              />
-              
-              <AnimatedCounter 
-                value={5}
-                title="Policy Recommendations"
-                description="Policy briefs delivered to local government"
-                icon={<PolicyRecommendationsIcon className="h-12 w-12" />}
               />
             </div>
             
