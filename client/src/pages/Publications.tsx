@@ -63,16 +63,37 @@ const Publications: React.FC = () => {
     );
   }
 
-  // Extract unique values for filters
-  const types = ['all', ...new Set(publications.map(pub => pub.type))];
-  const years = ['all', ...new Set(publications.map(pub => pub.year.toString()))].sort((a, b) => b.localeCompare(a));
-  const topics = ['all', ...new Set(publications.map(pub => pub.topic))];
+  // Extract unique values for filters using Array.from to handle Set iteration safely
+  const uniqueTypes = new Set(publications.map(pub => pub.type));
+  const types = ['all', ...Array.from(uniqueTypes)];
+  
+  // Get years from publicationDate if available, or fallback to createdAt
+  const yearSet = new Set(publications
+    .map(pub => {
+      const date = pub.publicationDate || pub.createdAt;
+      return date ? new Date(date).getFullYear().toString() : 'Unknown';
+    })
+  );
+  const years = ['all', ...Array.from(yearSet)].sort((a, b) => b.localeCompare(a));
+  
+  // Use categories as topics
+  const topicSet = new Set(publications
+    .flatMap(pub => pub.categories || [])
+    .filter(Boolean)
+  );
+  const topics = ['all', ...Array.from(topicSet)];
 
   // Apply filters
   const filteredPublications = publications.filter(pub => {
     const matchesType = typeFilter === 'all' || pub.type === typeFilter;
-    const matchesYear = yearFilter === 'all' || pub.year.toString() === yearFilter;
-    const matchesTopic = topicFilter === 'all' || pub.topic === topicFilter;
+    
+    const pubYear = pub.publicationDate || pub.createdAt;
+    const yearString = pubYear ? new Date(pubYear).getFullYear().toString() : 'Unknown';
+    const matchesYear = yearFilter === 'all' || yearString === yearFilter;
+    
+    const matchesTopic = topicFilter === 'all' || 
+      (pub.categories && pub.categories.includes(topicFilter));
+      
     return matchesType && matchesYear && matchesTopic;
   });
 

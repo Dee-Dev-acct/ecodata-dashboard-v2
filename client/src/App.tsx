@@ -21,6 +21,7 @@ import DataInsights from "@/pages/DataInsights";
 import CaseStudies from "@/pages/CaseStudies";
 import CaseStudyDetail from "@/pages/CaseStudyDetail";
 import Publications from "@/pages/Publications";
+import PublicationDetail from "@/pages/PublicationDetail";
 import FAQs from "@/pages/FAQs";
 
 // Service detail pages
@@ -53,6 +54,7 @@ function Router() {
       <Route path="/case-studies" component={CaseStudies} />
       <Route path="/case-studies/:slug" component={CaseStudyDetail} />
       <Route path="/publications" component={Publications} />
+      <Route path="/publications/:id" component={PublicationDetail} />
       <Route path="/faqs" component={FAQs} />
       
       {/* Service detail pages */}

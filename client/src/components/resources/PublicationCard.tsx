@@ -2,9 +2,10 @@ import React from 'react';
 import { motion } from "framer-motion";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Book, Download, FileText, Globe, Users } from "lucide-react";
+import { ArrowRight, Book, Download, ExternalLink, FileText, Globe, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Publication } from "@shared/schema";
+import { Link } from "wouter";
 
 interface PublicationCardProps {
   publication: Publication;
@@ -27,8 +28,8 @@ const PublicationCard: React.FC<PublicationCardProps> = ({ publication, index })
 
   // Type icon mapping
   const typeIcons: Record<string, React.ReactNode> = {
-    'research': <Book className="h-5 w-5" />,
-    'whitepaper': <FileText className="h-5 w-5" />,
+    'research paper': <Book className="h-5 w-5" />,
+    'white paper': <FileText className="h-5 w-5" />,
     'report': <FileText className="h-5 w-5" />,
     'policy': <Globe className="h-5 w-5" />,
     'article': <FileText className="h-5 w-5" />
@@ -36,6 +37,19 @@ const PublicationCard: React.FC<PublicationCardProps> = ({ publication, index })
 
   // Default icon if type doesn't match
   const defaultIcon = <FileText className="h-5 w-5" />;
+  
+  // Get publication year from publicationDate or createdAt
+  const getPublicationYear = () => {
+    const date = publication.publicationDate || publication.createdAt;
+    return date ? new Date(date).getFullYear().toString() : 'Unknown';
+  };
+  
+  // Get first category as the main topic
+  const getMainTopic = () => {
+    return publication.categories && publication.categories.length > 0 
+      ? publication.categories[0] 
+      : '';
+  };
 
   return (
     <motion.div
@@ -50,7 +64,7 @@ const PublicationCard: React.FC<PublicationCardProps> = ({ publication, index })
             <Badge variant="outline" className="capitalize px-2 py-1 text-sm">
               {publication.type}
             </Badge>
-            <span className="text-sm font-medium">{publication.year}</span>
+            <span className="text-sm font-medium">{getPublicationYear()}</span>
           </div>
           
           <h3 className="text-xl font-semibold mb-3 line-clamp-2">{publication.title}</h3>
@@ -59,9 +73,11 @@ const PublicationCard: React.FC<PublicationCardProps> = ({ publication, index })
             {publication.summary}
           </p>
           
-          <div className="flex items-center text-sm text-muted-foreground">
-            <span className="capitalize">{publication.topic}</span>
-          </div>
+          {getMainTopic() && (
+            <div className="flex items-center text-sm text-muted-foreground">
+              <span className="capitalize">{getMainTopic()}</span>
+            </div>
+          )}
           
           {publication.authors && publication.authors.length > 0 && (
             <div className="flex items-center mt-3 text-sm">
@@ -78,27 +94,59 @@ const PublicationCard: React.FC<PublicationCardProps> = ({ publication, index })
           <div className="w-full flex justify-between items-center">
             <div className="flex items-center text-muted-foreground">
               {typeIcons[publication.type.toLowerCase()] || defaultIcon}
-              <span className="ml-2 text-sm">{publication.organization}</span>
+              <span className="ml-2 text-sm">ECODATA CIC</span>
             </div>
             
-            {publication.fileUrl && (
+            <div className="flex items-center gap-2">
+              {publication.fileUrl && (
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  asChild
+                >
+                  <a 
+                    href={publication.fileUrl} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="flex items-center"
+                  >
+                    <Download size={14} className="mr-1" />
+                    PDF
+                  </a>
+                </Button>
+              )}
+              
+              {publication.externalUrl && (
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  asChild
+                >
+                  <a 
+                    href={publication.externalUrl} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="flex items-center"
+                  >
+                    <ExternalLink size={14} className="mr-1" />
+                    Source
+                  </a>
+                </Button>
+              )}
+              
+              {/* Link to publication detail page */}
               <Button 
-                variant="outline" 
+                variant="link" 
                 size="sm"
-                className="ml-auto"
+                className="px-2 font-medium"
                 asChild
               >
-                <a 
-                  href={publication.fileUrl} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="flex items-center"
-                >
-                  <Download size={14} className="mr-1" />
-                  PDF
-                </a>
+                <Link href={`/publications/${publication.id}`} className="flex items-center">
+                  View
+                  <ArrowRight size={14} className="ml-1" />
+                </Link>
               </Button>
-            )}
+            </div>
           </div>
         </CardFooter>
       </Card>
