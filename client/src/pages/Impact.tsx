@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import { Icon } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { motion } from 'framer-motion';
 import { Leaf, Loader2, ArrowLeft } from 'lucide-react';
-import { Link } from 'wouter';
+import { Link, useLocation } from 'wouter';
 import { 
   ImpactProject, 
   ImpactTimelineEvent,
@@ -99,7 +99,25 @@ const TimelineEvent = ({ event }: { event: ImpactTimelineEvent }) => {
 const ImpactPage = () => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedProject, setSelectedProject] = useState<number | null>(null);
-
+  const [location] = useLocation();
+  const [backLink, setBackLink] = useState({ path: "/#services", text: "Back to Services" });
+  
+  // Determine where the user came from
+  useEffect(() => {
+    // Check for referrer in sessionStorage
+    const referrer = sessionStorage.getItem('referrer');
+    
+    if (referrer === 'footer') {
+      setBackLink({ path: "/", text: "Back to Home" });
+    }
+    // Add more conditions as needed
+    
+    // Clean up
+    return () => {
+      sessionStorage.removeItem('referrer');
+    };
+  }, []);
+  
   // Fetch impact metrics
   const { 
     data: metrics, 
@@ -149,9 +167,9 @@ const ImpactPage = () => {
     <div className="max-w-7xl mx-auto px-4 py-12">
       {/* Back navigation */}
       <div className="mb-8">
-        <Link href="/#services" className="inline-flex items-center text-[#2A9D8F] hover:text-[#38B593]">
+        <Link href={backLink.path} className="inline-flex items-center text-[#2A9D8F] hover:text-[#38B593]">
           <ArrowLeft className="w-4 h-4 mr-1" />
-          Back to Services
+          {backLink.text}
         </Link>
       </div>
       

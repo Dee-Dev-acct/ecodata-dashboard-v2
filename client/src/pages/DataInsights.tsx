@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Link } from 'wouter';
+import { Link, useLocation } from 'wouter';
 import { ArrowLeft } from 'lucide-react';
 import { 
   BarChart,
@@ -134,6 +134,24 @@ const researchFindings = [
 
 const DataInsights = () => {
   const [reportFilter, setReportFilter] = useState('All');
+  const [location] = useLocation();
+  const [backLink, setBackLink] = useState({ path: "/#services", text: "Back to Services" });
+  
+  // Determine where the user came from
+  useEffect(() => {
+    // Check for referrer in sessionStorage
+    const referrer = sessionStorage.getItem('referrer');
+    
+    if (referrer === 'footer') {
+      setBackLink({ path: "/", text: "Back to Home" });
+    }
+    // Add more conditions as needed
+    
+    // Clean up
+    return () => {
+      sessionStorage.removeItem('referrer');
+    };
+  }, []);
   
   const filteredReports = reportFilter === 'All' 
     ? reports 
@@ -143,9 +161,9 @@ const DataInsights = () => {
     <div className="max-w-7xl mx-auto px-4 py-12">
       {/* Back navigation */}
       <div className="mb-8">
-        <Link href="/#services" className="inline-flex items-center text-[#2A9D8F] hover:text-[#38B593]">
+        <Link href={backLink.path} className="inline-flex items-center text-[#2A9D8F] hover:text-[#38B593]">
           <ArrowLeft className="w-4 h-4 mr-1" />
-          Back to Services
+          {backLink.text}
         </Link>
       </div>
       
