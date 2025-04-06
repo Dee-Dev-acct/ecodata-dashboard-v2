@@ -19,6 +19,12 @@ import Dashboard from "@/pages/Dashboard";
 import Impact from "@/pages/Impact";
 import DataInsights from "@/pages/DataInsights";
 
+// Service detail pages
+import DigitalLiteracy from "@/pages/services/DigitalLiteracy";
+import SocialImpact from "@/pages/services/SocialImpact";
+import ItConsultancy from "@/pages/services/ItConsultancy";
+import WebDevelopment from "@/pages/services/WebDevelopment";
+
 function Router() {
   return (
     <Switch>
@@ -35,6 +41,13 @@ function Router() {
       <Route path="/checkout/:goalId?" component={Checkout} />
       <Route path="/donation-success" component={DonationSuccess} />
       <Route path="/subscription-success" component={SubscriptionSuccess} />
+      
+      {/* Service detail pages */}
+      <Route path="/services/digital-literacy" component={DigitalLiteracy} />
+      <Route path="/services/social-impact" component={SocialImpact} />
+      <Route path="/services/it-consultancy" component={ItConsultancy} />
+      <Route path="/services/web-development" component={WebDevelopment} />
+      
       <Route component={NotFound} />
     </Switch>
   );

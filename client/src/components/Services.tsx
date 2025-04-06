@@ -4,9 +4,36 @@ import React, { useMemo } from "react";
 import { Link } from "wouter";
 
 const ServiceCard = ({ title, description, icon }: { title: string; description: string; icon: string }) => {
-  // Check if this is one of the services we want to add a special link for
-  const isDataAnalytics = title === "Data Analytics";
-  const isEnvironmentalResearch = title === "Environmental Research";
+  // Define links for each service
+  const serviceLinks: Record<string, { href: string; linkText: string }> = {
+    "Data Analytics": { 
+      href: "/data-insights", 
+      linkText: "Learn more about our data insights" 
+    },
+    "Environmental Research": { 
+      href: "/impact", 
+      linkText: "Explore our environmental impact" 
+    },
+    "Digital Literacy & Tech Training": { 
+      href: "/services/digital-literacy", 
+      linkText: "Discover our digital literacy programs" 
+    },
+    "Community Innovation & Social Impact Projects": { 
+      href: "/services/social-impact", 
+      linkText: "See our community impact projects" 
+    },
+    "IT Consultancy": { 
+      href: "/services/it-consultancy", 
+      linkText: "Explore our IT consulting services" 
+    },
+    "Web Development": { 
+      href: "/services/web-development", 
+      linkText: "View our web development approach" 
+    }
+  };
+  
+  // Check if this service has a detail page
+  const serviceLink = serviceLinks[title];
   
   return (
     <div className="bg-[#F4F1DE] dark:bg-[#264653] rounded-lg shadow-md p-6 transition-transform hover:translate-y-[-5px]">
@@ -18,18 +45,9 @@ const ServiceCard = ({ title, description, icon }: { title: string; description:
         {description}
       </p>
       
-      {isDataAnalytics && (
-        <Link href="/data-insights" className="inline-flex items-center text-[#2A9D8F] hover:text-[#38B593] font-medium">
-          Learn more about our data insights
-          <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
-          </svg>
-        </Link>
-      )}
-      
-      {isEnvironmentalResearch && (
-        <Link href="/impact" className="inline-flex items-center text-[#2A9D8F] hover:text-[#38B593] font-medium">
-          Explore our environmental impact
+      {serviceLink && (
+        <Link href={serviceLink.href} className="inline-flex items-center text-[#2A9D8F] hover:text-[#38B593] font-medium">
+          {serviceLink.linkText}
           <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
           </svg>

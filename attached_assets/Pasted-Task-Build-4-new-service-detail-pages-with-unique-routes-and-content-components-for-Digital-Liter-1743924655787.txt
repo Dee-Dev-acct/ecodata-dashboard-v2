@@ -1,0 +1,102 @@
+Task:
+Build 4 new service detail pages with unique routes and content components for:
+
+Digital Literacy & Tech Training
+
+Community Innovation & Social Impact Projects
+
+IT Consultancy
+
+Web Development
+
+🧩 Requirements per Page: Each page should follow this structure:
+
+✅ Unique route: e.g. /services/digital-literacy, /services/social-impact, etc.
+
+✅ Consistent layout (e.g. header, section title, call to action)
+
+✅ Hero section with a relevant icon and introduction paragraph
+
+✅ Content blocks for:
+
+What the service is
+
+Who it benefits
+
+Case study examples (static or future placeholder)
+
+CTA section (e.g. “Partner with Us”, “Book a Consultation”)
+
+📄 Page Content & Structure
+1. Digital Literacy & Tech Training
+Route: /services/digital-literacy
+
+Hero Title: Empowering Communities Through Digital Skills
+
+Description: We offer inclusive digital education programs to bridge the digital divide. Our workshops cover:
+
+Basic computer skills
+
+Data literacy
+
+Cybersecurity fundamentals
+
+Intro to coding (Python/HTML)
+
+CTA: “Empower your community—Start a workshop today.”
+
+2. Community Innovation & Social Impact Projects
+Route: /services/social-impact
+
+Hero Title: Co-creating Tech for Social Good
+
+Description: We collaborate with local organizations to tackle issues such as:
+
+Homelessness & housing support
+
+Youth engagement through digital platforms
+
+Mental health awareness tools
+
+Accessibility technology
+
+CTA: “Have a community idea? Let’s co-create a solution.”
+
+3. IT Consultancy
+Route: /services/it-consultancy
+
+Hero Title: Sustainable and Smart IT Solutions
+
+Description: Our IT consultancy supports:
+
+Infrastructure audits
+
+Migration to cloud-native environments
+
+Automation of business workflows
+
+Data privacy & security strategies
+
+CTA: “Book a free IT strategy session with our experts.”
+
+4. Web Development
+Route: /services/web-development
+
+Hero Title: Eco-Conscious Web Design
+
+Description: We build:
+
+Responsive websites for social and environmental orgs
+
+Data dashboards
+
+Community engagement platforms
+
+Low-carbon, accessible design
+
+CTA: “Need a website built with purpose? Let's talk.”
+
+🔗 Internal Navigation Updates
+Add "Learn More" links from each card on the Services grid (as shown in your image)
+
+Optionally: Add to navigation or sidebar in Services section
