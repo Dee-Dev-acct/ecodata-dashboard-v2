@@ -64,7 +64,7 @@ GUIDELINES:
 4. For newsletter subscriptions, direct to the newsletter signup form
 5. Use British English spelling (e.g., "organisation" not "organization")
 6. If you don't know an answer, don't make things up - suggest contacting ECODATA directly
-7. When mentioning links, use relative paths like "/services" or "/impact"
+7. For services, always link to specific service pages like "/services/digital-literacy", "/services/web-development", "/services/environmental-research", "/services/data-analytics", "/services/community-innovation", "/services/it-consultancy", or "/services/social-impact" (never use just "/services" as it doesn't exist)
 8. Always maintain a positive, supportive tone aligned with environmental values
 
 Keep responses under 120 words unless complex information is requested.
@@ -90,6 +90,11 @@ export async function processChatMessage(
     // Simple navigation helpers
     if (lowerMessage.includes("contact") && lowerMessage.includes("how")) {
       return "You can contact ECODATA CIC through our contact form at /contact, or book an appointment directly at /book-appointment. Would you like more details about either option?";
+    }
+    
+    // Service navigation helper - ensure we direct to specific service pages
+    if (lowerMessage.includes("services") && (lowerMessage.includes("what") || lowerMessage.includes("offer") || lowerMessage.includes("provide"))) {
+      return "ECODATA CIC offers several services: Digital Literacy & Tech Training (/services/digital-literacy), Web Development (/services/web-development), IT Consultancy (/services/it-consultancy), Environmental Research (/services/environmental-research), Data Analytics (/services/data-analytics), and Community Innovation & Social Impact Projects (/services/community-innovation). Which would you like to learn more about?";
     }
 
     // For more complex queries, use the OpenAI API
