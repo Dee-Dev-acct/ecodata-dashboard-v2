@@ -63,25 +63,25 @@ const Publications: React.FC = () => {
     );
   }
 
-  // Extract unique values for filters using Array.from to handle Set iteration safely
-  const uniqueTypes = new Set(publications.map(pub => pub.type));
-  const types = ['all', ...Array.from(uniqueTypes)];
+  // Extract unique values for filters
+  const typeValues: string[] = publications.map(pub => pub.type || '');
+  const uniqueTypes = [...new Set(typeValues)];
+  const types = ['all', ...uniqueTypes];
   
   // Get years from publicationDate if available, or fallback to createdAt
-  const yearSet = new Set(publications
-    .map(pub => {
-      const date = pub.publicationDate || pub.createdAt;
-      return date ? new Date(date).getFullYear().toString() : 'Unknown';
-    })
-  );
-  const years = ['all', ...Array.from(yearSet)].sort((a, b) => b.localeCompare(a));
+  const yearValues: string[] = publications.map(pub => {
+    const date = pub.publicationDate || pub.createdAt;
+    return date ? new Date(date).getFullYear().toString() : 'Unknown';
+  });
+  const uniqueYears = [...new Set(yearValues)];
+  const years = ['all', ...uniqueYears].sort((a, b) => b.localeCompare(a));
   
   // Use categories as topics
-  const topicSet = new Set(publications
+  const topicValues: string[] = publications
     .flatMap(pub => pub.categories || [])
-    .filter(Boolean)
-  );
-  const topics = ['all', ...Array.from(topicSet)];
+    .filter(Boolean) as string[];
+  const uniqueTopics = [...new Set(topicValues)];
+  const topics = ['all', ...uniqueTopics];
 
   // Apply filters
   const filteredPublications = publications.filter(pub => {
