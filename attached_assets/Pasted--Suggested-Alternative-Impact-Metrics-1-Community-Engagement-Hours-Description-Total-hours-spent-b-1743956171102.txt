@@ -1,0 +1,67 @@
+ Suggested Alternative Impact Metrics
+1. Community Engagement Hours
+Description: Total hours spent by community members in workshops, training, or volunteering.
+
+Why: Shows direct engagement, easier to record through attendance logs.
+
+Display: "3,600+ hours contributed by communities"
+
+2. Digital Literacy Improvements
+Description: Number of participants completing digital skills training.
+
+Why: Useful if you run any tech, training, or inclusion projects.
+
+Display: "248 participants improved digital skills"
+
+3. Decision-Making Dashboards Deployed
+Description: Dashboards created for clients, councils, or partner organizations.
+
+Why: A tangible outcome of your data projects.
+
+Display: "12 evidence-based dashboards deployed in the past year"
+
+4. Open Data Contributions
+Description: Datasets cleaned, published, or shared with public use licenses.
+
+Why: Defendable via GitHub/public portals, aligns with open data values.
+
+Display: "19 datasets contributed to the public domain"
+
+5. Policy Recommendations Informed
+Description: Number of recommendations or decisions supported by ECODATA insights.
+
+Why: Shows policy impact if you do research for councils or NGOs.
+
+Display: "5 policy briefs delivered to local government"
+
+6. Environmental Monitoring Sessions
+Description: Sensor deployments, data collection sessions, or citizen science events.
+
+Why: If you're involved in any form of environmental fieldwork.
+
+Display: "48 monitoring sessions conducted in 2024"
+
+7. Tech Access Improvements
+Description: Devices distributed or internet access sessions provided.
+
+Why: Relevant if you're tackling the digital divide.
+
+Display: "112 low-income families supported with access to tech"
+
+8. Satisfaction Score
+Description: Based on partner/participant feedback (e.g., via survey tools).
+
+Why: Good qualitative metric, especially when paired with testimonials.
+
+Display: "96% satisfaction rate across our services"
+
+📊 Suggested Visual Pairings for These Metrics
+Metric	Recommended Visualization
+Community Engagement Hours	Bar chart or time series
+Digital Literacy Graduates	Donut or vertical bar
+Dashboards Deployed	Counter + project tiles
+Open Data Contributions	GitHub activity heatmap or numeric count
+Policy Recommendations	Horizontal stacked bars
+Monitoring Sessions	Map + session heatmap
+Tech Access	Infographic or animated icon
+Satisfaction Score	Dial gauge or happy face meter

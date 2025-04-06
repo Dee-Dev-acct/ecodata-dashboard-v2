@@ -9,8 +9,26 @@ import { Link, useLocation } from 'wouter';
 import { 
   CarbonReductionIcon,
   CommunityEngagementIcon,
-  ResourceEfficiencyIcon
+  ResourceEfficiencyIcon,
+  CommunityEngagementHoursIcon,
+  DigitalLiteracyIcon,
+  DashboardsDeployedIcon,
+  OpenDataIcon,
+  PolicyRecommendationsIcon,
+  EnvironmentalMonitoringIcon,
+  TechAccessIcon,
+  SatisfactionScoreIcon
 } from '@/components/icons';
+import {
+  AnimatedCounter,
+  BarChart,
+  CounterWithTiles,
+  DonutChart,
+  GitHubActivity,
+  HorizontalBars,
+  MapWithHeatmap,
+  SatisfactionGauge
+} from '@/components/metrics';
 import { 
   ImpactProject, 
   ImpactTimelineEvent,
@@ -381,6 +399,107 @@ const ImpactPage = () => {
               </div>
             </motion.div>
           )}
+
+          {/* Alternative Impact Metrics */}
+          <motion.div
+            className="mb-16"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
+          >
+            <h2 className="text-3xl font-bold mb-8 text-center">Alternative Impact Metrics</h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+              {/* Community Engagement Hours - Bar Chart */}
+              <BarChart 
+                data={[
+                  { name: 'Q1 2024', value: 950 },
+                  { name: 'Q2 2024', value: 1200 },
+                  { name: 'Q3 2024', value: 750 },
+                  { name: 'Q4 2024', value: 700 }
+                ]}
+                title="Community Engagement Hours"
+                subtitle="Total hours spent by community members in workshops, training, or volunteering"
+                valueSuffix=" hrs"
+              />
+              
+              {/* Digital Literacy Improvements - Donut Chart */}
+              <DonutChart 
+                data={[
+                  { name: 'Beginners', value: 98, color: '#4BB462' },
+                  { name: 'Intermediate', value: 87, color: '#2A9D8F' },
+                  { name: 'Advanced', value: 63, color: '#264653' }
+                ]}
+                title="Digital Literacy Improvements"
+                subtitle="248 participants improved digital skills across three levels"
+                centerLabel="248"
+              />
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
+              {/* Animated Counters for different metrics */}
+              <AnimatedCounter 
+                value={12}
+                title="Decision-Making Dashboards Deployed"
+                description="Evidence-based dashboards deployed in the past year"
+                icon={<DashboardsDeployedIcon className="h-12 w-12" />}
+              />
+              
+              <AnimatedCounter 
+                value={19}
+                title="Open Data Contributions"
+                description="Datasets contributed to the public domain"
+                icon={<OpenDataIcon className="h-12 w-12" />}
+              />
+              
+              <AnimatedCounter 
+                value={5}
+                title="Policy Recommendations"
+                description="Policy briefs delivered to local government"
+                icon={<PolicyRecommendationsIcon className="h-12 w-12" />}
+              />
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+              {/* Environmental Monitoring Sessions - Map with Heatmap */}
+              <MapWithHeatmap 
+                locations={[
+                  { id: 1, lat: 51.5074, lng: -0.1278, name: 'London', value: 12, description: 'Urban air quality monitoring' },
+                  { id: 2, lat: 53.4808, lng: -2.2426, name: 'Manchester', value: 8, description: 'Water quality and ecosystem health' },
+                  { id: 3, lat: 55.9533, lng: -3.1883, name: 'Edinburgh', value: 5, description: 'Wildlife monitoring projects' },
+                  { id: 4, lat: 52.4068, lng: -1.5197, name: 'Coventry', value: 7, description: 'Green space biodiversity surveys' },
+                  { id: 5, lat: 54.9783, lng: -1.6178, name: 'Newcastle', value: 6, description: 'Coastal habitat monitoring' },
+                  { id: 6, lat: 50.9097, lng: -1.4044, name: 'Southampton', value: 10, description: 'Marine conservation projects' }
+                ]}
+                title="Environmental Monitoring Sessions"
+                subtitle="48 monitoring sessions conducted in 2024"
+                height="350px"
+              />
+              
+              {/* Tech Access Improvements - Horizontal Bars */}
+              <HorizontalBars 
+                data={[
+                  { label: 'Device Distribution', value: 45, color: '#2A9D8F' },
+                  { label: 'Internet Access', value: 32, color: '#4BB462' },
+                  { label: 'Digital Skills Training', value: 25, color: '#264653' },
+                  { label: 'Technical Support', value: 10, color: '#E9C46A' }
+                ]}
+                title="Tech Access Improvements"
+                subtitle="112 low-income families supported with access to tech"
+                maxValue={50}
+              />
+            </div>
+            
+            <div className="flex justify-center">
+              {/* Satisfaction Score - Gauge */}
+              <SatisfactionGauge 
+                percentage={96}
+                title="Satisfaction Score"
+                subtitle="Based on partner/participant feedback via surveys"
+                className="max-w-md"
+              />
+            </div>
+          </motion.div>
 
           {/* Project Timeline */}
           {selectedProject && timelineEvents && timelineEvents.length > 0 && (
