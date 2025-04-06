@@ -1,38 +1,35 @@
 import { useQuery } from "@tanstack/react-query";
 import { ImpactMetric } from "@shared/schema";
 import ImpactVisualization from "./ImpactVisualization";
+import {
+  CommunityEngagementHoursIcon,
+  DigitalLiteracyIcon,
+  DashboardsDeployedIcon,
+  OpenDataIcon,
+  PolicyRecommendationsIcon
+} from "@/components/icons";
 
-const ImpactCard = ({ title, value, description, icon, category }: { 
+const ImpactCard = ({ 
+  title, 
+  value, 
+  description, 
+  icon 
+}: { 
   title: string; 
-  value: string; 
+  value: string | number; 
   description: string; 
-  icon: string;
-  category: string;
+  icon: React.ReactNode;
 }) => {
-  // Determine color class based on category
-  const colorClass = () => {
-    switch (category) {
-      case 'environmental':
-        return 'bg-[#2A9D8F] text-[#2A9D8F]';
-      case 'social':
-        return 'bg-[#457B9D] text-[#457B9D]';
-      case 'efficiency':
-        return 'bg-[#4CAF50] text-[#4CAF50]';
-      default:
-        return 'bg-[#2A9D8F] text-[#2A9D8F]';
-    }
-  };
-
   return (
     <div className="bg-[#F4F1DE] dark:bg-[#264653] rounded-lg shadow-md overflow-hidden">
-      <div className={`h-40 ${colorClass()} bg-opacity-10 flex items-center justify-center`}>
+      <div className="h-40 bg-primary/10 flex items-center justify-center">
         <div className="w-full h-full flex items-center justify-center">
-          <i className={`fas ${icon} text-6xl ${colorClass()}`}></i>
+          {icon}
         </div>
       </div>
       <div className="p-6">
         <h3 className="text-xl font-heading font-semibold mb-2">{title}</h3>
-        <p className={`text-3xl font-bold ${colorClass()} mb-2`}>{value}</p>
+        <p className="text-3xl font-bold text-primary mb-2">{value}</p>
         <p className="dark:text-[#F4F1DE]">
           {description}
         </p>
@@ -42,9 +39,30 @@ const ImpactCard = ({ title, value, description, icon, category }: {
 };
 
 const Impact = () => {
-  const { data: metrics, isLoading, error } = useQuery<ImpactMetric[]>({
-    queryKey: ['/api/impact-metrics'],
-  });
+  // We're using predefined alternative metrics instead of querying
+  const alternativeMetrics = [
+    {
+      id: 1,
+      title: "Community Engagement Hours",
+      value: "3,420 hrs",
+      description: "Total hours spent by community members in workshops, training, or volunteering",
+      icon: <CommunityEngagementHoursIcon className="h-16 w-16 text-primary" />
+    },
+    {
+      id: 2,
+      title: "Digital Literacy",
+      value: "248 trained",
+      description: "Participants who improved their digital skills across three different levels",
+      icon: <DigitalLiteracyIcon className="h-16 w-16 text-primary" />
+    },
+    {
+      id: 3,
+      title: "Decision Dashboards",
+      value: "12",
+      description: "Evidence-based dashboards deployed to support community decision-making",
+      icon: <DashboardsDeployedIcon className="h-16 w-16 text-primary" />
+    }
+  ];
 
   return (
     <section id="impact" className="py-16 bg-white dark:bg-[#333333]">
@@ -59,28 +77,17 @@ const Impact = () => {
           </p>
         </div>
         
-        {isLoading ? (
-          <div className="flex justify-center py-8">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#2A9D8F]"></div>
-          </div>
-        ) : error ? (
-          <div className="text-center text-red-500 py-8">
-            Failed to load impact metrics. Please try again later.
-          </div>
-        ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {metrics?.map((metric) => (
-              <ImpactCard 
-                key={metric.id}
-                title={metric.title}
-                value={metric.value}
-                description={metric.description}
-                icon={metric.icon}
-                category={metric.category}
-              />
-            ))}
-          </div>
-        )}
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {alternativeMetrics.map((metric) => (
+            <ImpactCard 
+              key={metric.id}
+              title={metric.title}
+              value={metric.value}
+              description={metric.description}
+              icon={metric.icon}
+            />
+          ))}
+        </div>
         
         {/* Interactive Data Visualization Section */}
         <div className="mt-20 bg-[#F4F1DE]/30 dark:bg-[#264653]/30 rounded-xl p-6 shadow-sm">

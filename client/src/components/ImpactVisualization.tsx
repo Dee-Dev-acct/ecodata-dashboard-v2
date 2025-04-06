@@ -23,34 +23,41 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 // Historical data for time series visualization
 // In a real application, this would come from the API
 const historicalData = {
-  carbon: [
-    { year: '2020', value: 85 },
-    { year: '2021', value: 147 },
-    { year: '2022', value: 189 },
-    { year: '2023', value: 218 },
-    { year: '2024', value: 247 },
-  ],
-  community: [
-    { year: '2020', value: 650 },
+  engagement: [
+    { year: '2020', value: 850 },
     { year: '2021', value: 1420 },
     { year: '2022', value: 2100 },
     { year: '2023', value: 2800 },
-    { year: '2024', value: 3500 },
+    { year: '2024', value: 3420 },
   ],
-  efficiency: [
-    { year: '2020', value: 12 },
-    { year: '2021', value: 18 },
-    { year: '2022', value: 23 },
-    { year: '2023', value: 27 },
-    { year: '2024', value: 32 },
+  literacy: [
+    { year: '2020', value: 54 },
+    { year: '2021', value: 98 },
+    { year: '2022', value: 143 },
+    { year: '2023', value: 198 },
+    { year: '2024', value: 248 },
+  ],
+  dashboards: [
+    { year: '2020', value: 2 },
+    { year: '2021', value: 5 },
+    { year: '2022', value: 7 },
+    { year: '2023', value: 10 },
+    { year: '2024', value: 12 },
+  ],
+  opendata: [
+    { year: '2020', value: 3 },
+    { year: '2021', value: 7 },
+    { year: '2022', value: 11 },
+    { year: '2023', value: 15 },
+    { year: '2024', value: 19 },
   ]
 };
 
 // Comparative industry data
 // In a real application, this would come from the API
 const industryComparisonData = [
-  { name: 'ECODATA', value: 247, fill: '#2A9D8F' },
-  { name: 'Industry Average', value: 156, fill: '#E9C46A' },
+  { name: 'ECODATA', value: 248, fill: '#2A9D8F' },
+  { name: 'Industry Average', value: 125, fill: '#E9C46A' },
   { name: 'Top Performer', value: 320, fill: '#457B9D' },
 ];
 
@@ -77,7 +84,7 @@ const prepareMetricsForChart = (metrics: ImpactMetric[]) => {
 };
 
 const ImpactVisualization = () => {
-  const [selectedMetric, setSelectedMetric] = useState<string>('carbon');
+  const [selectedMetric, setSelectedMetric] = useState<string>('engagement');
   
   const { data: metrics = [], isLoading, error } = useQuery<ImpactMetric[]>({
     queryKey: ['/api/impact-metrics'],
@@ -103,27 +110,32 @@ const ImpactVisualization = () => {
   
   // Select time series data based on the selected metric
   const getTimeSeriesData = () => {
-    switch (selectedMetric) {
-      case 'carbon':
-        return historicalData.carbon;
-      case 'community':
-        return historicalData.community;
-      case 'efficiency':
-        return historicalData.efficiency;
-      default:
-        return historicalData.carbon;
+    if (selectedMetric === 'engagement') {
+      return historicalData.engagement;
+    } 
+    if (selectedMetric === 'literacy') {
+      return historicalData.literacy;
     }
+    if (selectedMetric === 'dashboards') {
+      return historicalData.dashboards;
+    }
+    if (selectedMetric === 'opendata') {
+      return historicalData.opendata;
+    }
+    return historicalData.engagement;
   };
   
   // Get the appropriate title for the time series chart
   const getTimeSeriesTitle = () => {
     switch (selectedMetric) {
-      case 'carbon':
-        return 'Carbon Reduction Progress';
-      case 'community':
+      case 'engagement':
         return 'Community Engagement Growth';
-      case 'efficiency':
-        return 'Resource Efficiency Improvements';
+      case 'literacy':
+        return 'Digital Literacy Improvements';
+      case 'dashboards':
+        return 'Decision Dashboards Deployed';
+      case 'opendata':
+        return 'Open Data Contributions';
       default:
         return 'Impact Progress';
     }
@@ -132,12 +144,14 @@ const ImpactVisualization = () => {
   // Get the appropriate unit for the time series chart
   const getTimeSeriesUnit = () => {
     switch (selectedMetric) {
-      case 'carbon':
-        return 'tonnes';
-      case 'community':
+      case 'engagement':
+        return 'hours';
+      case 'literacy':
         return 'people';
-      case 'efficiency':
-        return '%';
+      case 'dashboards':
+        return 'dashboards';
+      case 'opendata':
+        return 'datasets';
       default:
         return 'units';
     }
@@ -212,9 +226,10 @@ const ImpactVisualization = () => {
                     <SelectValue placeholder="Select metric" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="carbon">Carbon Reduction</SelectItem>
-                    <SelectItem value="community">Community Engagement</SelectItem>
-                    <SelectItem value="efficiency">Resource Efficiency</SelectItem>
+                    <SelectItem value="engagement">Community Engagement Hours</SelectItem>
+                    <SelectItem value="literacy">Digital Literacy Improvements</SelectItem>
+                    <SelectItem value="dashboards">Decision Dashboards Deployed</SelectItem>
+                    <SelectItem value="opendata">Open Data Contributions</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -233,7 +248,7 @@ const ImpactVisualization = () => {
                   >
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="year" />
-                    <YAxis unit={selectedMetric === 'efficiency' ? '%' : ''} />
+                    <YAxis unit={getTimeSeriesUnit().startsWith('d') ? '' : ''} />
                     <Tooltip 
                       formatter={(value) => [
                         `${value} ${getTimeSeriesUnit()}`, 
@@ -246,8 +261,9 @@ const ImpactVisualization = () => {
                       dataKey="value" 
                       name={getTimeSeriesTitle()} 
                       stroke={
-                        selectedMetric === 'carbon' ? '#2A9D8F' : 
-                        selectedMetric === 'community' ? '#457B9D' : '#4CAF50'
+                        selectedMetric === 'engagement' ? '#457B9D' : 
+                        selectedMetric === 'literacy' ? '#2A9D8F' :
+                        selectedMetric === 'dashboards' ? '#4CAF50' : '#E76F51'
                       }
                       strokeWidth={2}
                       activeDot={{ r: 8 }}
@@ -262,9 +278,9 @@ const ImpactVisualization = () => {
         <TabsContent value="comparison" className="pt-4">
           <Card>
             <CardHeader>
-              <CardTitle>Carbon Reduction Benchmarking</CardTitle>
+              <CardTitle>Digital Literacy Benchmarking</CardTitle>
               <CardDescription>
-                How ECODATA's carbon reduction compares to industry benchmarks (in tonnes CO₂e)
+                How ECODATA's digital literacy training compares to industry benchmarks (participants trained)
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -277,7 +293,7 @@ const ImpactVisualization = () => {
                       cy="50%"
                       labelLine={true}
                       outerRadius={150}
-                      label={({ name, value }) => `${name}: ${value} tonnes`}
+                      label={({ name, value }) => `${name}: ${value} participants`}
                       dataKey="value"
                     >
                       {industryComparisonData.map((entry, index) => (
