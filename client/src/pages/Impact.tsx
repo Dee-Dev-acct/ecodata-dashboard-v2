@@ -6,6 +6,7 @@ import 'leaflet/dist/leaflet.css';
 import { motion } from 'framer-motion';
 import { Leaf, Loader2, ArrowLeft } from 'lucide-react';
 import { Link, useLocation } from 'wouter';
+import { QuickFeedbackButton } from '@/components/FeedbackDialog';
 import { 
   CarbonReductionIcon,
   CommunityEngagementIcon,
@@ -534,6 +535,10 @@ const ImpactPage = () => {
           )}
         </>
       )}
+      
+      <div className="flex justify-center mt-12">
+        <QuickFeedbackButton />
+      </div>
     </div>
   );
 };

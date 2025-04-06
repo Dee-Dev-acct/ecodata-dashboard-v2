@@ -31,7 +31,11 @@ import {
   insertSettingSchema,
   insertPartnerSchema,
   insertDonationSchema,
-  insertSubscriptionSchema
+  insertSubscriptionSchema,
+  insertUserFeedbackSchema,
+  insertCaseStudySchema,
+  insertPublicationSchema,
+  insertFaqSchema
 } from "@shared/schema";
 
 // Initialize Stripe
@@ -761,6 +765,138 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching publication:", error);
       return res.status(500).json({ message: "Failed to fetch publication" });
+    }
+  });
+  
+  // User Feedback routes
+  app.post("/api/feedback", async (req: Request, res: Response) => {
+    try {
+      // Validate request body
+      const result = insertUserFeedbackSchema.safeParse(req.body);
+      
+      if (!result.success) {
+        return res.status(400).json({ 
+          message: "Invalid feedback data", 
+          errors: result.error.errors 
+        });
+      }
+      
+      // Get userId from authenticated user if available
+      let userId: number | null = null;
+      if (req.user) {
+        userId = req.user.userId;
+      }
+      
+      // Create user feedback
+      const feedbackData = {
+        ...result.data,
+        userId,
+        ipAddress: req.ip || null,
+        userAgent: req.headers['user-agent'] || null
+      };
+      
+      const feedback = await storage.createUserFeedback(feedbackData);
+      
+      return res.status(201).json({ 
+        message: "Thank you for your feedback!",
+        id: feedback.id
+      });
+    } catch (error) {
+      console.error("Feedback submission error:", error);
+      return res.status(500).json({ message: "An error occurred while submitting your feedback" });
+    }
+  });
+  
+  // Admin only routes for feedback management
+  app.get("/api/admin/feedback", authenticateToken, isAdmin, async (req: Request, res: Response) => {
+    try {
+      // Extract query parameters
+      const { resolved, category } = req.query;
+      const options: { resolved?: boolean, category?: string } = {};
+      
+      // Parse query parameters
+      if (resolved !== undefined) {
+        options.resolved = resolved === 'true';
+      }
+      
+      if (category) {
+        options.category = category as string;
+      }
+      
+      const feedback = await storage.getUserFeedback(options);
+      return res.json(feedback);
+    } catch (error) {
+      console.error("Error fetching user feedback:", error);
+      return res.status(500).json({ message: "Failed to fetch user feedback" });
+    }
+  });
+  
+  app.get("/api/admin/feedback/:id", authenticateToken, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const feedbackId = parseInt(req.params.id);
+      
+      if (isNaN(feedbackId)) {
+        return res.status(400).json({ message: "Invalid feedback ID" });
+      }
+      
+      const feedback = await storage.getUserFeedbackById(feedbackId);
+      
+      if (!feedback) {
+        return res.status(404).json({ message: "Feedback not found" });
+      }
+      
+      return res.json(feedback);
+    } catch (error) {
+      console.error("Error fetching feedback:", error);
+      return res.status(500).json({ message: "Failed to fetch feedback" });
+    }
+  });
+  
+  app.patch("/api/admin/feedback/:id", authenticateToken, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const feedbackId = parseInt(req.params.id);
+      
+      if (isNaN(feedbackId)) {
+        return res.status(400).json({ message: "Invalid feedback ID" });
+      }
+      
+      const { resolved, adminNotes } = req.body;
+      
+      if (resolved === undefined) {
+        return res.status(400).json({ message: "Resolved status is required" });
+      }
+      
+      const feedback = await storage.updateUserFeedbackResolution(feedbackId, resolved, adminNotes);
+      
+      if (!feedback) {
+        return res.status(404).json({ message: "Feedback not found" });
+      }
+      
+      return res.json(feedback);
+    } catch (error) {
+      console.error("Error updating feedback:", error);
+      return res.status(500).json({ message: "Failed to update feedback" });
+    }
+  });
+  
+  app.delete("/api/admin/feedback/:id", authenticateToken, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const feedbackId = parseInt(req.params.id);
+      
+      if (isNaN(feedbackId)) {
+        return res.status(400).json({ message: "Invalid feedback ID" });
+      }
+      
+      const success = await storage.deleteUserFeedback(feedbackId);
+      
+      if (!success) {
+        return res.status(404).json({ message: "Feedback not found" });
+      }
+      
+      return res.json({ message: "Feedback deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting feedback:", error);
+      return res.status(500).json({ message: "Failed to delete feedback" });
     }
   });
   

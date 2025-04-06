@@ -695,3 +695,38 @@ export const impactTimelineEventsRelations = relations(impactTimelineEvents, ({ 
     references: [impactProjects.id]
   })
 }));
+
+// User Feedback schema
+export const userFeedback = pgTable("user_feedback", {
+  id: serial("id").primaryKey(),
+  rating: integer("rating").notNull(), // 1-5 rating
+  feedback: text("feedback"), // Optional text feedback
+  pageUrl: text("page_url").notNull(), // The URL where feedback was submitted
+  userAgent: text("user_agent"), // Browser/device information 
+  ipAddress: text("ip_address"), // IP address for analytics
+  userId: integer("user_id").references(() => users.id), // Optional - for logged in users
+  category: text("category").default("general"), // general, usability, content, etc.
+  resolved: boolean("resolved").default(false), // Whether the feedback has been addressed
+  adminNotes: text("admin_notes"), // Notes from admins regarding the feedback
+  createdAt: timestamp("created_at").defaultNow()
+});
+
+export const insertUserFeedbackSchema = createInsertSchema(userFeedback).pick({
+  rating: true,
+  feedback: true,
+  pageUrl: true,
+  userAgent: true,
+  ipAddress: true,
+  userId: true,
+  category: true
+});
+
+export type UserFeedback = typeof userFeedback.$inferSelect;
+export type InsertUserFeedback = z.infer<typeof insertUserFeedbackSchema>;
+
+export const userFeedbackRelations = relations(userFeedback, ({ one }) => ({
+  user: one(users, {
+    fields: [userFeedback.userId],
+    references: [users.id]
+  })
+}));

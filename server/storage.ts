@@ -17,6 +17,7 @@ import {
   caseStudies, type CaseStudy, type InsertCaseStudy,
   publications, type Publication, type InsertPublication,
   faqs, type FAQ, type InsertFAQ,
+  userFeedback, type UserFeedback, type InsertUserFeedback,
   // MSSQL schemas
   type MSSQLUser,
   type MSSQLContactMessage,
@@ -171,6 +172,13 @@ export interface IStorage {
   createFAQ(faq: InsertFAQ): Promise<FAQ>;
   updateFAQ(id: number, faq: Partial<InsertFAQ>): Promise<FAQ | undefined>;
   deleteFAQ(id: number): Promise<boolean>;
+  
+  // User Feedback
+  getUserFeedback(options?: { resolved?: boolean, category?: string }): Promise<UserFeedback[]>;
+  getUserFeedbackById(id: number): Promise<UserFeedback | undefined>;
+  createUserFeedback(feedback: InsertUserFeedback): Promise<UserFeedback>;
+  updateUserFeedbackResolution(id: number, resolved: boolean, adminNotes?: string): Promise<UserFeedback | undefined>;
+  deleteUserFeedback(id: number): Promise<boolean>;
 }
 
 export class MemStorage implements IStorage {
@@ -192,6 +200,7 @@ export class MemStorage implements IStorage {
   private _caseStudies: Map<number, CaseStudy>;
   private _publications: Map<number, Publication>;
   private _faqs: Map<number, FAQ>;
+  private _userFeedback: Map<number, UserFeedback>;
   
   private currentUserId: number;
   private currentContactMessageId: number;
@@ -211,6 +220,7 @@ export class MemStorage implements IStorage {
   private _currentCaseStudyId: number;
   private _currentPublicationId: number;
   private _currentFaqId: number;
+  private _currentUserFeedbackId: number;
 
   constructor() {
     this.users = new Map();
@@ -231,6 +241,7 @@ export class MemStorage implements IStorage {
     this._caseStudies = new Map();
     this._publications = new Map();
     this._faqs = new Map();
+    this._userFeedback = new Map();
     
     this.currentUserId = 1;
     this.currentContactMessageId = 1;
@@ -250,6 +261,7 @@ export class MemStorage implements IStorage {
     this._currentCaseStudyId = 1;
     this._currentPublicationId = 1;
     this._currentFaqId = 1;
+    this._currentUserFeedbackId = 1;
     
     // Initialize with sample data
     this.initializeData();
@@ -1828,6 +1840,64 @@ export class MemStorage implements IStorage {
   async deleteFAQ(id: number): Promise<boolean> {
     return this._faqs.delete(id);
   }
+  
+  // User Feedback
+  async getUserFeedback(options?: { resolved?: boolean, category?: string }): Promise<UserFeedback[]> {
+    let feedbacks = Array.from(this._userFeedback.values());
+    
+    if (options) {
+      if (options.resolved !== undefined) {
+        feedbacks = feedbacks.filter(feedback => feedback.resolved === options.resolved);
+      }
+      
+      if (options.category) {
+        feedbacks = feedbacks.filter(feedback => feedback.category === options.category);
+      }
+    }
+    
+    return feedbacks;
+  }
+  
+  async getUserFeedbackById(id: number): Promise<UserFeedback | undefined> {
+    return this._userFeedback.get(id);
+  }
+  
+  async createUserFeedback(feedback: InsertUserFeedback): Promise<UserFeedback> {
+    const now = new Date();
+    const newFeedback: UserFeedback = {
+      id: this._currentUserFeedbackId++,
+      createdAt: now,
+      updatedAt: now,
+      resolved: false,
+      adminNotes: null,
+      ...feedback
+    };
+    
+    this._userFeedback.set(newFeedback.id, newFeedback);
+    return newFeedback;
+  }
+  
+  async updateUserFeedbackResolution(id: number, resolved: boolean, adminNotes?: string): Promise<UserFeedback | undefined> {
+    const feedback = this._userFeedback.get(id);
+    
+    if (!feedback) {
+      return undefined;
+    }
+    
+    const updatedFeedback: UserFeedback = {
+      ...feedback,
+      resolved,
+      adminNotes: adminNotes !== undefined ? adminNotes : feedback.adminNotes,
+      updatedAt: new Date()
+    };
+    
+    this._userFeedback.set(id, updatedFeedback);
+    return updatedFeedback;
+  }
+  
+  async deleteUserFeedback(id: number): Promise<boolean> {
+    return this._userFeedback.delete(id);
+  }
 }
 
 export class DatabaseStorage implements IStorage {
@@ -2482,6 +2552,64 @@ export class DatabaseStorage implements IStorage {
   
   async deleteFAQ(id: number): Promise<boolean> {
     const result = await db.delete(faqs).where(eq(faqs.id, id));
+    return result.rowCount > 0;
+  }
+  
+  // User Feedback
+  async getUserFeedback(options?: { resolved?: boolean, category?: string }): Promise<UserFeedback[]> {
+    let query = db.select().from(userFeedback);
+    
+    if (options) {
+      if (options.resolved !== undefined) {
+        query = query.where(eq(userFeedback.resolved, options.resolved));
+      }
+      
+      if (options.category) {
+        query = query.where(eq(userFeedback.category, options.category));
+      }
+    }
+    
+    return query.orderBy(desc(userFeedback.createdAt));
+  }
+  
+  async getUserFeedbackById(id: number): Promise<UserFeedback | undefined> {
+    const [feedback] = await db
+      .select()
+      .from(userFeedback)
+      .where(eq(userFeedback.id, id));
+    return feedback || undefined;
+  }
+  
+  async createUserFeedback(feedbackData: InsertUserFeedback): Promise<UserFeedback> {
+    const [feedback] = await db.insert(userFeedback).values({
+      ...feedbackData,
+      resolved: false,
+      adminNotes: null
+    }).returning();
+    return feedback;
+  }
+  
+  async updateUserFeedbackResolution(id: number, resolved: boolean, adminNotes?: string): Promise<UserFeedback | undefined> {
+    const now = new Date();
+    const updateData: Partial<UserFeedback> = { 
+      resolved, 
+      updatedAt: now 
+    };
+    
+    if (adminNotes !== undefined) {
+      updateData.adminNotes = adminNotes;
+    }
+    
+    const [feedback] = await db
+      .update(userFeedback)
+      .set(updateData)
+      .where(eq(userFeedback.id, id))
+      .returning();
+    return feedback || undefined;
+  }
+  
+  async deleteUserFeedback(id: number): Promise<boolean> {
+    const result = await db.delete(userFeedback).where(eq(userFeedback.id, id));
     return result.rowCount > 0;
   }
 }
