@@ -119,7 +119,7 @@ const researchFindings = [
   {
     id: 2,
     title: 'Effective Strategies for Community-Led Environmental Monitoring',
-    summary: 'Analysis of citizen science projects revealed that community-led environmental monitoring is most effective when paired with accessible data visualization tools and regular expert feedback.',
+    summary: 'Analysis of citizen science projects revealed that community-led environmental monitoring is most effective when paired with accessible data visualisation tools and regular expert feedback.',
     impact: 'This research has shaped our approach to community environmental projects, emphasizing user-friendly technology and expert mentorship.',
     year: 2023
   },
@@ -176,11 +176,11 @@ const DataInsights = () => {
       >
         <h1 className="text-4xl md:text-5xl font-bold mb-6">Data Insights</h1>
         <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-          Explore the measurable impact of our work through data visualization, research findings, and analytical reports that drive our evidence-based approach.
+          Explore the measurable impact of our work through data visualisation, research findings, and analytical reports that drive our evidence-based approach.
         </p>
       </motion.div>
 
-      {/* Data Visualizations Section */}
+      {/* Data Visualisations Section */}
       <motion.section 
         className="mb-20"
         variants={staggerContainer}
@@ -191,7 +191,7 @@ const DataInsights = () => {
           className="text-3xl font-bold mb-10 text-center"
           variants={fadeIn}
         >
-          Impact Visualizations
+          Impact Visualisations
         </motion.h2>
 
         <Tabs defaultValue="environmental" className="w-full">
@@ -286,7 +286,7 @@ const DataInsights = () => {
                   Beneficiary Growth (2023)
                 </CardTitle>
                 <CardDescription>
-                  Monthly growth in individual and organizational beneficiaries of our programs.
+                  Monthly growth in individual and organisational beneficiaries of our programmes.
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -302,7 +302,7 @@ const DataInsights = () => {
                       <Tooltip />
                       <Legend />
                       <Line type="monotone" dataKey="individuals" name="Individual Beneficiaries" stroke="#2A9D8F" activeDot={{ r: 8 }} />
-                      <Line type="monotone" dataKey="organizations" name="Partner Organizations" stroke="#457B9D" />
+                      <Line type="monotone" dataKey="organizations" name="Partner Organisations" stroke="#457B9D" />
                     </LineChart>
                   </ResponsiveContainer>
                 </div>
@@ -460,7 +460,7 @@ const DataInsights = () => {
       >
         <h2 className="text-2xl font-bold mb-4">Need Custom Data Analysis?</h2>
         <p className="max-w-2xl mx-auto mb-6">
-          Our team can provide tailored data analysis, visualization, and impact assessment services for your organization's sustainability and social impact initiatives.
+          Our team can provide tailored data analysis, visualisation, and impact assessment services for your organisation's sustainability and social impact initiatives.
         </p>
         <Button size="lg" className="gap-2">
           <Filter className="h-5 w-5" />

@@ -43,7 +43,7 @@ const Technology = () => {
               <TechItem 
                 icon="fas fa-globe" 
                 title="GIS & Spatial Analysis" 
-                description="QGIS, PostGIS, and Leaflet for geospatial visualization"
+                description="QGIS, PostGIS, and Leaflet for geospatial visualisation"
               />
               <TechItem 
                 icon="fas fa-brain" 

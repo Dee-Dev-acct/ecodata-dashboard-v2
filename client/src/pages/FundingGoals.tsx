@@ -361,7 +361,7 @@ const FundingGoals: React.FC = () => {
             )}
           </div>
 
-          {/* Circular progress visualization for goals requiring immediate attention */}
+          {/* Circular progress visualisation for goals requiring immediate attention */}
           {filterByUrgency === "all" && !showWatchlist && activeTab === "all" && (
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
@@ -542,7 +542,7 @@ const FundingGoals: React.FC = () => {
             </CardHeader>
             <CardContent>
               <p className="text-gray-600 dark:text-gray-300">
-                Enables sophisticated data analysis, visualization tools, and research to extract meaningful insights.
+                Enables sophisticated data analysis, visualisation tools, and research to extract meaningful insights.
               </p>
             </CardContent>
           </Card>

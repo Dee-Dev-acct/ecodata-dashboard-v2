@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { ImpactMetric } from "@shared/schema";
-import ImpactVisualization from "./ImpactVisualization";
+import ImpactVisualisation from "./ImpactVisualisation";
 import {
   CommunityEngagementHoursIcon,
   DigitalLiteracyIcon,
@@ -89,7 +89,7 @@ const Impact = () => {
           ))}
         </div>
         
-        {/* Interactive Data Visualization Section */}
+        {/* Interactive Data Visualisation Section */}
         <div className="mt-20 bg-[#F4F1DE]/30 dark:bg-[#264653]/30 rounded-xl p-6 shadow-sm">
           <div className="text-center mb-8">
             <h2 className="text-2xl font-heading font-bold mb-4 relative inline-block">
@@ -97,12 +97,12 @@ const Impact = () => {
               <span className="absolute -bottom-2 left-0 w-full h-1 bg-[#2A9D8F] opacity-40"></span>
             </h2>
             <p className="text-base max-w-3xl mx-auto dark:text-[#F4F1DE]/90">
-              Explore our impact data through interactive visualizations. See the progress over time, 
+              Explore our impact data through interactive visualisations. See the progress over time, 
               compare metrics, and understand how our work translates into real-world results.
             </p>
           </div>
           
-          <ImpactVisualization />
+          <ImpactVisualisation />
         </div>
       </div>
     </section>

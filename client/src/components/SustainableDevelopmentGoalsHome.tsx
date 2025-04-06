@@ -59,7 +59,7 @@ const SustainableDevelopmentGoalsHome: React.FC = () => {
         >
           <Link href="/impact" onClick={() => { sessionStorage.setItem('referrer', 'home_sdg'); }}>
             <span className="inline-flex items-center text-primary hover:text-primary/80 font-medium">
-              Learn more about our impact and SDG contributions
+              Learn more about our contribution to SDGs
               <ArrowRight className="ml-2 h-4 w-4" />
             </span>
           </Link>

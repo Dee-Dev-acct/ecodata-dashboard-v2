@@ -49,21 +49,21 @@ const SustainableDevelopmentGoals: React.FC = () => {
       number: 12,
       title: "Responsible Consumption and Production",
       description: "Ensure sustainable consumption and production patterns.",
-      alignment: "Our data visualization tools help organizations analyze resource efficiency and environmental impact, supporting the transition to sustainable practices and circular economy principles."
+      alignment: "Our data visualisation tools help organisations analyse resource efficiency and environmental impact, supporting the transition to sustainable practices and circular economy principles."
     },
     {
       color: "bg-green-500",
       number: 13,
       title: "Climate Action",
       description: "Take urgent action to combat climate change and its impacts.",
-      alignment: "We develop impact measurement frameworks and dashboards that track emissions reductions, helping organizations understand their environmental footprint and take meaningful climate action."
+      alignment: "We develop impact measurement frameworks and dashboards that track emissions reductions, helping organisations understand their environmental footprint and take meaningful climate action."
     },
     {
       color: "bg-blue-500",
       number: 17,
       title: "Partnerships for the Goals",
       description: "Strengthen the means of implementation and revitalize the global partnership for sustainable development.",
-      alignment: "ECODATA CIC actively partners with local councils, universities, NGOs, and community organizations, contributing to open data initiatives that advance sustainable development goals."
+      alignment: "ECODATA CIC actively partners with local councils, universities, NGOs, and community organisations, contributing to open data initiatives that advance sustainable development goals."
     }
   ];
 
@@ -81,7 +81,7 @@ const SustainableDevelopmentGoals: React.FC = () => {
           <p className="text-lg text-slate-600 dark:text-slate-300">
             ECODATA CIC aligns its work with the United Nations Sustainable Development Goals,
             focusing particularly on these key areas where our digital literacy and data expertise
-            can make the most significant impact.
+            can make the most significant contribution.
           </p>
         </motion.div>
 

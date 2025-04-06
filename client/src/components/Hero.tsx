@@ -32,7 +32,7 @@ const Hero = () => {
             <div className="absolute -bottom-8 -left-8 w-40 h-40 bg-[#264653] rounded-full opacity-10"></div>
             <img 
               src="https://images.unsplash.com/photo-1581091226033-d5c48150dbaa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" 
-              alt="Data visualization representing environmental impact" 
+              alt="Data visualisation representing environmental impact" 
               className="w-full h-auto rounded-lg shadow-xl relative z-10"
             />
           </div>

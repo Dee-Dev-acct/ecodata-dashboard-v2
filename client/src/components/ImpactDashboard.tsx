@@ -131,7 +131,7 @@ const ImpactDashboard: React.FC = () => {
           value: 5000,
           label: 'Halfway Mark',
           icon: <Target size={16} />,
-          description: 'Enable expanded data analysis and visualization tools'
+          description: 'Enable expanded data analysis and visualisation tools'
         },
         {
           value: 7500,

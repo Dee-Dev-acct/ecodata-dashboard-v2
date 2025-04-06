@@ -9,12 +9,12 @@ const DataAnalyticsPage = () => {
       <ServiceDetail
         title="Data Analytics"
         heroTitle="Transforming Data into Environmental Impact"
-        description="We harness the power of data analysis and visualization to help organizations understand environmental patterns, make informed decisions, and communicate their sustainability efforts effectively."
+        description="We harness the power of data analysis and visualisation to help organisations understand environmental patterns, make informed decisions, and communicate their sustainability efforts effectively."
         content={{
           what: [
             "Environmental data collection and normalization",
             "Statistical analysis of sustainability metrics",
-            "Interactive dashboards and visualization tools",
+            "Interactive dashboards and visualisation tools",
             "Predictive modeling for environmental outcomes",
             "Data-driven sustainability reporting and communication",
             "Custom algorithms for specific environmental applications"

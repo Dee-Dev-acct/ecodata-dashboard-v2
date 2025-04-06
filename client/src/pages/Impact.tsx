@@ -421,14 +421,14 @@ const ImpactPage = () => {
             </motion.div>
           )}
 
-          {/* Data Visualization Section */}
+          {/* Data Visualisation Section */}
           <motion.div
             className="mb-16"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5 }}
           >
-            <h2 className="text-3xl font-bold mb-8 text-center">Impact Visualization</h2>
+            <h2 className="text-3xl font-bold mb-8 text-center">Impact Visualisation</h2>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
               {/* Community Engagement Hours - Bar Chart */}
@@ -493,7 +493,7 @@ const ImpactPage = () => {
                 title="Community Impact"
                 subtitle="Different ways we're making a difference"
                 tiles={[
-                  { label: 'Organizations', value: 24, icon: "🏢" },
+                  { label: 'Organisations', value: 24, icon: "🏢" },
                   { label: 'Schools', value: 17, icon: "🏫" },
                   { label: 'Communities', value: 31, icon: "🏘️" },
                   { label: 'Regions', value: 8, icon: "🗺️" }
