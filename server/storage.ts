@@ -14,6 +14,9 @@ import {
   userActivityLogs, type UserActivityLog, type InsertUserActivityLog,
   impactProjects, type ImpactProject, type InsertImpactProject,
   impactTimelineEvents, type ImpactTimelineEvent, type InsertImpactTimelineEvent,
+  caseStudies, type CaseStudy, type InsertCaseStudy,
+  publications, type Publication, type InsertPublication,
+  faqs, type FAQ, type InsertFAQ,
   // MSSQL schemas
   type MSSQLUser,
   type MSSQLContactMessage,
@@ -145,6 +148,29 @@ export interface IStorage {
   createImpactTimelineEvent(event: InsertImpactTimelineEvent): Promise<ImpactTimelineEvent>;
   updateImpactTimelineEvent(id: number, event: Partial<InsertImpactTimelineEvent>): Promise<ImpactTimelineEvent | undefined>;
   deleteImpactTimelineEvent(id: number): Promise<boolean>;
+  
+  // Case Studies
+  getCaseStudies(options?: { published?: boolean }): Promise<CaseStudy[]>;
+  getCaseStudyById(id: number): Promise<CaseStudy | undefined>;
+  getCaseStudyBySlug(slug: string): Promise<CaseStudy | undefined>;
+  createCaseStudy(caseStudy: InsertCaseStudy): Promise<CaseStudy>;
+  updateCaseStudy(id: number, caseStudy: Partial<InsertCaseStudy>): Promise<CaseStudy | undefined>;
+  deleteCaseStudy(id: number): Promise<boolean>;
+  
+  // Publications
+  getPublications(options?: { published?: boolean }): Promise<Publication[]>;
+  getPublicationById(id: number): Promise<Publication | undefined>;
+  createPublication(publication: InsertPublication): Promise<Publication>;
+  updatePublication(id: number, publication: Partial<InsertPublication>): Promise<Publication | undefined>;
+  deletePublication(id: number): Promise<boolean>;
+  
+  // FAQs
+  getFAQs(): Promise<FAQ[]>;
+  getFAQsByCategory(category: string): Promise<FAQ[]>;
+  getFAQById(id: number): Promise<FAQ | undefined>;
+  createFAQ(faq: InsertFAQ): Promise<FAQ>;
+  updateFAQ(id: number, faq: Partial<InsertFAQ>): Promise<FAQ | undefined>;
+  deleteFAQ(id: number): Promise<boolean>;
 }
 
 export class MemStorage implements IStorage {
@@ -163,6 +189,9 @@ export class MemStorage implements IStorage {
   private _userActivityLogs: Map<number, UserActivityLog>;
   private _impactProjects: Map<number, ImpactProject>;
   private _impactTimelineEvents: Map<number, ImpactTimelineEvent>;
+  private _caseStudies: Map<number, CaseStudy>;
+  private _publications: Map<number, Publication>;
+  private _faqs: Map<number, FAQ>;
   
   private currentUserId: number;
   private currentContactMessageId: number;
@@ -179,6 +208,9 @@ export class MemStorage implements IStorage {
   private _currentUserActivityLogId: number;
   private _currentImpactProjectId: number;
   private _currentImpactTimelineEventId: number;
+  private _currentCaseStudyId: number;
+  private _currentPublicationId: number;
+  private _currentFaqId: number;
 
   constructor() {
     this.users = new Map();
@@ -196,6 +228,9 @@ export class MemStorage implements IStorage {
     this._userActivityLogs = new Map();
     this._impactProjects = new Map();
     this._impactTimelineEvents = new Map();
+    this._caseStudies = new Map();
+    this._publications = new Map();
+    this._faqs = new Map();
     
     this.currentUserId = 1;
     this.currentContactMessageId = 1;
@@ -212,6 +247,9 @@ export class MemStorage implements IStorage {
     this._currentUserActivityLogId = 1;
     this._currentImpactProjectId = 1;
     this._currentImpactTimelineEventId = 1;
+    this._currentCaseStudyId = 1;
+    this._currentPublicationId = 1;
+    this._currentFaqId = 1;
     
     // Initialize with sample data
     this.initializeData();
@@ -455,6 +493,156 @@ export class MemStorage implements IStorage {
     
     // Add the impact projects to the storage
     impactProjects.forEach(project => this.createImpactProject(project));
+    
+    // Add sample case studies
+    const caseStudies = [
+      {
+        title: "Urban Air Quality Monitoring Network",
+        location: "Manchester, UK",
+        slug: "urban-air-quality-monitoring-network",
+        content: "# Urban Air Quality Monitoring Network\n\nECODATA CIC partnered with the Manchester City Council and local community organizations to implement a comprehensive air quality monitoring network across the city.\n\n## Challenge\nManchester, like many urban areas, faces significant air pollution challenges that impact public health and quality of life. Traditional monitoring stations were limited in number and provided insufficient granular data to inform targeted interventions.\n\n## Approach\nWe designed and deployed a network of 120 low-cost air quality sensors across key areas of the city, focusing on high-risk zones near schools, hospitals, and major traffic corridors. Our solution incorporated:\n\n- Calibrated PM2.5, PM10, NO2, and O3 sensors\n- Solar-powered operations where possible\n- Real-time data transmission to a central dashboard\n- Community engagement program to involve residents in monitoring\n- Integration with traffic management systems\n\n## Results\nThe project delivered significant environmental and social benefits:\n\n- Identified 15 previously unknown pollution hotspots\n- Led to targeted traffic management changes that reduced pollution by 23% in school zones\n- Provided data for new urban planning policies\n- Created a public awareness dashboard accessed by over 15,000 residents monthly\n- Assisted vulnerable populations with real-time alerts during pollution events\n\n## Sustainability Impact\nBeyond technical implementation, the project catalyzed broader sustainable actions, including increased cycling infrastructure funding, expanded public transport schedules, and new school anti-idling campaigns. The data also supported successful grant applications for green infrastructure projects totaling £1.2 million.",
+        summary: "Implementation of a citywide air quality monitoring network with 120 sensors that identified pollution hotspots and led to targeted interventions reducing pollution by 23% in school zones.",
+        sector: "Environmental Monitoring",
+        impactType: "Environmental",
+        coverImage: "https://images.unsplash.com/photo-1573511860302-28c11ff60a20?auto=format&fit=crop&w=800&q=80",
+        clientName: "Manchester City Council",
+        technologies: ["IoT Sensors", "Data Analytics", "Cloud Infrastructure"],
+        published: true,
+        publishDate: new Date("2022-07-15"),
+        stats: {
+          sensors: 120,
+          pollutionReduction: "23%",
+          userEngagement: 15000
+        }
+      },
+      {
+        title: "Rural Digital Inclusion Program",
+        location: "Yorkshire Dales, UK",
+        slug: "rural-digital-inclusion-program",
+        content: "# Rural Digital Inclusion Program\n\nECODATA CIC worked with the Yorkshire Rural Network to bridge the digital divide in remote communities across the Yorkshire Dales.\n\n## Challenge\nRural communities in the Yorkshire Dales faced significant digital exclusion, with limited broadband access, insufficient digital skills, and lack of access to technology. This created educational, economic, and social disadvantages compared to urban areas.\n\n## Approach\nWe implemented a comprehensive digital inclusion strategy involving:\n\n- Establishing five community technology hubs with free internet access\n- Delivering digital skills training programs tailored for different age groups\n- Coordinating with service providers to improve broadband infrastructure\n- Providing refurbished devices to low-income households\n- Creating a tech support network staffed by trained local volunteers\n\n## Results\nThe program achieved remarkable outcomes:\n\n- Connected 12 isolated villages with reliable broadband internet\n- Trained over 800 residents in essential digital skills\n- Distributed 250 refurbished computers to households in need\n- Created 15 part-time jobs for local tech facilitators\n- Enabled 35 residents to secure remote work opportunities\n\n## Sustainability Impact\nThe program had broader sustainability implications by reducing travel needs (lowering carbon emissions), enabling remote education during COVID-19, and connecting local businesses to wider markets. By building local digital capacity, we helped create more resilient communities less dependent on physical transportation infrastructure.",
+        summary: "A comprehensive digital inclusion initiative that connected 12 rural communities, trained 800+ residents, and created economic opportunities while reducing travel-related carbon emissions.",
+        sector: "Digital Inclusion",
+        impactType: "Social",
+        coverImage: "https://images.unsplash.com/photo-1586769412527-f3d9d8211867?auto=format&fit=crop&w=800&q=80",
+        clientName: "Yorkshire Rural Network",
+        technologies: ["Broadband Infrastructure", "Digital Education", "Community Engagement"],
+        published: true,
+        publishDate: new Date("2023-01-22"),
+        stats: {
+          communitiesConnected: 12,
+          peopleTrainedInDigitalSkills: 800,
+          jobsCreated: 15
+        }
+      },
+      {
+        title: "Circular Economy Data Platform",
+        location: "Bristol, UK",
+        slug: "circular-economy-data-platform",
+        content: "# Circular Economy Data Platform\n\nECODATA CIC developed a data-driven platform to support Bristol's transition to a circular economy.\n\n## Challenge\nBristol, like many cities, faced challenges in tracking material flows, identifying waste reduction opportunities, and connecting potential partners in circular economy initiatives. Businesses and policymakers lacked the data infrastructure to make informed decisions about resource efficiency.\n\n## Approach\nWe created a comprehensive digital platform that:\n\n- Mapped material flows across key sectors (construction, food, manufacturing)\n- Provided analytics tools to identify circular economy opportunities\n- Connected businesses with potential partners for waste-to-resource exchanges\n- Integrated with existing waste management and procurement systems\n- Visualized environmental and economic benefits of circular initiatives\n\n## Results\nThe platform catalyzed significant circular economy progress:\n\n- Enabled 45 new material exchange partnerships between businesses\n- Diverted 1,200 tonnes of waste from landfill in the first year\n- Facilitated investment of £3.2 million in circular business models\n- Supported policymakers with data for new procurement guidelines\n- Created a replicable model adopted by three other UK cities\n\n## Sustainability Impact\nThe project contributed to broader sustainability goals by reducing extraction of virgin materials, lowering greenhouse gas emissions from waste processing, and creating new green business opportunities. The platform continues to evolve with new data sources and analytical capabilities.",
+        summary: "Development of a data platform mapping material flows across Bristol, enabling 45 new circular economy partnerships and diverting 1,200 tonnes of waste from landfill annually.",
+        sector: "Circular Economy",
+        impactType: "Environmental",
+        coverImage: "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=800&q=80",
+        clientName: "Bristol City Council",
+        technologies: ["Data Analytics", "Machine Learning", "Material Flow Analysis"],
+        published: true,
+        publishDate: new Date("2022-11-05"),
+        stats: {
+          materialExchanges: 45,
+          wasteDiverted: "1,200 tonnes",
+          investmentFacilitated: "£3.2 million"
+        }
+      }
+    ];
+    
+    // Add the case studies to storage
+    caseStudies.forEach(caseStudy => this.createCaseStudy(caseStudy));
+    
+    // Add sample publications
+    const publications = [
+      {
+        type: "Research Paper",
+        title: "Measuring the Environmental Impact of Cloud Computing Infrastructure",
+        summary: "This paper presents a comprehensive methodology for assessing the environmental footprint of cloud computing services, incorporating energy consumption, water usage, and hardware lifecycle impacts.",
+        organization: "Journal of Sustainable Computing",
+        year: 2022,
+        topic: "Green Computing",
+        published: true,
+        coverImage: "https://images.unsplash.com/photo-1483000805330-4eaf0a0d82df?auto=format&fit=crop&w=800&q=80",
+        authors: ["Dr. James Richards", "Dr. Sarah Williams", "Mark Thompson"],
+        fileUrl: "https://ecodatacic.org/publications/measuring-environmental-impact-cloud-computing.pdf"
+      },
+      {
+        type: "White Paper",
+        title: "Data-Driven Approaches to Biodiversity Conservation",
+        summary: "This white paper explores how modern data collection, machine learning, and spatial analysis techniques can enhance biodiversity conservation efforts and improve ecological monitoring.",
+        organization: "ECODATA CIC",
+        year: 2023,
+        topic: "Biodiversity",
+        published: true,
+        coverImage: "https://images.unsplash.com/photo-1621459555843-75ca4893cd5e?auto=format&fit=crop&w=800&q=80",
+        authors: ["Dr. Emma Chen", "Prof. Robert Davis"],
+        fileUrl: "https://ecodatacic.org/publications/data-driven-biodiversity-conservation.pdf"
+      },
+      {
+        type: "Policy Brief",
+        title: "Ethical Frameworks for Environmental Data Collection",
+        summary: "This policy brief outlines recommended governance structures and ethical guidelines for the collection, storage, and usage of environmental data, with special consideration for indigenous knowledge and community data sovereignty.",
+        organization: "UK Environmental Data Initiative",
+        year: 2022,
+        topic: "Data Ethics",
+        published: true,
+        coverImage: "https://images.unsplash.com/photo-1562240020-ce31ccb0fa7d?auto=format&fit=crop&w=800&q=80",
+        authors: ["Dr. Maya Patel", "Christopher Johnson", "Dr. Lisa Turner"],
+        fileUrl: "https://ecodatacic.org/publications/ethical-frameworks-environmental-data.pdf"
+      }
+    ];
+    
+    // Add the publications to storage
+    publications.forEach(publication => this.createPublication(publication));
+    
+    // Add sample FAQs
+    const faqs = [
+      {
+        category: "Services",
+        question: "What types of organizations do you work with?",
+        answer: "ECODATA CIC works with a diverse range of organizations including local authorities, nonprofits, academic institutions, and private sector companies. We specialize in supporting organizations that are committed to improving their environmental and social impact through better data practices and technology solutions.",
+        order: 1
+      },
+      {
+        category: "Services",
+        question: "Do you offer training for our team?",
+        answer: "Yes, we offer comprehensive training programs tailored to your organization's needs. Our training covers topics like sustainable IT practices, data analytics for environmental impact assessment, and digital skills for green economy jobs. All our training programs include practical, hands-on components and ongoing support resources.",
+        order: 2
+      },
+      {
+        category: "Technology",
+        question: "How do you ensure data security and privacy?",
+        answer: "We implement industry-leading security measures including encryption, secure access controls, regular security audits, and compliance with GDPR and other relevant regulations. Our ethical data framework ensures transparency about how data is collected, stored, and used, with special attention to sensitive environmental and community data.",
+        order: 1
+      },
+      {
+        category: "Technology",
+        question: "What technologies do you use for your data platforms?",
+        answer: "We employ a range of technologies selected for both performance and sustainability. Our stack typically includes energy-efficient cloud infrastructure, open-source data processing frameworks like Apache Spark, and visualization tools that make complex environmental data accessible. We prioritize technologies with lower carbon footprints where feasible.",
+        order: 2
+      },
+      {
+        category: "Impact",
+        question: "How do you measure the impact of your projects?",
+        answer: "We establish clear baseline measurements before projects begin and track both technical and sustainability metrics throughout implementation. Depending on the project, we might measure reduced carbon emissions, improved resource efficiency, community engagement levels, or enhanced decision-making capabilities. We provide transparent impact reports to all partners.",
+        order: 1
+      },
+      {
+        category: "Impact",
+        question: "Do you offer ongoing support after project completion?",
+        answer: "Yes, sustainability is built into our approach, which includes ensuring projects continue to deliver impact long-term. We offer different support packages including technical maintenance, data analysis services, knowledge transfer to your team, and periodic impact assessments to ensure continued value from our solutions.",
+        order: 2
+      }
+    ];
+    
+    // Add the FAQs to storage
+    faqs.forEach(faq => this.createFAQ(faq));
     
     // Add sample timeline events for the projects
     const impactTimelineEvents = [
@@ -1487,6 +1675,159 @@ export class MemStorage implements IStorage {
   async deleteImpactTimelineEvent(id: number): Promise<boolean> {
     return this._impactTimelineEvents.delete(id);
   }
+  
+  // Case Studies
+  async getCaseStudies(options?: { published?: boolean }): Promise<CaseStudy[]> {
+    const caseStudies = Array.from(this._caseStudies.values());
+    
+    if (options?.published !== undefined) {
+      return caseStudies.filter(study => study.published === options.published);
+    }
+    
+    return caseStudies;
+  }
+  
+  async getCaseStudyById(id: number): Promise<CaseStudy | undefined> {
+    return this._caseStudies.get(id);
+  }
+  
+  async getCaseStudyBySlug(slug: string): Promise<CaseStudy | undefined> {
+    return Array.from(this._caseStudies.values()).find(
+      study => study.slug === slug
+    );
+  }
+  
+  async createCaseStudy(caseStudy: InsertCaseStudy): Promise<CaseStudy> {
+    const now = new Date();
+    const newCaseStudy: CaseStudy = {
+      id: this._currentCaseStudyId++,
+      createdAt: now,
+      updatedAt: now,
+      ...caseStudy
+    };
+    
+    this._caseStudies.set(newCaseStudy.id, newCaseStudy);
+    return newCaseStudy;
+  }
+  
+  async updateCaseStudy(id: number, caseStudyData: Partial<InsertCaseStudy>): Promise<CaseStudy | undefined> {
+    const caseStudy = this._caseStudies.get(id);
+    
+    if (!caseStudy) {
+      return undefined;
+    }
+    
+    const updatedCaseStudy: CaseStudy = {
+      ...caseStudy,
+      ...caseStudyData,
+      updatedAt: new Date()
+    };
+    
+    this._caseStudies.set(id, updatedCaseStudy);
+    return updatedCaseStudy;
+  }
+  
+  async deleteCaseStudy(id: number): Promise<boolean> {
+    return this._caseStudies.delete(id);
+  }
+  
+  // Publications
+  async getPublications(options?: { published?: boolean }): Promise<Publication[]> {
+    const publications = Array.from(this._publications.values());
+    
+    if (options?.published !== undefined) {
+      return publications.filter(pub => pub.published === options.published);
+    }
+    
+    return publications;
+  }
+  
+  async getPublicationById(id: number): Promise<Publication | undefined> {
+    return this._publications.get(id);
+  }
+  
+  async createPublication(publication: InsertPublication): Promise<Publication> {
+    const now = new Date();
+    const newPublication: Publication = {
+      id: this._currentPublicationId++,
+      createdAt: now,
+      updatedAt: now,
+      ...publication
+    };
+    
+    this._publications.set(newPublication.id, newPublication);
+    return newPublication;
+  }
+  
+  async updatePublication(id: number, publicationData: Partial<InsertPublication>): Promise<Publication | undefined> {
+    const publication = this._publications.get(id);
+    
+    if (!publication) {
+      return undefined;
+    }
+    
+    const updatedPublication: Publication = {
+      ...publication,
+      ...publicationData,
+      updatedAt: new Date()
+    };
+    
+    this._publications.set(id, updatedPublication);
+    return updatedPublication;
+  }
+  
+  async deletePublication(id: number): Promise<boolean> {
+    return this._publications.delete(id);
+  }
+  
+  // FAQs
+  async getFAQs(): Promise<FAQ[]> {
+    return Array.from(this._faqs.values());
+  }
+  
+  async getFAQsByCategory(category: string): Promise<FAQ[]> {
+    return Array.from(this._faqs.values()).filter(
+      faq => faq.category === category
+    );
+  }
+  
+  async getFAQById(id: number): Promise<FAQ | undefined> {
+    return this._faqs.get(id);
+  }
+  
+  async createFAQ(faq: InsertFAQ): Promise<FAQ> {
+    const now = new Date();
+    const newFAQ: FAQ = {
+      id: this._currentFaqId++,
+      createdAt: now,
+      updatedAt: now,
+      ...faq
+    };
+    
+    this._faqs.set(newFAQ.id, newFAQ);
+    return newFAQ;
+  }
+  
+  async updateFAQ(id: number, faqData: Partial<InsertFAQ>): Promise<FAQ | undefined> {
+    const faq = this._faqs.get(id);
+    
+    if (!faq) {
+      return undefined;
+    }
+    
+    const updatedFAQ: FAQ = {
+      ...faq,
+      ...faqData,
+      updatedAt: new Date()
+    };
+    
+    this._faqs.set(id, updatedFAQ);
+    return updatedFAQ;
+  }
+  
+  async deleteFAQ(id: number): Promise<boolean> {
+    return this._faqs.delete(id);
+  }
 }
 
 export class DatabaseStorage implements IStorage {
@@ -2025,6 +2366,123 @@ export class DatabaseStorage implements IStorage {
       .where(eq(subscriptions.id, id))
       .returning();
     return subscription || undefined;
+  }
+
+  // Case Studies
+  async getCaseStudies(options?: { published?: boolean }): Promise<CaseStudy[]> {
+    let query = db.select().from(caseStudies);
+    
+    if (options?.published !== undefined) {
+      query = query.where(eq(caseStudies.published, options.published));
+    }
+    
+    return query.orderBy(desc(caseStudies.publishDate));
+  }
+  
+  async getCaseStudyById(id: number): Promise<CaseStudy | undefined> {
+    const [caseStudy] = await db.select().from(caseStudies).where(eq(caseStudies.id, id));
+    return caseStudy || undefined;
+  }
+  
+  async getCaseStudyBySlug(slug: string): Promise<CaseStudy | undefined> {
+    const [caseStudy] = await db.select().from(caseStudies).where(eq(caseStudies.slug, slug));
+    return caseStudy || undefined;
+  }
+  
+  async createCaseStudy(caseStudyData: InsertCaseStudy): Promise<CaseStudy> {
+    const [caseStudy] = await db.insert(caseStudies).values(caseStudyData).returning();
+    return caseStudy;
+  }
+  
+  async updateCaseStudy(id: number, caseStudyData: Partial<InsertCaseStudy>): Promise<CaseStudy | undefined> {
+    const [caseStudy] = await db
+      .update(caseStudies)
+      .set({
+        ...caseStudyData,
+        updatedAt: new Date()
+      })
+      .where(eq(caseStudies.id, id))
+      .returning();
+    return caseStudy || undefined;
+  }
+  
+  async deleteCaseStudy(id: number): Promise<boolean> {
+    const result = await db.delete(caseStudies).where(eq(caseStudies.id, id));
+    return result.rowCount > 0;
+  }
+  
+  // Publications
+  async getPublications(options?: { published?: boolean }): Promise<Publication[]> {
+    let query = db.select().from(publications);
+    
+    if (options?.published !== undefined) {
+      query = query.where(eq(publications.published, options.published));
+    }
+    
+    return query.orderBy(desc(publications.year));
+  }
+  
+  async getPublicationById(id: number): Promise<Publication | undefined> {
+    const [publication] = await db.select().from(publications).where(eq(publications.id, id));
+    return publication || undefined;
+  }
+  
+  async createPublication(publicationData: InsertPublication): Promise<Publication> {
+    const [publication] = await db.insert(publications).values(publicationData).returning();
+    return publication;
+  }
+  
+  async updatePublication(id: number, publicationData: Partial<InsertPublication>): Promise<Publication | undefined> {
+    const [publication] = await db
+      .update(publications)
+      .set({
+        ...publicationData,
+        updatedAt: new Date()
+      })
+      .where(eq(publications.id, id))
+      .returning();
+    return publication || undefined;
+  }
+  
+  async deletePublication(id: number): Promise<boolean> {
+    const result = await db.delete(publications).where(eq(publications.id, id));
+    return result.rowCount > 0;
+  }
+  
+  // FAQs
+  async getFAQs(): Promise<FAQ[]> {
+    return db.select().from(faqs).orderBy(asc(faqs.order));
+  }
+  
+  async getFAQsByCategory(category: string): Promise<FAQ[]> {
+    return db.select().from(faqs).where(eq(faqs.category, category)).orderBy(asc(faqs.order));
+  }
+  
+  async getFAQById(id: number): Promise<FAQ | undefined> {
+    const [faq] = await db.select().from(faqs).where(eq(faqs.id, id));
+    return faq || undefined;
+  }
+  
+  async createFAQ(faqData: InsertFAQ): Promise<FAQ> {
+    const [faq] = await db.insert(faqs).values(faqData).returning();
+    return faq;
+  }
+  
+  async updateFAQ(id: number, faqData: Partial<InsertFAQ>): Promise<FAQ | undefined> {
+    const [faq] = await db
+      .update(faqs)
+      .set({
+        ...faqData,
+        updatedAt: new Date()
+      })
+      .where(eq(faqs.id, id))
+      .returning();
+    return faq || undefined;
+  }
+  
+  async deleteFAQ(id: number): Promise<boolean> {
+    const result = await db.delete(faqs).where(eq(faqs.id, id));
+    return result.rowCount > 0;
   }
 }
 

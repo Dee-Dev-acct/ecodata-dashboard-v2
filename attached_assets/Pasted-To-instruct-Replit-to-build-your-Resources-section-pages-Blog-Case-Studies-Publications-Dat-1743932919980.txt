@@ -1,0 +1,90 @@
+To instruct Replit to build your **Resources section pages**—**Blog, Case Studies, Publications, Data Insights, and FAQs**—with **images, animations**, and **real-time open-source data APIs**, you can pass this detailed instruction directly into your Replit chat or file system:
+
+---
+
+### ✅ Instruction for Replit: Build ECODATA CIC “Resources” Pages with Visual & Data Features
+
+---
+
+#### 🔧 Pages to Implement:
+Create the following **resource content pages** under `/resources/` or as individual routes with dynamic routing:
+
+1. **Blog Page**
+   - Display blog articles with thumbnails, author name, publish date, tags.
+   - Use Markdown or CMS-compatible format for content.
+   - Add animation on scroll (e.g., Framer Motion or Animate.css).
+   - Allow blog filtering by category or tag.
+   - **Optional**: Pull live news/articles from [Dev.to API](https://developers.forem.com/api) or Medium (if preferred).
+
+2. **Case Studies Page**
+   - Show case studies in grid layout with:
+     - Title, sector, location, impact type.
+     - Cover image and quick stats.
+     - “Read more” link to a detailed subpage.
+   - Add animated stats or reveal-on-hover details using motion.
+   - **Optional API Source**: Pull anonymized Open Data case examples from [data.gov.uk](https://data.gov.uk/).
+
+3. **Publications Page**
+   - Present reports/papers in card or table view.
+   - Include download links, publication year, author/org, and topic tag.
+   - Animate document icons with hover.
+   - Provide a filter by topic/year.
+   - **Optional API Source**: Pull environmental datasets or papers from [Europe PMC API](https://europepmc.org/RestfulWebService).
+
+4. **Data Insights Page**
+   - Embed real-time charts (Bar, Pie, Line) using Recharts or Chart.js.
+   - Pull live data via:
+     - [UK Air Quality API](https://uk-air.defra.gov.uk/data/interactive-map)
+     - [OpenAQ API](https://docs.openaq.org/)
+     - [CO2.Earth](https://co2.earth/api)
+   - Add tooltip animations and data refresh button.
+   - Include map visualization using Leaflet for regional data.
+
+5. **FAQs Page**
+   - Accordion-style Q&A display.
+   - Animate open/close with friendly micro-interactions.
+   - Option to search/filter questions.
+   - Add contact CTA if a user doesn’t find their answer.
+
+---
+
+#### 💡 Shared Elements:
+- Use TailwindCSS + Radix UI or ShadCN for styling.
+- Animate with Framer Motion or Animate.css.
+- Use responsive cards and pagination.
+- Keep all routes SEO-friendly.
+
+---
+
+#### 📂 Suggested Structure:
+
+```
+/resources
+  ├── blog/
+  ├── case-studies/
+  ├── publications/
+  ├── data-insights/
+  ├── faqs/
+```
+
+---
+
+#### 🧪 Sample APIs to Integrate:
+
+| Feature             | API Suggestion |
+|---------------------|----------------|
+| Blog (optional)     | https://dev.to/api |
+| Case Study (open data) | https://data.gov.uk |
+| Publications        | https://europepmc.org |
+| Data Insights       | https://api.openaq.org |
+| Air Quality         | https://api.weatherapi.com |
+| CO2 Impact          | https://co2.earth/api |
+
+---
+
+#### ✅ Final Note for Replit:
+Use animations and transitions sparingly but effectively to maintain performance. Prioritize accessibility and responsiveness across devices.
+
+---
+
+Would you like me to help design mockups or content samples for these pages too?

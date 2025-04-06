@@ -18,6 +18,10 @@ import AuthPage from "@/pages/auth-page";
 import Dashboard from "@/pages/Dashboard";
 import Impact from "@/pages/Impact";
 import DataInsights from "@/pages/DataInsights";
+import CaseStudies from "@/pages/CaseStudies";
+import CaseStudyDetail from "@/pages/CaseStudyDetail";
+import Publications from "@/pages/Publications";
+import FAQs from "@/pages/FAQs";
 
 // Service detail pages
 import DigitalLiteracy from "@/pages/services/DigitalLiteracy";
@@ -44,6 +48,12 @@ function Router() {
       <Route path="/checkout/:goalId?" component={Checkout} />
       <Route path="/donation-success" component={DonationSuccess} />
       <Route path="/subscription-success" component={SubscriptionSuccess} />
+      
+      {/* Resource pages */}
+      <Route path="/case-studies" component={CaseStudies} />
+      <Route path="/case-studies/:slug" component={CaseStudyDetail} />
+      <Route path="/publications" component={Publications} />
+      <Route path="/faqs" component={FAQs} />
       
       {/* Service detail pages */}
       <Route path="/services/digital-literacy" component={DigitalLiteracy} />

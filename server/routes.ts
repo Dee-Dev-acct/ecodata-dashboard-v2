@@ -701,6 +701,81 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.status(500).json({ message: "Failed to fetch blog post" });
     }
   });
+  
+  // Case Studies routes
+  app.get("/api/case-studies", async (req: Request, res: Response) => {
+    try {
+      const published = req.query.published === 'true';
+      const caseStudies = await storage.getCaseStudies({ published });
+      return res.json(caseStudies);
+    } catch (error) {
+      console.error("Error fetching case studies:", error);
+      return res.status(500).json({ message: "Failed to fetch case studies" });
+    }
+  });
+  
+  app.get("/api/case-studies/:slug", async (req: Request, res: Response) => {
+    try {
+      const { slug } = req.params;
+      const caseStudy = await storage.getCaseStudyBySlug(slug);
+      
+      if (!caseStudy) {
+        return res.status(404).json({ message: "Case study not found" });
+      }
+      
+      return res.json(caseStudy);
+    } catch (error) {
+      console.error("Error fetching case study:", error);
+      return res.status(500).json({ message: "Failed to fetch case study" });
+    }
+  });
+  
+  // Publications routes
+  app.get("/api/publications", async (req: Request, res: Response) => {
+    try {
+      const published = req.query.published === 'true';
+      const publications = await storage.getPublications({ published });
+      return res.json(publications);
+    } catch (error) {
+      console.error("Error fetching publications:", error);
+      return res.status(500).json({ message: "Failed to fetch publications" });
+    }
+  });
+  
+  app.get("/api/publications/:id", async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const publication = await storage.getPublicationById(parseInt(id));
+      
+      if (!publication) {
+        return res.status(404).json({ message: "Publication not found" });
+      }
+      
+      return res.json(publication);
+    } catch (error) {
+      console.error("Error fetching publication:", error);
+      return res.status(500).json({ message: "Failed to fetch publication" });
+    }
+  });
+  
+  // FAQs routes
+  app.get("/api/faqs", async (req: Request, res: Response) => {
+    try {
+      const { category } = req.query;
+      let faqs;
+      
+      if (category) {
+        faqs = await storage.getFAQsByCategory(category as string);
+      } else {
+        faqs = await storage.getFAQs();
+      }
+      
+      return res.json(faqs);
+    } catch (error) {
+      console.error("Error fetching FAQs:", error);
+      return res.status(500).json({ message: "Failed to fetch FAQs" });
+    }
+  });
 
   // Protected admin routes
   app.get("/api/admin/messages", authenticateToken, isAdmin, async (req: Request, res: Response) => {
@@ -1067,6 +1142,201 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error creating blog post:", error);
       return res.status(500).json({ message: "Failed to create blog post" });
+    }
+  });
+  
+  // CMS Routes - Case Studies
+  app.get("/api/admin/case-studies", authenticateToken, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const caseStudies = await storage.getCaseStudies();
+      return res.json(caseStudies);
+    } catch (error) {
+      console.error("Error fetching case studies:", error);
+      return res.status(500).json({ message: "Failed to fetch case studies" });
+    }
+  });
+  
+  app.post("/api/admin/case-studies", authenticateToken, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const result = insertCaseStudySchema.safeParse(req.body);
+      
+      if (!result.success) {
+        return res.status(400).json({ message: "Invalid case study data", errors: result.error.errors });
+      }
+      
+      const caseStudy = await storage.createCaseStudy(result.data);
+      return res.status(201).json(caseStudy);
+    } catch (error) {
+      console.error("Error creating case study:", error);
+      return res.status(500).json({ message: "Failed to create case study" });
+    }
+  });
+  
+  app.put("/api/admin/case-studies/:id", authenticateToken, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const result = insertCaseStudySchema.partial().safeParse(req.body);
+      
+      if (!result.success) {
+        return res.status(400).json({ message: "Invalid case study data", errors: result.error.errors });
+      }
+      
+      const caseStudy = await storage.updateCaseStudy(parseInt(id), result.data);
+      
+      if (!caseStudy) {
+        return res.status(404).json({ message: "Case study not found" });
+      }
+      
+      return res.json(caseStudy);
+    } catch (error) {
+      console.error("Error updating case study:", error);
+      return res.status(500).json({ message: "Failed to update case study" });
+    }
+  });
+  
+  app.delete("/api/admin/case-studies/:id", authenticateToken, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const success = await storage.deleteCaseStudy(parseInt(id));
+      
+      if (!success) {
+        return res.status(404).json({ message: "Case study not found" });
+      }
+      
+      return res.json({ message: "Case study deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting case study:", error);
+      return res.status(500).json({ message: "Failed to delete case study" });
+    }
+  });
+  
+  // CMS Routes - Publications
+  app.get("/api/admin/publications", authenticateToken, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const publications = await storage.getPublications();
+      return res.json(publications);
+    } catch (error) {
+      console.error("Error fetching publications:", error);
+      return res.status(500).json({ message: "Failed to fetch publications" });
+    }
+  });
+  
+  app.post("/api/admin/publications", authenticateToken, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const result = insertPublicationSchema.safeParse(req.body);
+      
+      if (!result.success) {
+        return res.status(400).json({ message: "Invalid publication data", errors: result.error.errors });
+      }
+      
+      const publication = await storage.createPublication(result.data);
+      return res.status(201).json(publication);
+    } catch (error) {
+      console.error("Error creating publication:", error);
+      return res.status(500).json({ message: "Failed to create publication" });
+    }
+  });
+  
+  app.put("/api/admin/publications/:id", authenticateToken, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const result = insertPublicationSchema.partial().safeParse(req.body);
+      
+      if (!result.success) {
+        return res.status(400).json({ message: "Invalid publication data", errors: result.error.errors });
+      }
+      
+      const publication = await storage.updatePublication(parseInt(id), result.data);
+      
+      if (!publication) {
+        return res.status(404).json({ message: "Publication not found" });
+      }
+      
+      return res.json(publication);
+    } catch (error) {
+      console.error("Error updating publication:", error);
+      return res.status(500).json({ message: "Failed to update publication" });
+    }
+  });
+  
+  app.delete("/api/admin/publications/:id", authenticateToken, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const success = await storage.deletePublication(parseInt(id));
+      
+      if (!success) {
+        return res.status(404).json({ message: "Publication not found" });
+      }
+      
+      return res.json({ message: "Publication deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting publication:", error);
+      return res.status(500).json({ message: "Failed to delete publication" });
+    }
+  });
+  
+  // CMS Routes - FAQs
+  app.get("/api/admin/faqs", authenticateToken, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const faqs = await storage.getFAQs();
+      return res.json(faqs);
+    } catch (error) {
+      console.error("Error fetching FAQs:", error);
+      return res.status(500).json({ message: "Failed to fetch FAQs" });
+    }
+  });
+  
+  app.post("/api/admin/faqs", authenticateToken, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const result = insertFaqSchema.safeParse(req.body);
+      
+      if (!result.success) {
+        return res.status(400).json({ message: "Invalid FAQ data", errors: result.error.errors });
+      }
+      
+      const faq = await storage.createFAQ(result.data);
+      return res.status(201).json(faq);
+    } catch (error) {
+      console.error("Error creating FAQ:", error);
+      return res.status(500).json({ message: "Failed to create FAQ" });
+    }
+  });
+  
+  app.put("/api/admin/faqs/:id", authenticateToken, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const result = insertFaqSchema.partial().safeParse(req.body);
+      
+      if (!result.success) {
+        return res.status(400).json({ message: "Invalid FAQ data", errors: result.error.errors });
+      }
+      
+      const faq = await storage.updateFAQ(parseInt(id), result.data);
+      
+      if (!faq) {
+        return res.status(404).json({ message: "FAQ not found" });
+      }
+      
+      return res.json(faq);
+    } catch (error) {
+      console.error("Error updating FAQ:", error);
+      return res.status(500).json({ message: "Failed to update FAQ" });
+    }
+  });
+  
+  app.delete("/api/admin/faqs/:id", authenticateToken, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const success = await storage.deleteFAQ(parseInt(id));
+      
+      if (!success) {
+        return res.status(404).json({ message: "FAQ not found" });
+      }
+      
+      return res.json({ message: "FAQ deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting FAQ:", error);
+      return res.status(500).json({ message: "Failed to delete FAQ" });
     }
   });
 

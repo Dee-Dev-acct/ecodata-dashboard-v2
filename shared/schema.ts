@@ -523,6 +523,86 @@ export const userActivityLogsRelations = relations(userActivityLogs, ({ one }) =
   })
 }));
 
+// Case Studies schema
+export const caseStudies = pgTable("case_studies", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  slug: text("slug").notNull().unique(),
+  summary: text("summary").notNull(),
+  content: text("content").notNull(),
+  sector: text("sector").notNull(),
+  location: text("location").notNull(),
+  impactType: text("impact_type").notNull(),
+  coverImage: text("cover_image"),
+  stats: jsonb("stats"),
+  published: boolean("published").notNull().default(true),
+  publishDate: timestamp("publish_date"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+export const insertCaseStudySchema = createInsertSchema(caseStudies).pick({
+  title: true,
+  slug: true,
+  summary: true,
+  content: true,
+  sector: true,
+  location: true,
+  impactType: true,
+  coverImage: true,
+  stats: true,
+  published: true,
+  publishDate: true
+});
+
+// Publications schema
+export const publications = pgTable("publications", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  type: text("type").notNull(), // Report, White Paper, Research, etc.
+  authors: text("authors").array(),
+  organization: text("organization").notNull(),
+  year: integer("year").notNull(),
+  topic: text("topic").notNull(),
+  summary: text("summary").notNull(),
+  fileUrl: text("file_url"),
+  coverImage: text("cover_image"),
+  published: boolean("published").notNull().default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+export const insertPublicationSchema = createInsertSchema(publications).pick({
+  title: true,
+  type: true,
+  authors: true,
+  organization: true,
+  year: true,
+  topic: true,
+  summary: true,
+  fileUrl: true,
+  coverImage: true,
+  published: true
+});
+
+// FAQs schema
+export const faqs = pgTable("faqs", {
+  id: serial("id").primaryKey(),
+  question: text("question").notNull(),
+  answer: text("answer").notNull(),
+  category: text("category").notNull(),
+  order: integer("order").notNull().default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+export const insertFaqSchema = createInsertSchema(faqs).pick({
+  question: true,
+  answer: true,
+  category: true,
+  order: true
+});
+
 // Impact Projects schema
 export const impactProjects = pgTable("impact_projects", {
   id: serial("id").primaryKey(),
@@ -590,6 +670,15 @@ export type InsertImpactProject = z.infer<typeof insertImpactProjectSchema>;
 
 export type ImpactTimelineEvent = typeof impactTimelineEvents.$inferSelect;
 export type InsertImpactTimelineEvent = z.infer<typeof insertImpactTimelineEventSchema>;
+
+export type CaseStudy = typeof caseStudies.$inferSelect;
+export type InsertCaseStudy = z.infer<typeof insertCaseStudySchema>;
+
+export type Publication = typeof publications.$inferSelect;
+export type InsertPublication = z.infer<typeof insertPublicationSchema>;
+
+export type FAQ = typeof faqs.$inferSelect;
+export type InsertFAQ = z.infer<typeof insertFaqSchema>;
 
 // Add relationship between impact projects and timeline events
 export const impactProjectsRelations = relations(impactProjects, ({ many }) => ({
