@@ -461,42 +461,47 @@ const ImpactPage = () => {
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-              {/* Environmental Monitoring Sessions - Map with Heatmap */}
-              <MapWithHeatmap 
-                locations={[
-                  { id: 1, lat: 51.5074, lng: -0.1278, name: 'London', value: 12, description: 'Urban air quality monitoring' },
-                  { id: 2, lat: 53.4808, lng: -2.2426, name: 'Manchester', value: 8, description: 'Water quality and ecosystem health' },
-                  { id: 3, lat: 55.9533, lng: -3.1883, name: 'Edinburgh', value: 5, description: 'Wildlife monitoring projects' },
-                  { id: 4, lat: 52.4068, lng: -1.5197, name: 'Coventry', value: 7, description: 'Green space biodiversity surveys' },
-                  { id: 5, lat: 54.9783, lng: -1.6178, name: 'Newcastle', value: 6, description: 'Coastal habitat monitoring' },
-                  { id: 6, lat: 50.9097, lng: -1.4044, name: 'Southampton', value: 10, description: 'Marine conservation projects' }
+              {/* GitHub Activity */}
+              <GitHubActivity 
+                title="Open Source Contributions"
+                subtitle="Recent code contributions to sustainability projects"
+                contributions={[
+                  { day: 'Mon', count: 5 },
+                  { day: 'Tue', count: 8 },
+                  { day: 'Wed', count: 12 },
+                  { day: 'Thu', count: 4 },
+                  { day: 'Fri', count: 9 },
+                  { day: 'Sat', count: 3 },
+                  { day: 'Sun', count: 0 }
                 ]}
-                title="Environmental Monitoring Sessions"
-                subtitle="48 monitoring sessions conducted in 2024"
-                height="350px"
               />
               
-              {/* Tech Access Improvements - Horizontal Bars */}
+              {/* Satisfaction Score - Horizontal Bars */}
               <HorizontalBars 
                 data={[
-                  { label: 'Device Distribution', value: 45, color: '#2A9D8F' },
-                  { label: 'Internet Access', value: 32, color: '#4BB462' },
-                  { label: 'Digital Skills Training', value: 25, color: '#264653' },
-                  { label: 'Technical Support', value: 10, color: '#E9C46A' }
+                  { label: 'Very Satisfied', value: 78, color: '#4BB462' },
+                  { label: 'Satisfied', value: 18, color: '#2A9D8F' },
+                  { label: 'Neutral', value: 3, color: '#E9C46A' },
+                  { label: 'Unsatisfied', value: 1, color: '#E76F51' }
                 ]}
-                title="Tech Access Improvements"
-                subtitle="112 low-income families supported with access to tech"
-                maxValue={50}
+                title="Satisfaction Score"
+                subtitle="Based on partner/participant feedback via surveys"
+                maxValue={100}
               />
             </div>
             
             <div className="flex justify-center">
-              {/* Satisfaction Score - Gauge */}
-              <SatisfactionGauge 
-                percentage={96}
-                title="Satisfaction Score"
-                subtitle="Based on partner/participant feedback via surveys"
-                className="max-w-md"
+              {/* Counter with Tiles */}
+              <CounterWithTiles
+                title="Community Impact"
+                subtitle="Different ways we're making a difference"
+                tiles={[
+                  { label: 'Organizations', value: 24, icon: "🏢" },
+                  { label: 'Schools', value: 17, icon: "🏫" },
+                  { label: 'Communities', value: 31, icon: "🏘️" },
+                  { label: 'Regions', value: 8, icon: "🗺️" }
+                ]}
+                className="max-w-3xl"
               />
             </div>
           </motion.div>
