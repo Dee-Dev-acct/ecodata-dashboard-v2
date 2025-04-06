@@ -4,8 +4,9 @@ import React, { useMemo } from "react";
 import { Link } from "wouter";
 
 const ServiceCard = ({ title, description, icon }: { title: string; description: string; icon: string }) => {
-  // Check if this is the Data Analytics service to add a special link
+  // Check if this is one of the services we want to add a special link for
   const isDataAnalytics = title === "Data Analytics";
+  const isEnvironmentalResearch = title === "Environmental Research";
   
   return (
     <div className="bg-[#F4F1DE] dark:bg-[#264653] rounded-lg shadow-md p-6 transition-transform hover:translate-y-[-5px]">
@@ -20,6 +21,15 @@ const ServiceCard = ({ title, description, icon }: { title: string; description:
       {isDataAnalytics && (
         <Link href="/data-insights" className="inline-flex items-center text-[#2A9D8F] hover:text-[#38B593] font-medium">
           Learn more about our data insights
+          <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
+          </svg>
+        </Link>
+      )}
+      
+      {isEnvironmentalResearch && (
+        <Link href="/impact" className="inline-flex items-center text-[#2A9D8F] hover:text-[#38B593] font-medium">
+          Explore our environmental impact
           <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
           </svg>
