@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "./context/AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { FloatingFeedbackButton } from "@/components/FeedbackDialog";
+import { ChatBot } from "@/components/chatbot/ChatBot";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
 import AdminLogin from "@/pages/AdminLogin";
@@ -78,6 +79,7 @@ function App() {
       <AuthProvider>
         <Router />
         <FloatingFeedbackButton />
+        <ChatBot />
         <Toaster />
       </AuthProvider>
     </QueryClientProvider>
