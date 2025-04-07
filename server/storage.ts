@@ -18,6 +18,7 @@ import {
   publications, type Publication, type InsertPublication,
   faqs, type FAQ, type InsertFAQ,
   userFeedback, type UserFeedback, type InsertUserFeedback,
+  errorReports, type ErrorReport, type InsertErrorReport,
   // MSSQL schemas
   type MSSQLUser,
   type MSSQLContactMessage,
@@ -179,6 +180,13 @@ export interface IStorage {
   createUserFeedback(feedback: InsertUserFeedback): Promise<UserFeedback>;
   updateUserFeedbackResolution(id: number, resolved: boolean, adminNotes?: string): Promise<UserFeedback | undefined>;
   deleteUserFeedback(id: number): Promise<boolean>;
+  
+  // Error Reports
+  getErrorReports(options?: { status?: string }): Promise<ErrorReport[]>;
+  getErrorReportById(id: number): Promise<ErrorReport | undefined>;
+  createErrorReport(report: InsertErrorReport): Promise<ErrorReport>;
+  updateErrorReportStatus(id: number, status: string, adminNotes?: string): Promise<ErrorReport | undefined>;
+  deleteErrorReport(id: number): Promise<boolean>;
 }
 
 export class MemStorage implements IStorage {
@@ -201,6 +209,7 @@ export class MemStorage implements IStorage {
   private _publications: Map<number, Publication>;
   private _faqs: Map<number, FAQ>;
   private _userFeedback: Map<number, UserFeedback>;
+  private _errorReports: Map<number, ErrorReport>;
   
   private currentUserId: number;
   private currentContactMessageId: number;
@@ -221,6 +230,7 @@ export class MemStorage implements IStorage {
   private _currentPublicationId: number;
   private _currentFaqId: number;
   private _currentUserFeedbackId: number;
+  private _currentErrorReportId: number;
 
   constructor() {
     this.users = new Map();
@@ -242,6 +252,7 @@ export class MemStorage implements IStorage {
     this._publications = new Map();
     this._faqs = new Map();
     this._userFeedback = new Map();
+    this._errorReports = new Map();
     
     this.currentUserId = 1;
     this.currentContactMessageId = 1;
@@ -262,6 +273,7 @@ export class MemStorage implements IStorage {
     this._currentPublicationId = 1;
     this._currentFaqId = 1;
     this._currentUserFeedbackId = 1;
+    this._currentErrorReportId = 1;
     
     // Initialize with sample data
     this.initializeData();
@@ -1898,6 +1910,67 @@ export class MemStorage implements IStorage {
   async deleteUserFeedback(id: number): Promise<boolean> {
     return this._userFeedback.delete(id);
   }
+
+  // Error Reports
+  async getErrorReports(options?: { status?: string }): Promise<ErrorReport[]> {
+    let reports = Array.from(this._errorReports.values());
+    
+    if (options?.status) {
+      reports = reports.filter(report => report.status === options.status);
+    }
+    
+    return reports.sort((a, b) => {
+      const dateA = a.reportedAt?.getTime() || 0;
+      const dateB = b.reportedAt?.getTime() || 0;
+      return dateB - dateA; // Sort by most recent first
+    });
+  }
+
+  async getErrorReportById(id: number): Promise<ErrorReport | undefined> {
+    return this._errorReports.get(id);
+  }
+
+  async createErrorReport(report: InsertErrorReport): Promise<ErrorReport> {
+    const newReport: ErrorReport = {
+      id: this._currentErrorReportId++,
+      reportedAt: new Date(),
+      resolvedAt: null,
+      status: "pending", // Default status
+      ...report
+    };
+    
+    this._errorReports.set(newReport.id, newReport);
+    return newReport;
+  }
+
+  async updateErrorReportStatus(id: number, status: string, adminNotes?: string): Promise<ErrorReport | undefined> {
+    const report = this._errorReports.get(id);
+    
+    if (!report) {
+      return undefined;
+    }
+    
+    // Set resolvedAt when status is resolved
+    const resolvedAt = status === "resolved" ? new Date() : report.resolvedAt;
+    
+    const updatedReport: ErrorReport = {
+      ...report,
+      status,
+      resolvedAt,
+      adminNotes: adminNotes || report.adminNotes
+    };
+    
+    this._errorReports.set(id, updatedReport);
+    return updatedReport;
+  }
+
+  async deleteErrorReport(id: number): Promise<boolean> {
+    if (this._errorReports.has(id)) {
+      this._errorReports.delete(id);
+      return true;
+    }
+    return false;
+  }
 }
 
 export class DatabaseStorage implements IStorage {
@@ -2610,6 +2683,61 @@ export class DatabaseStorage implements IStorage {
   
   async deleteUserFeedback(id: number): Promise<boolean> {
     const result = await db.delete(userFeedback).where(eq(userFeedback.id, id));
+    return result.rowCount > 0;
+  }
+
+  // Error Reports
+  async getErrorReports(options?: { status?: string }): Promise<ErrorReport[]> {
+    let query = db.select().from(errorReports);
+    
+    if (options?.status) {
+      query = query.where(eq(errorReports.status, options.status));
+    }
+    
+    return query.orderBy(desc(errorReports.reportedAt));
+  }
+
+  async getErrorReportById(id: number): Promise<ErrorReport | undefined> {
+    const [report] = await db
+      .select()
+      .from(errorReports)
+      .where(eq(errorReports.id, id));
+    return report || undefined;
+  }
+
+  async createErrorReport(report: InsertErrorReport): Promise<ErrorReport> {
+    const [newReport] = await db
+      .insert(errorReports)
+      .values({
+        ...report,
+        status: report.status || "pending", // Default status if not provided
+        reportedAt: report.reportedAt || new Date(),
+        resolvedAt: null
+      })
+      .returning();
+    return newReport;
+  }
+
+  async updateErrorReportStatus(id: number, status: string, adminNotes?: string): Promise<ErrorReport | undefined> {
+    // If marking as resolved, set resolvedAt date
+    const resolvedAt = status === "resolved" ? new Date() : undefined;
+    
+    const updateData: Partial<ErrorReport> = { 
+      status,
+      adminNotes: adminNotes,
+      ...(resolvedAt && { resolvedAt })
+    };
+    
+    const [report] = await db
+      .update(errorReports)
+      .set(updateData)
+      .where(eq(errorReports.id, id))
+      .returning();
+    return report || undefined;
+  }
+
+  async deleteErrorReport(id: number): Promise<boolean> {
+    const result = await db.delete(errorReports).where(eq(errorReports.id, id));
     return result.rowCount > 0;
   }
 }

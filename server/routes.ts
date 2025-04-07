@@ -37,7 +37,8 @@ import {
   insertUserFeedbackSchema,
   insertCaseStudySchema,
   insertPublicationSchema,
-  insertFaqSchema
+  insertFaqSchema,
+  insertErrorReportSchema
 } from "@shared/schema";
 
 // Initialize Stripe
@@ -806,6 +807,112 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Feedback submission error:", error);
       return res.status(500).json({ message: "An error occurred while submitting your feedback" });
+    }
+  });
+  
+  // Error Report routes
+  app.post("/api/error-reports", async (req: Request, res: Response) => {
+    try {
+      // Validate request body
+      const result = insertErrorReportSchema.safeParse(req.body);
+      
+      if (!result.success) {
+        return res.status(400).json({ 
+          message: "Invalid error report data", 
+          errors: result.error.errors 
+        });
+      }
+      
+      // Create error report
+      const report = await storage.createErrorReport({
+        ...result.data,
+        browserInfo: req.headers['user-agent'] || "Unknown browser",
+        status: "pending",
+        reportedAt: new Date()
+      });
+      
+      return res.status(201).json({ 
+        message: "Thank you for reporting this issue. Our team will look into it.",
+        id: report.id
+      });
+    } catch (error) {
+      console.error("Error report submission error:", error);
+      return res.status(500).json({ message: "An error occurred while submitting your error report" });
+    }
+  });
+  
+  // Admin routes for error reports
+  app.get("/api/admin/error-reports", authenticateToken, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const status = req.query.status as string | undefined;
+      const reports = await storage.getErrorReports(status ? { status } : undefined);
+      res.json(reports);
+    } catch (error) {
+      console.error("Error retrieving error reports:", error);
+      res.status(500).json({ message: "Failed to retrieve error reports" });
+    }
+  });
+  
+  app.get("/api/admin/error-reports/:id", authenticateToken, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const reportId = parseInt(req.params.id);
+      if (isNaN(reportId)) {
+        return res.status(400).json({ message: "Invalid report ID" });
+      }
+      
+      const report = await storage.getErrorReportById(reportId);
+      if (!report) {
+        return res.status(404).json({ message: "Error report not found" });
+      }
+      
+      res.json(report);
+    } catch (error) {
+      console.error("Error retrieving error report:", error);
+      res.status(500).json({ message: "Failed to retrieve error report" });
+    }
+  });
+  
+  app.put("/api/admin/error-reports/:id/status", authenticateToken, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const reportId = parseInt(req.params.id);
+      if (isNaN(reportId)) {
+        return res.status(400).json({ message: "Invalid report ID" });
+      }
+      
+      const { status, adminNotes } = req.body;
+      
+      if (!status || typeof status !== "string") {
+        return res.status(400).json({ message: "Status is required" });
+      }
+      
+      const updatedReport = await storage.updateErrorReportStatus(reportId, status, adminNotes);
+      if (!updatedReport) {
+        return res.status(404).json({ message: "Error report not found" });
+      }
+      
+      res.json(updatedReport);
+    } catch (error) {
+      console.error("Error updating error report status:", error);
+      res.status(500).json({ message: "Failed to update error report status" });
+    }
+  });
+
+  app.delete("/api/admin/error-reports/:id", authenticateToken, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const reportId = parseInt(req.params.id);
+      if (isNaN(reportId)) {
+        return res.status(400).json({ message: "Invalid report ID" });
+      }
+      
+      const success = await storage.deleteErrorReport(reportId);
+      if (!success) {
+        return res.status(404).json({ message: "Error report not found" });
+      }
+      
+      res.status(200).json({ message: "Error report deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting error report:", error);
+      res.status(500).json({ message: "Failed to delete error report" });
     }
   });
   

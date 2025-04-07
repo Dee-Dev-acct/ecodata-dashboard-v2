@@ -523,6 +523,32 @@ export const userActivityLogsRelations = relations(userActivityLogs, ({ one }) =
   })
 }));
 
+// Error Reports schema
+export const errorReports = pgTable("error_reports", {
+  id: serial("id").primaryKey(),
+  email: text("email"),
+  errorDetails: text("error_details").notNull(),
+  currentPage: text("current_page").notNull(),
+  browserInfo: jsonb("browser_info"),
+  status: text("status").notNull().default("pending"), // pending, in-progress, resolved
+  adminNotes: text("admin_notes"),
+  reportedAt: timestamp("reported_at").defaultNow(),
+  resolvedAt: timestamp("resolved_at")
+});
+
+export const insertErrorReportSchema = createInsertSchema(errorReports).pick({
+  email: true,
+  errorDetails: true,
+  currentPage: true,
+  browserInfo: true,
+  status: true,
+  adminNotes: true,
+  reportedAt: true
+});
+
+export type ErrorReport = typeof errorReports.$inferSelect;
+export type InsertErrorReport = z.infer<typeof insertErrorReportSchema>;
+
 // Case Studies schema
 export const caseStudies = pgTable("case_studies", {
   id: serial("id").primaryKey(),
