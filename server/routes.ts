@@ -315,6 +315,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Mark a user as having used their free consultation
+  app.post("/api/user/consultation", authenticateToken, async (req: Request, res: Response) => {
+    try {
+      if (!req.user) {
+        return res.status(401).json({ message: "Authentication required" });
+      }
+      
+      const userId = req.user.userId;
+      const user = await storage.getUser(userId);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Check if user has already used their free consultation
+      if (user.hasUsedFreeConsultation) {
+        return res.status(400).json({ 
+          message: "User has already used their free consultation", 
+          hasUsedFreeConsultation: true 
+        });
+      }
+      
+      // Update user's free consultation usage flag
+      const updatedUser = await storage.updateUserFreeConsultationUsage(userId);
+      
+      if (!updatedUser) {
+        return res.status(500).json({ message: "Failed to update consultation status" });
+      }
+      
+      // Return updated status
+      return res.json({ 
+        message: "Free consultation usage marked successfully",
+        hasUsedFreeConsultation: updatedUser.hasUsedFreeConsultation
+      });
+    } catch (error) {
+      console.error("Error updating free consultation status:", error);
+      return res.status(500).json({ message: "Failed to update consultation status" });
+    }
+  });
+  
   app.post("/api/newsletter/subscribe", async (req: Request, res: Response) => {
     try {
       // Validate request body

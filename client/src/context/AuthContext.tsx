@@ -17,6 +17,7 @@ interface User {
   interests?: string[];
   watchlist?: string[];
   notificationsEnabled?: boolean;
+  hasUsedFreeConsultation?: boolean;
   createdAt?: string;
   updatedAt?: string;
 }

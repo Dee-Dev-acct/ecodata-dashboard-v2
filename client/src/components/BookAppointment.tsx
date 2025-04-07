@@ -1,10 +1,81 @@
-import { Calendar, Clock, Users } from "lucide-react";
+import { Calendar, Clock, Users, BadgeCheck, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/context/AuthContext";
+import { apiRequest } from "@/lib/queryClient";
 
 const BookAppointment = () => {
   // Microsoft Teams meeting booking link
   // This would ideally be a URL from your Microsoft Bookings or Teams calendar
   const teamsBookingUrl = "https://outlook.office.com/bookwithme/user";
+  
+  const { toast } = useToast();
+  const { user, isAuthenticated } = useAuth();
+  const [hasUsedConsultation, setHasUsedConsultation] = useState<boolean>(false);
+  const [isProcessing, setIsProcessing] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  
+  useEffect(() => {
+    if (user) {
+      // Try to get this value from the user object, otherwise default to false
+      setHasUsedConsultation(user.hasUsedFreeConsultation || false);
+    }
+    // Set loading to false after checking
+    setIsLoading(false);
+  }, [user]);
+  
+  const handleBooking = async () => {
+    if (!user) {
+      toast({
+        title: "Login required",
+        description: "Please log in or register to book a consultation",
+        variant: "destructive"
+      });
+      // Redirect to login page
+      window.location.href = "/auth";
+      return;
+    }
+    
+    if (!hasUsedConsultation) {
+      try {
+        setIsProcessing(true);
+        
+        // Update the user's free consultation status
+        const response = await apiRequest("POST", "/api/user/consultation");
+        const data = await response.json();
+        
+        if (response.ok) {
+          setHasUsedConsultation(true);
+          toast({
+            title: "Success!",
+            description: "Your free consultation has been registered. Proceed to book your appointment.",
+          });
+          
+          // Open booking link in new tab
+          window.open(teamsBookingUrl, '_blank');
+        } else {
+          toast({
+            title: "Error",
+            description: data.message || "Failed to register consultation",
+            variant: "destructive"
+          });
+        }
+      } catch (error) {
+        console.error("Error updating consultation status:", error);
+        toast({
+          title: "Error",
+          description: "Something went wrong. Please try again.",
+          variant: "destructive"
+        });
+      } finally {
+        setIsProcessing(false);
+      }
+    } else {
+      // User has already used their free consultation, just open the booking link
+      window.open(teamsBookingUrl, '_blank');
+    }
+  };
   
   return (
     <section id="book-appointment" className="py-16 bg-[#F4F1DE] dark:bg-[#1A323C]">
@@ -17,6 +88,20 @@ const BookAppointment = () => {
           <p className="text-lg max-w-2xl mx-auto dark:text-[#F4F1DE]">
             Schedule a consultation with our team to discuss your project needs and how we can help.
           </p>
+          
+          {!isLoading && user && !hasUsedConsultation && (
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="mt-4"
+            >
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100">
+                <Sparkles size={16} className="mr-1" />
+                Your first consultation is free!
+              </span>
+            </motion.div>
+          )}
         </div>
         
         <div className="max-w-4xl mx-auto">
@@ -50,6 +135,16 @@ const BookAppointment = () => {
                       <p className="text-sm text-gray-200">Meet with specialists who understand your sector</p>
                     </div>
                   </div>
+                  
+                  {!isLoading && user && !hasUsedConsultation && (
+                    <div className="flex items-start">
+                      <BadgeCheck className="h-6 w-6 text-green-400 mr-4 mt-1 flex-shrink-0" />
+                      <div>
+                        <h4 className="font-medium mb-1">First Session Free</h4>
+                        <p className="text-sm text-gray-200">Your initial consultation is complimentary</p>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
               
@@ -65,84 +160,101 @@ const BookAppointment = () => {
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.97 }}
                 >
-                  <a 
-                    href={teamsBookingUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center px-6 py-4 bg-[#2A9D8F] hover:bg-[#1F7268] text-white font-medium rounded-lg transition-colors shadow-md"
+                  <button 
+                    onClick={handleBooking}
+                    disabled={isProcessing}
+                    className="inline-flex items-center px-6 py-4 bg-[#2A9D8F] hover:bg-[#1F7268] text-white font-medium rounded-lg transition-colors shadow-md disabled:opacity-70 disabled:cursor-not-allowed"
                   >
-                    <svg 
-                      className="w-5 h-5 mr-2" 
-                      xmlns="http://www.w3.org/2000/svg" 
-                      viewBox="0 0 2228.833 2073.333"
-                    >
-                      <path 
-                        fill="#fff" 
-                        d="M1554.637,777.5h575.713c54.391,0,98.483,44.092,98.483,98.483c0,0,0,0,0,0v524.398  c0,199.901-162.124,362.024-362.024,362.024h0H1554.637V777.5z" 
-                      />
-                      <circle fill="#5059C9" cx="1943.75" cy="440.583" r="233.25" />
-                      <circle fill="#5059C9" cx="1218.083" cy="336.917" r="336.917" />
-                      <path 
-                        fill="#7B83EB" 
-                        d="M1667.323,777.5H717.01c-53.743,1.33-96.257,45.931-95.01,99.676v598.105  c-7.505,322.519,247.657,590.16,570.167,598.053c322.51-7.893,577.671-275.534,570.167-598.053V877.176  C1763.58,823.431,1721.066,778.83,1667.323,777.5z"
-                      />
-                      <path 
-                        opacity=".1" 
-                        d="M1244,777.5v838.145c-0.258,38.435-23.549,72.964-59.09,87.598  c-11.316,4.787-23.478,7.254-35.765,7.257H667.613c-6.738-17.105-12.958-34.21-18.142-51.833  c-18.144-59.477-27.402-121.307-27.472-183.49V877.02c-1.246-53.659,41.198-98.19,94.855-99.52H1244z"
-                      />
-                      <path 
-                        opacity=".2" 
-                        d="M1192.167,777.5v889.978c-0.002,12.287-2.47,24.449-7.257,35.765  c-14.634,35.541-49.163,58.833-87.598,59.09H691.975c-8.812-17.105-17.105-34.21-24.362-51.833  c-7.257-17.623-12.958-34.21-18.142-51.833c-18.144-59.477-27.402-121.307-27.472-183.49V877.02  c-1.246-53.659,41.198-98.19,94.855-99.52H1192.167z"
-                      />
-                      <path 
-                        opacity=".2" 
-                        d="M1192.167,777.5v786.312c-0.395,52.223-42.632,94.46-94.855,94.855h-447.24  c-18.144-59.477-27.402-121.307-27.472-183.49V877.02c-1.246-53.659,41.198-98.19,94.855-99.52H1192.167z"
-                      />
-                      <path 
-                        opacity=".2" 
-                        d="M1140.333,777.5v786.312c-0.395,52.223-42.632,94.46-94.855,94.855H667.613  c-18.144-59.477-27.402-121.307-27.472-183.49V877.02c-1.246-53.659,41.198-98.19,94.855-99.52H1140.333z"
-                      />
-                      <path 
-                        opacity=".1" 
-                        d="M1244,509.522v163.275c-8.812,0.518-17.105,1.037-25.917,1.037  c-8.812,0-17.105-0.518-25.917-1.037c-17.496-1.161-34.848-3.937-51.833-8.293c-104.963-24.857-191.679-98.469-233.25-198.003  c-7.153-16.715-12.706-34.071-16.587-51.833h258.648C1201.449,414.866,1243.801,457.217,1244,509.522z"
-                      />
-                      <path 
-                        opacity=".2" 
-                        d="M1192.167,561.355v111.442c-17.496-1.161-34.848-3.937-51.833-8.293  c-104.963-24.857-191.679-98.469-233.25-198.003h190.228C1149.616,466.699,1191.968,509.051,1192.167,561.355z"
-                      />
-                      <path 
-                        opacity=".2" 
-                        d="M1192.167,561.355v111.442c-17.496-1.161-34.848-3.937-51.833-8.293  c-104.963-24.857-191.679-98.469-233.25-198.003h190.228C1149.616,466.699,1191.968,509.051,1192.167,561.355z"
-                      />
-                      <path 
-                        opacity=".2" 
-                        d="M1140.333,561.355v103.148c-104.963-24.857-191.679-98.469-233.25-198.003h138.395  C1097.783,466.699,1140.134,509.051,1140.333,561.355z"
-                      />
-                      <linearGradient 
-                        id="teamsPrimaryLinearGradient" 
-                        gradientUnits="userSpaceOnUse" 
-                        x1="198.099" 
-                        y1="1683.0726" 
-                        x2="942.2344" 
-                        y2="394.2607" 
-                        gradientTransform="matrix(1 0 0 -1 0 2075.3333)"
-                      >
-                        <stop offset="0" style={{stopColor: "#5A62C3"}} />
-                        <stop offset=".5" style={{stopColor: "#4D55BD"}} />
-                        <stop offset="1" style={{stopColor: "#3940AB"}} />
-                      </linearGradient>
-                      <path 
-                        fill="url(#teamsPrimaryLinearGradient)" 
-                        d="M95.01,777.5h950.312c52.473,0,95.01,42.538,95.01,95.01v950.312  c0,52.473-42.538,95.01-95.01,95.01H95.01c-52.473,0-95.01-42.538-95.01-95.01V872.51C0,820.038,42.538,777.5,95.01,777.5z"
-                      />
-                      <path 
-                        fill="#FFF" 
-                        d="M820.211,1273.92H618.053v-202.25h202.158c5.197,0,9.412,4.215,9.412,9.412v183.427  C829.623,1269.705,825.408,1273.92,820.211,1273.92z M618.053,1095.545h-269.37c-5.197,0-9.412-4.215-9.412-9.412V902.705  c0-5.197,4.215-9.412,9.412-9.412h269.37V1095.545z M348.683,1120.67h269.37v153.25h-269.37c-5.197,0-9.412-4.215-9.412-9.412  v-134.427C339.27,1124.885,343.485,1120.67,348.683,1120.67z"
-                      />
-                    </svg>
-                    Book via Microsoft Teams
-                  </a>
+                    {isProcessing ? (
+                      <>
+                        <div className="animate-spin mr-2 h-5 w-5 border-2 border-white border-t-transparent rounded-full"></div>
+                        Processing...
+                      </>
+                    ) : (
+                      <>
+                        <svg 
+                          className="w-5 h-5 mr-2" 
+                          xmlns="http://www.w3.org/2000/svg" 
+                          viewBox="0 0 2228.833 2073.333"
+                        >
+                          <path 
+                            fill="#fff" 
+                            d="M1554.637,777.5h575.713c54.391,0,98.483,44.092,98.483,98.483c0,0,0,0,0,0v524.398  c0,199.901-162.124,362.024-362.024,362.024h0H1554.637V777.5z" 
+                          />
+                          <circle fill="#5059C9" cx="1943.75" cy="440.583" r="233.25" />
+                          <circle fill="#5059C9" cx="1218.083" cy="336.917" r="336.917" />
+                          <path 
+                            fill="#7B83EB" 
+                            d="M1667.323,777.5H717.01c-53.743,1.33-96.257,45.931-95.01,99.676v598.105  c-7.505,322.519,247.657,590.16,570.167,598.053c322.51-7.893,577.671-275.534,570.167-598.053V877.176  C1763.58,823.431,1721.066,778.83,1667.323,777.5z"
+                          />
+                          <path 
+                            opacity=".1" 
+                            d="M1244,777.5v838.145c-0.258,38.435-23.549,72.964-59.09,87.598  c-11.316,4.787-23.478,7.254-35.765,7.257H667.613c-6.738-17.105-12.958-34.21-18.142-51.833  c-18.144-59.477-27.402-121.307-27.472-183.49V877.02c-1.246-53.659,41.198-98.19,94.855-99.52H1244z"
+                          />
+                          <path 
+                            opacity=".2" 
+                            d="M1192.167,777.5v889.978c-0.002,12.287-2.47,24.449-7.257,35.765  c-14.634,35.541-49.163,58.833-87.598,59.09H691.975c-8.812-17.105-17.105-34.21-24.362-51.833  c-7.257-17.623-12.958-34.21-18.142-51.833c-18.144-59.477-27.402-121.307-27.472-183.49V877.02  c-1.246-53.659,41.198-98.19,94.855-99.52H1192.167z"
+                          />
+                          <path 
+                            opacity=".2" 
+                            d="M1192.167,777.5v786.312c-0.395,52.223-42.632,94.46-94.855,94.855h-447.24  c-18.144-59.477-27.402-121.307-27.472-183.49V877.02c-1.246-53.659,41.198-98.19,94.855-99.52H1192.167z"
+                          />
+                          <path 
+                            opacity=".2" 
+                            d="M1140.333,777.5v786.312c-0.395,52.223-42.632,94.46-94.855,94.855H667.613  c-18.144-59.477-27.402-121.307-27.472-183.49V877.02c-1.246-53.659,41.198-98.19,94.855-99.52H1140.333z"
+                          />
+                          <path 
+                            opacity=".1" 
+                            d="M1244,509.522v163.275c-8.812,0.518-17.105,1.037-25.917,1.037  c-8.812,0-17.105-0.518-25.917-1.037c-17.496-1.161-34.848-3.937-51.833-8.293c-104.963-24.857-191.679-98.469-233.25-198.003  c-7.153-16.715-12.706-34.071-16.587-51.833h258.648C1201.449,414.866,1243.801,457.217,1244,509.522z"
+                          />
+                          <path 
+                            opacity=".2" 
+                            d="M1192.167,561.355v111.442c-17.496-1.161-34.848-3.937-51.833-8.293  c-104.963-24.857-191.679-98.469-233.25-198.003h190.228C1149.616,466.699,1191.968,509.051,1192.167,561.355z"
+                          />
+                          <path 
+                            opacity=".2" 
+                            d="M1192.167,561.355v111.442c-17.496-1.161-34.848-3.937-51.833-8.293  c-104.963-24.857-191.679-98.469-233.25-198.003h190.228C1149.616,466.699,1191.968,509.051,1192.167,561.355z"
+                          />
+                          <path 
+                            opacity=".2" 
+                            d="M1140.333,561.355v103.148c-104.963-24.857-191.679-98.469-233.25-198.003h138.395  C1097.783,466.699,1140.134,509.051,1140.333,561.355z"
+                          />
+                          <linearGradient 
+                            id="teamsPrimaryLinearGradient" 
+                            gradientUnits="userSpaceOnUse" 
+                            x1="198.099" 
+                            y1="1683.0726" 
+                            x2="942.2344" 
+                            y2="394.2607" 
+                            gradientTransform="matrix(1 0 0 -1 0 2075.3333)"
+                          >
+                            <stop offset="0" style={{stopColor: "#5A62C3"}} />
+                            <stop offset=".5" style={{stopColor: "#4D55BD"}} />
+                            <stop offset="1" style={{stopColor: "#3940AB"}} />
+                          </linearGradient>
+                          <path 
+                            fill="url(#teamsPrimaryLinearGradient)" 
+                            d="M95.01,777.5h950.312c52.473,0,95.01,42.538,95.01,95.01v950.312  c0,52.473-42.538,95.01-95.01,95.01H95.01c-52.473,0-95.01-42.538-95.01-95.01V872.51C0,820.038,42.538,777.5,95.01,777.5z"
+                          />
+                          <path 
+                            fill="#FFF" 
+                            d="M820.211,1273.92H618.053v-202.25h202.158c5.197,0,9.412,4.215,9.412,9.412v183.427  C829.623,1269.705,825.408,1273.92,820.211,1273.92z M618.053,1095.545h-269.37c-5.197,0-9.412-4.215-9.412-9.412V902.705  c0-5.197,4.215-9.412,9.412-9.412h269.37V1095.545z M348.683,1120.67h269.37v153.25h-269.37c-5.197,0-9.412-4.215-9.412-9.412  v-134.427C339.27,1124.885,343.485,1120.67,348.683,1120.67z"
+                          />
+                        </svg>
+                        Book via Microsoft Teams
+                      </>
+                    )}
+                  </button>
                 </motion.div>
+                
+                {!isLoading && user && !hasUsedConsultation && (
+                  <div className="mt-4 text-center">
+                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100">
+                      <BadgeCheck size={14} className="mr-1" />
+                      Your first session will be marked as free
+                    </span>
+                  </div>
+                )}
                 
                 <p className="text-sm text-gray-600 dark:text-gray-300 mt-6">
                   No Microsoft account? <a href="/#contact" className="text-[#2A9D8F] hover:underline">Contact us</a> directly and we'll arrange an appointment for you.

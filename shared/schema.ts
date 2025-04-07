@@ -130,6 +130,7 @@ export const users = pgTable("users", {
   stripeCustomerId: text("stripe_customer_id"),
   lastLogin: timestamp("last_login"),
   isEmailVerified: boolean("is_email_verified").default(false),
+  hasUsedFreeConsultation: boolean("has_used_free_consultation").default(false),
   createdAt: timestamp("created_at").defaultNow()
 });
 
@@ -146,7 +147,8 @@ export const insertUserSchema = createInsertSchema(users).pick({
   watchlist: true,
   notificationsEnabled: true,
   stripeCustomerId: true,
-  isEmailVerified: true
+  isEmailVerified: true,
+  hasUsedFreeConsultation: true
 });
 
 // Contact messages schema

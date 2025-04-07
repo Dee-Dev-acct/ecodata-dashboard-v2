@@ -48,6 +48,7 @@ export interface IStorage {
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: number, user: Partial<InsertUser>): Promise<User | undefined>;
+  updateUserFreeConsultationUsage(id: number): Promise<User | undefined>;
   updateUserStripeInfo(id: number, stripeInfo: { stripeCustomerId: string, stripeSubscriptionId?: string }): Promise<User | undefined>;
   
   // User Activity Logs
@@ -989,6 +990,19 @@ export class MemStorage implements IStorage {
     return updatedUser;
   }
   
+  async updateUserFreeConsultationUsage(id: number): Promise<User | undefined> {
+    const user = this.users.get(id);
+    if (!user) return undefined;
+    
+    const updatedUser: User = {
+      ...user,
+      hasUsedFreeConsultation: true
+    };
+    
+    this.users.set(id, updatedUser);
+    return updatedUser;
+  }
+
   async updateUserStripeInfo(id: number, stripeInfo: { stripeCustomerId: string, stripeSubscriptionId?: string }): Promise<User | undefined> {
     const user = this.users.get(id);
     if (!user) return undefined;
@@ -2134,6 +2148,19 @@ export class DatabaseStorage implements IStorage {
     const [user] = await db
       .update(users)
       .set({ ...userData, updatedAt: now })
+      .where(eq(users.id, id))
+      .returning();
+    return user || undefined;
+  }
+  
+  async updateUserFreeConsultationUsage(id: number): Promise<User | undefined> {
+    const now = new Date();
+    const [user] = await db
+      .update(users)
+      .set({ 
+        hasUsedFreeConsultation: true,
+        updatedAt: now 
+      })
       .where(eq(users.id, id))
       .returning();
     return user || undefined;

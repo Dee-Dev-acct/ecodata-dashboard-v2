@@ -25,6 +25,7 @@ import CaseStudyDetail from "@/pages/CaseStudyDetail";
 import Publications from "@/pages/Publications";
 import PublicationDetail from "@/pages/PublicationDetail";
 import FAQs from "@/pages/FAQs";
+import BookAppointmentPage from "@/pages/BookAppointmentPage";
 
 // Service detail pages
 import DigitalLiteracy from "@/pages/services/DigitalLiteracy";
@@ -51,6 +52,7 @@ function Router() {
       <Route path="/checkout/:goalId?" component={Checkout} />
       <Route path="/donation-success" component={DonationSuccess} />
       <Route path="/subscription-success" component={SubscriptionSuccess} />
+      <Route path="/book-appointment" component={BookAppointmentPage} />
       
       {/* Resource pages */}
       <Route path="/case-studies" component={CaseStudies} />
