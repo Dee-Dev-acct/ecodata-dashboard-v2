@@ -1,6 +1,6 @@
 import { createContext, useContext, ReactNode, useState, useEffect } from "react";
 import { login as authLogin, logout as authLogout, isAuthenticated, getUserFromToken } from "@/lib/auth";
-import { useMutation, UseMutationResult } from "@tanstack/react-query";
+import { useMutation, UseQueryResult, useQuery, UseMutationResult } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
@@ -42,6 +42,7 @@ interface AuthContextType {
   login: (username: string, password: string) => Promise<LoginResponse>;
   logout: () => void;
   isAdmin: boolean;
+  userQuery: UseQueryResult<User, Error>;
   registerMutation: UseMutationResult<any, Error, RegisterData>;
   loginMutation: UseMutationResult<LoginResponse, Error, { username: string; password: string }>;
 }
@@ -52,12 +53,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const { toast } = useToast();
   
+  // Fetch complete user profile if authenticated
+  const userQuery = useQuery({
+    queryKey: ['/api/user/profile'],
+    queryFn: async () => {
+      if (!isAuthenticated()) return null;
+      const response = await apiRequest('GET', '/api/user/profile');
+      if (!response.ok) {
+        throw new Error('Failed to fetch user profile');
+      }
+      return response.json();
+    },
+    enabled: isAuthenticated(), // Only run query if user is authenticated
+    retry: false, // Don't retry on failure
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+  
   useEffect(() => {
-    // Check for existing authentication on initial load
-    if (isAuthenticated()) {
+    // Set user from query results if available
+    if (userQuery.data) {
+      setUser(userQuery.data);
+    } else if (isAuthenticated()) {
+      // Fallback to basic token data if profile fetch fails
       const userData = getUserFromToken();
       if (userData) {
-        // Convert to User type with required fields
         const userWithRequiredFields: User = {
           id: userData.id,
           username: userData.username,
@@ -67,7 +86,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(userWithRequiredFields);
       }
     }
-  }, []);
+  }, [userQuery.data]);
   
   // Login mutation
   const loginMutation = useMutation({
@@ -133,6 +152,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         login,
         logout,
         isAdmin: user?.role === 'admin',
+        userQuery,
         registerMutation,
         loginMutation
       }}

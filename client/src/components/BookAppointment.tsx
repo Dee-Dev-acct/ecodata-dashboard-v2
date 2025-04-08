@@ -1,4 +1,4 @@
-import { Calendar, Clock, Users, BadgeCheck, Sparkles } from "lucide-react";
+import { Calendar, Clock, Users, BadgeCheck, Sparkles, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
@@ -11,19 +11,24 @@ const BookAppointment = () => {
   const teamsBookingUrl = "https://outlook.office.com/bookwithme/user";
   
   const { toast } = useToast();
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, userQuery } = useAuth();
   const [hasUsedConsultation, setHasUsedConsultation] = useState<boolean>(false);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   
   useEffect(() => {
-    if (user) {
-      // Try to get this value from the user object, otherwise default to false
-      setHasUsedConsultation(user.hasUsedFreeConsultation || false);
+    // Set loading based on query status
+    if (isAuthenticated && userQuery.isLoading) {
+      setIsLoading(true);
+    } else {
+      if (user) {
+        // Use the hasUsedFreeConsultation value from the user profile
+        console.log("User consultation status:", user.hasUsedFreeConsultation);
+        setHasUsedConsultation(user.hasUsedFreeConsultation || false);
+      }
+      setIsLoading(false);
     }
-    // Set loading to false after checking
-    setIsLoading(false);
-  }, [user]);
+  }, [user, userQuery.isLoading, isAuthenticated]);
   
   const handleBooking = async () => {
     if (!user) {
@@ -88,6 +93,15 @@ const BookAppointment = () => {
           <p className="text-lg max-w-2xl mx-auto dark:text-[#F4F1DE]">
             Schedule a consultation with our team to discuss your project needs and how we can help.
           </p>
+          
+          {isLoading && isAuthenticated && (
+            <div className="flex items-center justify-center mt-4">
+              <div className="animate-pulse flex space-x-2 items-center">
+                <Loader2 className="h-5 w-5 animate-spin text-[#2A9D8F]" />
+                <span className="text-sm text-gray-600 dark:text-gray-300">Loading your account information...</span>
+              </div>
+            </div>
+          )}
           
           {!isLoading && user && !hasUsedConsultation && (
             <motion.div 
