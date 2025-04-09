@@ -9,17 +9,17 @@ const EnvironmentalResearchPage = () => {
       <ServiceDetail
         title="Environmental Research"
         heroTitle="Data-Driven Ecological Analysis"
-        description="We conduct in-depth environmental research that provides organizations with crucial insights for sustainability planning, conservation efforts, and climate resilience strategies."
+        description="We conduct in-depth environmental research that provides organisations with crucial insights for sustainability planning, conservation efforts, and climate resilience strategies."
         content={{
           what: [
             "Comprehensive environmental data collection and analysis",
             "Biodiversity monitoring and ecological impact assessments",
             "Carbon footprint calculations and reduction strategies",
-            "Climate change resilience planning for organizations and communities",
+            "Climate change resilience planning for organisations and communities",
             "Environmental policy research and recommendations"
           ],
           benefits: [
-            "Conservation organizations seeking data-driven approaches",
+            "Conservation organisations seeking data-driven approaches",
             "Local governments developing climate action plans",
             "Businesses implementing sustainability strategies",
             "Research institutions requiring environmental data expertise",

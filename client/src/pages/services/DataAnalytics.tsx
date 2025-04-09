@@ -12,19 +12,19 @@ const DataAnalyticsPage = () => {
         description="We harness the power of data analysis and visualisation to help organisations understand environmental patterns, make informed decisions, and communicate their sustainability efforts effectively."
         content={{
           what: [
-            "Environmental data collection and normalization",
+            "Environmental data collection and normalisation",
             "Statistical analysis of sustainability metrics",
             "Interactive dashboards and visualisation tools",
-            "Predictive modeling for environmental outcomes",
+            "Predictive modelling for environmental outcomes",
             "Data-driven sustainability reporting and communication",
             "Custom algorithms for specific environmental applications"
           ],
           benefits: [
-            "Environmental nonprofits seeking to measure and communicate impact",
+            "Environmental non-profits seeking to measure and communicate impact",
             "Local authorities tracking progress on sustainability goals",
-            "Research institutions needing specialized environmental data analysis",
+            "Research institutions needing specialised environmental data analysis",
             "Businesses implementing data-driven sustainability strategies",
-            "Community organizations advocating for evidence-based environmental policies"
+            "Community organisations advocating for evidence-based environmental policies"
           ],
           caseStudies: [
             "Developed a real-time air quality monitoring dashboard for a community coalition, empowering residents to track pollution patterns and advocate for cleaner air policies.",
@@ -40,7 +40,7 @@ const DataAnalyticsPage = () => {
         impactStories={[
           {
             title: "Air Quality Monitoring Network",
-            description: "We implemented a community-based air quality monitoring network across underserved neighborhoods, enabling evidence-based advocacy for environmental justice.",
+            description: "We implemented a community-based air quality monitoring network across underserved neighbourhoods, enabling evidence-based advocacy for environmental justice.",
             metrics: "15 monitoring stations | 500+ residents engaged | 35% reduction in local pollutants",
             imageUrl: "https://images.unsplash.com/photo-1617791160536-598cf32026fb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80"
           },

@@ -10,7 +10,7 @@ const SocialImpactPage = () => {
       <ServiceDetail
         title="Community Innovation & Social Impact Projects"
         heroTitle="Co-creating Tech for Social Good"
-        description="We collaborate with local organizations to tackle community issues through innovative technology solutions, focusing on sustainable impact and knowledge transfer."
+        description="We collaborate with local organisations to tackle community issues through innovative technology solutions, focusing on sustainable impact and knowledge transfer."
         content={{
           what: [
             "Collaborative tech development to address community challenges",
@@ -20,11 +20,11 @@ const SocialImpactPage = () => {
             "Ongoing support and maintenance for community-led tech initiatives"
           ],
           benefits: [
-            "Nonprofit organizations seeking technological solutions",
+            "Non-profit organisations seeking technological solutions",
             "Community groups addressing local social issues",
             "Local governments implementing digital community engagement",
             "Healthcare providers serving vulnerable populations",
-            "Environmental organizations tracking and visualizing impact data"
+            "Environmental organisations tracking and visualising impact data"
           ],
           caseStudies: [
             "Developed a mobile application for a homelessness charity to connect rough sleepers with available shelter beds and support services in real-time.",

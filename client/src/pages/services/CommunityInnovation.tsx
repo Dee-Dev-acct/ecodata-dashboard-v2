@@ -9,7 +9,7 @@ const CommunityInnovationPage = () => {
       <ServiceDetail
         title="Community Innovation & Social Impact"
         heroTitle="Technology for Social Change"
-        description="We collaborate with communities and organizations to develop innovative technology solutions that address social and environmental challenges, emphasizing inclusive design and sustainable impact."
+        description="We collaborate with communities and organisations to develop innovative technology solutions that address social and environmental challenges, emphasising inclusive design and sustainable impact."
         content={{
           what: [
             "Collaborative co-design sessions with community stakeholders",
@@ -20,11 +20,11 @@ const CommunityInnovationPage = () => {
             "Sustainable funding models for community tech projects"
           ],
           benefits: [
-            "Community organizations seeking innovative approaches to local challenges",
+            "Community organisations seeking innovative approaches to local challenges",
             "Social enterprises looking to scale their impact through technology",
             "Local authorities implementing community engagement strategies",
-            "Educational institutions developing community outreach programs",
-            "Neighborhood groups organizing around environmental or social issues"
+            "Educational institutions developing community outreach programmes",
+            "Neighbourhood groups organising around environmental or social issues"
           ],
           caseStudies: [
             "Co-designed a community energy monitoring system with residents of a housing estate, resulting in 23% energy savings and the formation of a resident-led sustainability committee.",
@@ -33,7 +33,7 @@ const CommunityInnovationPage = () => {
           ]
         }}
         cta={{
-          text: "Ready to innovate with community at the center?",
+          text: "Ready to innovate with community at the centre?",
           buttonText: "Let's Talk"
         }}
         icon="fa-people-group"
