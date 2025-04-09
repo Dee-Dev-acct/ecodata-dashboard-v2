@@ -38,10 +38,11 @@ const Footer = () => {
             <h4 className="text-lg font-heading font-semibold mb-4">Resources</h4>
             <nav className="flex flex-col space-y-2">
               <Link href="/blog" className="text-gray-300 hover:text-white transition-colors">Blog</Link>
-              <a href="#" className="text-gray-300 hover:text-white transition-colors">Case Studies</a>
-              <a href="#" className="text-gray-300 hover:text-white transition-colors">Publications</a>
+              <Link href="/case-studies" className="text-gray-300 hover:text-white transition-colors">Case Studies</Link>
+              <Link href="/publications" className="text-gray-300 hover:text-white transition-colors">Publications</Link>
               <Link href="/data-insights" onClick={() => sessionStorage.setItem('referrer', 'footer')} className="text-gray-300 hover:text-white transition-colors">Data Insights</Link>
-              <a href="#" className="text-gray-300 hover:text-white transition-colors">FAQs</a>
+              <Link href="/faqs" className="text-gray-300 hover:text-white transition-colors">FAQs</Link>
+              <Link href="/book-appointment" className="text-gray-300 hover:text-white transition-colors">Book Appointment</Link>
             </nav>
           </div>
           

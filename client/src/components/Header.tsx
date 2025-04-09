@@ -62,24 +62,111 @@ const Header = () => {
           >
             About
           </a>
-          <a 
-            href="#services" 
-            className="font-medium hover:text-[#2A9D8F] dark:text-[#F4F1DE] dark:hover:text-[#38B593] transition-colors"
+          <div
+            className="relative"
           >
-            Services
-          </a>
+            <button
+              onClick={() => {
+                // If on home page, scroll to services section
+                if (window.location.pathname === '/') {
+                  const servicesElement = document.getElementById('services');
+                  if (servicesElement) {
+                    servicesElement.scrollIntoView({ behavior: 'smooth' });
+                  }
+                } else {
+                  // Create a dropdown with service links
+                  setResourcesOpen(false); // Close resources dropdown if open
+                  const servicesDropdownElement = document.getElementById('services-dropdown');
+                  if (servicesDropdownElement) {
+                    servicesDropdownElement.classList.toggle('hidden');
+                  }
+                }
+              }}
+              className="flex items-center font-medium hover:text-[#2A9D8F] dark:text-[#F4F1DE] dark:hover:text-[#38B593] transition-colors focus:outline-none"
+            >
+              Services
+              <ChevronDown size={16} className="ml-1" />
+            </button>
+            
+            <div id="services-dropdown" className="absolute top-full left-0 mt-2 w-56 rounded-md shadow-lg bg-white dark:bg-[#264653] z-10 hidden">
+              <div className="py-1 rounded-md bg-white dark:bg-[#264653] shadow-xs">
+                <Link 
+                  href="/services/digital-literacy" 
+                  className="block px-4 py-2 text-sm hover:bg-[#F4F1DE] dark:hover:bg-[#1A323C] dark:text-[#F4F1DE] transition-colors"
+                >
+                  Digital Literacy
+                </Link>
+                <Link 
+                  href="/services/social-impact" 
+                  className="block px-4 py-2 text-sm hover:bg-[#F4F1DE] dark:hover:bg-[#1A323C] dark:text-[#F4F1DE] transition-colors"
+                >
+                  Social Impact
+                </Link>
+                <Link 
+                  href="/services/it-consultancy" 
+                  className="block px-4 py-2 text-sm hover:bg-[#F4F1DE] dark:hover:bg-[#1A323C] dark:text-[#F4F1DE] transition-colors"
+                >
+                  IT Consultancy
+                </Link>
+                <Link 
+                  href="/services/web-development" 
+                  className="block px-4 py-2 text-sm hover:bg-[#F4F1DE] dark:hover:bg-[#1A323C] dark:text-[#F4F1DE] transition-colors"
+                >
+                  Web Development
+                </Link>
+                <Link 
+                  href="/services/environmental-research" 
+                  className="block px-4 py-2 text-sm hover:bg-[#F4F1DE] dark:hover:bg-[#1A323C] dark:text-[#F4F1DE] transition-colors"
+                >
+                  Environmental Research
+                </Link>
+                <Link 
+                  href="/services/data-analytics" 
+                  className="block px-4 py-2 text-sm hover:bg-[#F4F1DE] dark:hover:bg-[#1A323C] dark:text-[#F4F1DE] transition-colors"
+                >
+                  Data Analytics
+                </Link>
+                <Link 
+                  href="/services/community-innovation" 
+                  className="block px-4 py-2 text-sm hover:bg-[#F4F1DE] dark:hover:bg-[#1A323C] dark:text-[#F4F1DE] transition-colors"
+                >
+                  Community Innovation
+                </Link>
+              </div>
+            </div>
+          </div>
+          
           <a 
             href="#technology" 
             className="font-medium hover:text-[#2A9D8F] dark:text-[#F4F1DE] dark:hover:text-[#38B593] transition-colors"
           >
             Technology
           </a>
-          <a 
-            href="#impact" 
+          <div className="relative">
+            <button
+              onClick={() => {
+                // If on home page, scroll to impact section
+                if (window.location.pathname === '/') {
+                  const impactElement = document.getElementById('impact');
+                  if (impactElement) {
+                    impactElement.scrollIntoView({ behavior: 'smooth' });
+                  }
+                } else {
+                  // Navigate to impact page
+                  window.location.href = '/impact';
+                }
+              }}
+              className="flex items-center font-medium hover:text-[#2A9D8F] dark:text-[#F4F1DE] dark:hover:text-[#38B593] transition-colors focus:outline-none"
+            >
+              Impact
+            </button>
+          </div>
+          <Link 
+            href="/book-appointment" 
             className="font-medium hover:text-[#2A9D8F] dark:text-[#F4F1DE] dark:hover:text-[#38B593] transition-colors"
           >
-            Impact
-          </a>
+            Book Appointment
+          </Link>
           <div
             className="relative"
             ref={resourcesDropdownRef}
@@ -185,13 +272,73 @@ const Header = () => {
             >
               About
             </a>
-            <a 
-              href="#services" 
-              onClick={() => setMobileMenuOpen(false)}
-              className="py-2 px-4 hover:bg-[#F4F1DE] dark:hover:bg-[#1A323C] dark:text-white rounded transition-colors"
-            >
-              Services
-            </a>
+            <div
+              className="py-2 px-4 hover:bg-[#F4F1DE] dark:hover:bg-[#1A323C] dark:text-white rounded transition-colors">
+              <div
+                className="flex items-center justify-between cursor-pointer"
+                onClick={() => {
+                  const servicesMenuElement = document.getElementById('mobile-services-menu');
+                  if (servicesMenuElement) {
+                    servicesMenuElement.classList.toggle('hidden');
+                  }
+                }}
+              >
+                <span>Services</span>
+                <ChevronDown size={16} className="transition-transform duration-200" />
+              </div>
+              
+              <div id="mobile-services-menu" className="mt-2 ml-4 flex flex-col space-y-2 hidden">
+                <Link 
+                  href="/services/digital-literacy" 
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="py-1 block dark:text-[#F4F1DE]"
+                >
+                  Digital Literacy
+                </Link>
+                <Link 
+                  href="/services/social-impact" 
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="py-1 block dark:text-[#F4F1DE]"
+                >
+                  Social Impact
+                </Link>
+                <Link 
+                  href="/services/it-consultancy" 
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="py-1 block dark:text-[#F4F1DE]"
+                >
+                  IT Consultancy
+                </Link>
+                <Link 
+                  href="/services/web-development" 
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="py-1 block dark:text-[#F4F1DE]"
+                >
+                  Web Development
+                </Link>
+                <Link 
+                  href="/services/environmental-research" 
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="py-1 block dark:text-[#F4F1DE]"
+                >
+                  Environmental Research
+                </Link>
+                <Link 
+                  href="/services/data-analytics" 
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="py-1 block dark:text-[#F4F1DE]"
+                >
+                  Data Analytics
+                </Link>
+                <Link 
+                  href="/services/community-innovation" 
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="py-1 block dark:text-[#F4F1DE]"
+                >
+                  Community Innovation
+                </Link>
+              </div>
+            </div>
             <a 
               href="#technology" 
               onClick={() => setMobileMenuOpen(false)}
@@ -199,13 +346,20 @@ const Header = () => {
             >
               Technology
             </a>
-            <a 
-              href="#impact" 
+            <Link 
+              href="/impact" 
               onClick={() => setMobileMenuOpen(false)}
               className="py-2 px-4 hover:bg-[#F4F1DE] dark:hover:bg-[#1A323C] dark:text-white rounded transition-colors"
             >
               Impact
-            </a>
+            </Link>
+            <Link 
+              href="/book-appointment" 
+              onClick={() => setMobileMenuOpen(false)}
+              className="py-2 px-4 hover:bg-[#F4F1DE] dark:hover:bg-[#1A323C] dark:text-white rounded transition-colors"
+            >
+              Book Appointment
+            </Link>
             <div
               className="py-2 px-4 hover:bg-[#F4F1DE] dark:hover:bg-[#1A323C] dark:text-white rounded transition-colors">
               <div
