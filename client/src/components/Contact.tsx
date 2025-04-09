@@ -147,7 +147,7 @@ const Contact = () => {
                   required
                 >
                   <option value="" disabled>Select a subject</option>
-                  <option value="general">General Inquiry</option>
+                  <option value="general">General Enquiry</option>
                   <option value="services">Services Information</option>
                   <option value="partnership">Partnership Opportunity</option>
                   <option value="support">Technical Support</option>
@@ -184,7 +184,7 @@ const Contact = () => {
                     checked={formState.consent}
                     onChange={handleCheckboxChange}
                   />
-                  I consent to ECODATA processing my data to respond to my inquiry.
+                  I consent to ECODATA processing my data to respond to my enquiry.
                 </label>
               </div>
               

@@ -10,7 +10,7 @@ const Hero = () => {
               Data-Driven <span className="text-[#2A9D8F]">Solutions</span> for Environmental Impact
             </h1>
             <p className="text-lg mb-8 dark:text-[#F4F1DE]">
-              ECODATA CIC provides IT consultancy, data analytics, and environmental research services to help organizations make sustainable decisions.
+              ECODATA CIC provides IT consultancy, data analytics, and environmental research services to help organisations make sustainable decisions.
             </p>
             <div className="flex flex-col sm:flex-row justify-center md:justify-start space-y-4 sm:space-y-0 sm:space-x-4">
               <a 

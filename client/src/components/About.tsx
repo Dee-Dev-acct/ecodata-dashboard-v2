@@ -40,7 +40,7 @@ const About = () => {
                 Our Mission
               </h3>
               <p className="dark:text-[#F4F1DE]">
-                To democratize access to environmental data and empower organizations to make sustainable decisions through accessible technology solutions.
+                To democratise access to environmental data and empower organisations to make sustainable decisions through accessible technology solutions.
               </p>
             </div>
             
@@ -50,7 +50,7 @@ const About = () => {
                 Our Vision
               </h3>
               <p className="dark:text-[#F4F1DE]">
-                A world where all organizations, regardless of size, have the data tools and knowledge needed to minimize environmental impact and maximize social good.
+                A world where all organisations, regardless of size, have the data tools and knowledge needed to minimise environmental impact and maximise social good.
               </p>
             </div>
             
@@ -62,7 +62,7 @@ const About = () => {
               <ul className="list-disc list-inside dark:text-[#F4F1DE] space-y-2">
                 <li>Environmental responsibility in all operations</li>
                 <li>Data transparency and ethical usage</li>
-                <li>Community-centered approach to technology</li>
+                <li>Community-centred approach to technology</li>
                 <li>Continuous innovation and learning</li>
               </ul>
             </div>
