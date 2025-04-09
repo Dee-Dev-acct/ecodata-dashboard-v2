@@ -6,8 +6,10 @@ import { ChevronDown } from "lucide-react";
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [resourcesOpen, setResourcesOpen] = useState(false);
+  const [servicesOpen, setServicesOpen] = useState(false);
   const { theme, toggleTheme } = useTheme();
   const resourcesDropdownRef = useRef<HTMLDivElement>(null);
+  const servicesDropdownRef = useRef<HTMLDivElement>(null);
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
@@ -17,11 +19,19 @@ const Header = () => {
     setResourcesOpen(!resourcesOpen);
   };
 
-  // Close the resources dropdown when clicking outside
+  const toggleServicesDropdown = () => {
+    setServicesOpen(!servicesOpen);
+    setResourcesOpen(false);
+  };
+
+  // Close the dropdowns when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (resourcesDropdownRef.current && !resourcesDropdownRef.current.contains(event.target as Node)) {
         setResourcesOpen(false);
+      }
+      if (servicesDropdownRef.current && !servicesDropdownRef.current.contains(event.target as Node)) {
+        setServicesOpen(false);
       }
     }
     
@@ -64,76 +74,71 @@ const Header = () => {
           </a>
           <div
             className="relative"
+            ref={servicesDropdownRef}
           >
             <button
-              onClick={() => {
-                // If on home page, scroll to services section
-                if (window.location.pathname === '/') {
-                  const servicesElement = document.getElementById('services');
-                  if (servicesElement) {
-                    servicesElement.scrollIntoView({ behavior: 'smooth' });
-                  }
-                } else {
-                  // Create a dropdown with service links
-                  setResourcesOpen(false); // Close resources dropdown if open
-                  const servicesDropdownElement = document.getElementById('services-dropdown');
-                  if (servicesDropdownElement) {
-                    servicesDropdownElement.classList.toggle('hidden');
-                  }
-                }
-              }}
+              onClick={toggleServicesDropdown}
               className="flex items-center font-medium hover:text-[#2A9D8F] dark:text-[#F4F1DE] dark:hover:text-[#38B593] transition-colors focus:outline-none"
             >
               Services
-              <ChevronDown size={16} className="ml-1" />
+              <ChevronDown size={16} className={`ml-1 transition-transform duration-200 ${servicesOpen ? 'rotate-180' : ''}`} />
             </button>
             
-            <div id="services-dropdown" className="absolute top-full left-0 mt-2 w-56 rounded-md shadow-lg bg-white dark:bg-[#264653] z-10 hidden">
-              <div className="py-1 rounded-md bg-white dark:bg-[#264653] shadow-xs">
-                <Link 
-                  href="/services/digital-literacy" 
-                  className="block px-4 py-2 text-sm hover:bg-[#F4F1DE] dark:hover:bg-[#1A323C] dark:text-[#F4F1DE] transition-colors"
-                >
-                  Digital Literacy
-                </Link>
-                <Link 
-                  href="/services/social-impact" 
-                  className="block px-4 py-2 text-sm hover:bg-[#F4F1DE] dark:hover:bg-[#1A323C] dark:text-[#F4F1DE] transition-colors"
-                >
-                  Social Impact
-                </Link>
-                <Link 
-                  href="/services/it-consultancy" 
-                  className="block px-4 py-2 text-sm hover:bg-[#F4F1DE] dark:hover:bg-[#1A323C] dark:text-[#F4F1DE] transition-colors"
-                >
-                  IT Consultancy
-                </Link>
-                <Link 
-                  href="/services/web-development" 
-                  className="block px-4 py-2 text-sm hover:bg-[#F4F1DE] dark:hover:bg-[#1A323C] dark:text-[#F4F1DE] transition-colors"
-                >
-                  Web Development
-                </Link>
-                <Link 
-                  href="/services/environmental-research" 
-                  className="block px-4 py-2 text-sm hover:bg-[#F4F1DE] dark:hover:bg-[#1A323C] dark:text-[#F4F1DE] transition-colors"
-                >
-                  Environmental Research
-                </Link>
-                <Link 
-                  href="/services/data-analytics" 
-                  className="block px-4 py-2 text-sm hover:bg-[#F4F1DE] dark:hover:bg-[#1A323C] dark:text-[#F4F1DE] transition-colors"
-                >
-                  Data Analytics
-                </Link>
-                <Link 
-                  href="/services/community-innovation" 
-                  className="block px-4 py-2 text-sm hover:bg-[#F4F1DE] dark:hover:bg-[#1A323C] dark:text-[#F4F1DE] transition-colors"
-                >
-                  Community Innovation
-                </Link>
+            {servicesOpen && (
+              <div className="absolute top-full left-0 mt-2 w-56 rounded-md shadow-lg bg-white dark:bg-[#264653] z-10">
+                <div className="py-1 rounded-md bg-white dark:bg-[#264653] shadow-xs">
+                  <Link 
+                    href="/services/digital-literacy" 
+                    className="block px-4 py-2 text-sm hover:bg-[#F4F1DE] dark:hover:bg-[#1A323C] dark:text-[#F4F1DE] transition-colors"
+                    onClick={() => setServicesOpen(false)}
+                  >
+                    Digital Literacy
+                  </Link>
+                  <Link 
+                    href="/services/social-impact" 
+                    className="block px-4 py-2 text-sm hover:bg-[#F4F1DE] dark:hover:bg-[#1A323C] dark:text-[#F4F1DE] transition-colors"
+                    onClick={() => setServicesOpen(false)}
+                  >
+                    Social Impact
+                  </Link>
+                  <Link 
+                    href="/services/it-consultancy" 
+                    className="block px-4 py-2 text-sm hover:bg-[#F4F1DE] dark:hover:bg-[#1A323C] dark:text-[#F4F1DE] transition-colors"
+                    onClick={() => setServicesOpen(false)}
+                  >
+                    IT Consultancy
+                  </Link>
+                  <Link 
+                    href="/services/web-development" 
+                    className="block px-4 py-2 text-sm hover:bg-[#F4F1DE] dark:hover:bg-[#1A323C] dark:text-[#F4F1DE] transition-colors"
+                    onClick={() => setServicesOpen(false)}
+                  >
+                    Web Development
+                  </Link>
+                  <Link 
+                    href="/services/environmental-research" 
+                    className="block px-4 py-2 text-sm hover:bg-[#F4F1DE] dark:hover:bg-[#1A323C] dark:text-[#F4F1DE] transition-colors"
+                    onClick={() => setServicesOpen(false)}
+                  >
+                    Environmental Research
+                  </Link>
+                  <Link 
+                    href="/services/data-analytics" 
+                    className="block px-4 py-2 text-sm hover:bg-[#F4F1DE] dark:hover:bg-[#1A323C] dark:text-[#F4F1DE] transition-colors"
+                    onClick={() => setServicesOpen(false)}
+                  >
+                    Data Analytics
+                  </Link>
+                  <Link 
+                    href="/services/community-innovation" 
+                    className="block px-4 py-2 text-sm hover:bg-[#F4F1DE] dark:hover:bg-[#1A323C] dark:text-[#F4F1DE] transition-colors"
+                    onClick={() => setServicesOpen(false)}
+                  >
+                    Community Innovation
+                  </Link>
+                </div>
               </div>
-            </div>
+            )}
           </div>
           
           <a 
@@ -276,68 +281,65 @@ const Header = () => {
               className="py-2 px-4 hover:bg-[#F4F1DE] dark:hover:bg-[#1A323C] dark:text-white rounded transition-colors">
               <div
                 className="flex items-center justify-between cursor-pointer"
-                onClick={() => {
-                  const servicesMenuElement = document.getElementById('mobile-services-menu');
-                  if (servicesMenuElement) {
-                    servicesMenuElement.classList.toggle('hidden');
-                  }
-                }}
+                onClick={() => setServicesOpen(!servicesOpen)}
               >
                 <span>Services</span>
-                <ChevronDown size={16} className="transition-transform duration-200" />
+                <ChevronDown size={16} className={`transition-transform duration-200 ${servicesOpen ? 'rotate-180' : ''}`} />
               </div>
               
-              <div id="mobile-services-menu" className="mt-2 ml-4 flex flex-col space-y-2 hidden">
-                <Link 
-                  href="/services/digital-literacy" 
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="py-1 block dark:text-[#F4F1DE]"
-                >
-                  Digital Literacy
-                </Link>
-                <Link 
-                  href="/services/social-impact" 
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="py-1 block dark:text-[#F4F1DE]"
-                >
-                  Social Impact
-                </Link>
-                <Link 
-                  href="/services/it-consultancy" 
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="py-1 block dark:text-[#F4F1DE]"
-                >
-                  IT Consultancy
-                </Link>
-                <Link 
-                  href="/services/web-development" 
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="py-1 block dark:text-[#F4F1DE]"
-                >
-                  Web Development
-                </Link>
-                <Link 
-                  href="/services/environmental-research" 
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="py-1 block dark:text-[#F4F1DE]"
-                >
-                  Environmental Research
-                </Link>
-                <Link 
-                  href="/services/data-analytics" 
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="py-1 block dark:text-[#F4F1DE]"
-                >
-                  Data Analytics
-                </Link>
-                <Link 
-                  href="/services/community-innovation" 
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="py-1 block dark:text-[#F4F1DE]"
-                >
-                  Community Innovation
-                </Link>
-              </div>
+              {servicesOpen && (
+                <div className="mt-2 ml-4 flex flex-col space-y-2">
+                  <Link 
+                    href="/services/digital-literacy" 
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="py-1 block dark:text-[#F4F1DE]"
+                  >
+                    Digital Literacy
+                  </Link>
+                  <Link 
+                    href="/services/social-impact" 
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="py-1 block dark:text-[#F4F1DE]"
+                  >
+                    Social Impact
+                  </Link>
+                  <Link 
+                    href="/services/it-consultancy" 
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="py-1 block dark:text-[#F4F1DE]"
+                  >
+                    IT Consultancy
+                  </Link>
+                  <Link 
+                    href="/services/web-development" 
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="py-1 block dark:text-[#F4F1DE]"
+                  >
+                    Web Development
+                  </Link>
+                  <Link 
+                    href="/services/environmental-research" 
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="py-1 block dark:text-[#F4F1DE]"
+                  >
+                    Environmental Research
+                  </Link>
+                  <Link 
+                    href="/services/data-analytics" 
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="py-1 block dark:text-[#F4F1DE]"
+                  >
+                    Data Analytics
+                  </Link>
+                  <Link 
+                    href="/services/community-innovation" 
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="py-1 block dark:text-[#F4F1DE]"
+                  >
+                    Community Innovation
+                  </Link>
+                </div>
+              )}
             </div>
             <a 
               href="#technology" 
