@@ -758,3 +758,29 @@ export const userFeedbackRelations = relations(userFeedback, ({ one }) => ({
     references: [users.id]
   })
 }));
+
+// Password reset tokens schema
+export const passwordResetTokens = pgTable("password_reset_tokens", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  token: text("token").notNull().unique(),
+  expiresAt: timestamp("expires_at").notNull(),
+  used: boolean("used").default(false),
+  createdAt: timestamp("created_at").defaultNow()
+});
+
+export const insertPasswordResetTokenSchema = createInsertSchema(passwordResetTokens).pick({
+  userId: true,
+  token: true,
+  expiresAt: true
+});
+
+export type PasswordResetToken = typeof passwordResetTokens.$inferSelect;
+export type InsertPasswordResetToken = z.infer<typeof insertPasswordResetTokenSchema>;
+
+export const passwordResetTokensRelations = relations(passwordResetTokens, ({ one }) => ({
+  user: one(users, {
+    fields: [passwordResetTokens.userId],
+    references: [users.id]
+  })
+}));

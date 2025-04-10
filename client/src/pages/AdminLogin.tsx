@@ -42,7 +42,6 @@ const AdminLogin = () => {
       toast({
         title: "Login successful",
         description: "Welcome to the admin dashboard.",
-        variant: "success",
       });
       setLocation("/admin/dashboard");
     } catch (error) {

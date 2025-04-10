@@ -19,6 +19,7 @@ import {
   faqs, type FAQ, type InsertFAQ,
   userFeedback, type UserFeedback, type InsertUserFeedback,
   errorReports, type ErrorReport, type InsertErrorReport,
+  passwordResetTokens, type PasswordResetToken, type InsertPasswordResetToken,
   // MSSQL schemas
   type MSSQLUser,
   type MSSQLContactMessage,
@@ -30,6 +31,7 @@ import {
   type MSSQLSetting,
   type MSSQLPartner
 } from "@shared/schema";
+import { randomBytes } from "crypto";
 import { db, mssqlClient } from "./db";
 import { 
   eq, 
@@ -188,6 +190,12 @@ export interface IStorage {
   createErrorReport(report: InsertErrorReport): Promise<ErrorReport>;
   updateErrorReportStatus(id: number, status: string, adminNotes?: string): Promise<ErrorReport | undefined>;
   deleteErrorReport(id: number): Promise<boolean>;
+  
+  // Password Reset Tokens
+  createPasswordResetToken(userId: number): Promise<PasswordResetToken>;
+  getPasswordResetTokenByToken(token: string): Promise<PasswordResetToken | undefined>;
+  validatePasswordResetToken(token: string): Promise<User | undefined>;
+  markTokenAsUsed(tokenId: number): Promise<PasswordResetToken | undefined>;
 }
 
 export class MemStorage implements IStorage {

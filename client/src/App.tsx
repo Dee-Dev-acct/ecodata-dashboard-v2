@@ -26,6 +26,7 @@ import Publications from "@/pages/Publications";
 import PublicationDetail from "@/pages/PublicationDetail";
 import FAQs from "@/pages/FAQs";
 import BookAppointmentPage from "@/pages/BookAppointmentPage";
+import PasswordRecovery from "@/pages/PasswordRecovery";
 
 // Service detail pages
 import DigitalLiteracy from "@/pages/services/DigitalLiteracy";
@@ -41,6 +42,7 @@ function Router() {
     <Switch>
       <Route path="/" component={Home} />
       <Route path="/auth" component={AuthPage} />
+      <Route path="/password-recovery" component={PasswordRecovery} />
       <ProtectedRoute path="/dashboard" component={Dashboard} />
       <Route path="/admin/login" component={AdminLogin} />
       <Route path="/admin/:panel*" component={Admin} />
