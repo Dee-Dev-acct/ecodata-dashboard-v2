@@ -90,14 +90,29 @@ const PasswordRecovery = () => {
     try {
       setEmail(data.email);
       
+      // IMPORTANT: First try an existing account to test the token retrieval
+      // Use admin@ecodatacic.org to test this flow, as we know this account exists
+      console.log("Sending password recovery request for email:", data.email);
+  
       const response = await apiRequest("POST", "/api/auth/forgot-password", {
         email: data.email,
       });
       
+      console.log("Password recovery response status:", response.status);
+      
       if (response.ok) {
+        let responseData;
+        let responseText = "";
+        
         try {
-          // For development purposes only - parse response to get token
-          const responseData = await response.json();
+          // First try to get the raw text for debugging
+          responseText = await response.clone().text();
+          console.log("Raw response text:", responseText);
+          
+          // Then try to parse as JSON
+          responseData = JSON.parse(responseText);
+          console.log("Parsed response data:", responseData);
+          
           setStep("confirmation");
           toast({
             title: "Request Sent",
@@ -105,23 +120,31 @@ const PasswordRecovery = () => {
           });
           
           // Display the token information for testing purposes
-          setTimeout(() => {
-            const tokenInfoElement = document.getElementById('token-info');
-            if (tokenInfoElement && responseData.token) {
-              tokenInfoElement.innerHTML = `
-                <div class="mb-2">
-                  <div>Your reset token: <strong>${responseData.token}</strong></div>
-                  <div class="text-xs mt-1">Copy this token or click the link below:</div>
-                </div>
-                <a href="${responseData.resetURL || `/password-recovery?token=${responseData.token}`}" 
-                   class="inline-block px-3 py-1 bg-primary text-white text-xs rounded-md hover:bg-primary/90">
-                  Open Reset Form
-                </a>
-              `;
-            }
-          }, 100);
+          if (responseData && responseData.token) {
+            console.log("Found token in response:", responseData.token);
+            setTimeout(() => {
+              const tokenInfoElement = document.getElementById('token-info');
+              if (tokenInfoElement) {
+                tokenInfoElement.innerHTML = `
+                  <div class="mb-2">
+                    <div>Your reset token: <strong>${responseData.token}</strong></div>
+                    <div class="text-xs mt-1">Copy this token or click the link below:</div>
+                  </div>
+                  <a href="${responseData.resetURL || `/password-recovery?token=${responseData.token}`}" 
+                     class="inline-block px-3 py-1 bg-primary text-white text-xs rounded-md hover:bg-primary/90">
+                    Open Reset Form
+                  </a>
+                `;
+              } else {
+                console.error("Token info element not found in DOM");
+              }
+            }, 300);
+          } else {
+            console.warn("No token found in response data:", responseData);
+          }
         } catch (error) {
-          console.error("Error parsing token response:", error);
+          console.error("Error processing response:", error);
+          console.log("Raw response was:", responseText);
           setStep("confirmation");
         }
       } else {

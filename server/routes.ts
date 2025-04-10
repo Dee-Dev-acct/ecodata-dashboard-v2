@@ -191,14 +191,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // In a real production environment, we would send an email here
       // For this demo, we'll just return the token directly for easy testing
       console.log(`RESET TOKEN for ${email}: ${resetToken.token}`);
+      console.log(`DEBUG: Sending reset token response with token: ${resetToken.token}`);
       
       // For easier testing in development environment, return the actual token
       // In production, this would be removed for security reasons
-      return res.status(200).json({ 
+      const responseData = {
         message: "If that email exists in our system, we've sent a password reset link",
         token: resetToken.token,
         resetURL: `${process.env.FRONTEND_URL || ''}/password-recovery?token=${resetToken.token}`
-      });
+      };
+      console.log("DEBUG: Response data:", responseData);
+      
+      return res.status(200).json(responseData);
     } catch (error) {
       console.error("Password reset request error:", error);
       return res.status(500).json({ message: "An error occurred during password reset request" });
