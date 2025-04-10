@@ -219,6 +219,7 @@ export class MemStorage implements IStorage {
   private _faqs: Map<number, FAQ>;
   private _userFeedback: Map<number, UserFeedback>;
   private _errorReports: Map<number, ErrorReport>;
+  private _passwordResetTokens: Map<number, PasswordResetToken>;
   
   private currentUserId: number;
   private currentContactMessageId: number;
@@ -240,6 +241,7 @@ export class MemStorage implements IStorage {
   private _currentFaqId: number;
   private _currentUserFeedbackId: number;
   private _currentErrorReportId: number;
+  private _currentPasswordResetTokenId: number;
 
   constructor() {
     this.users = new Map();
@@ -262,6 +264,7 @@ export class MemStorage implements IStorage {
     this._faqs = new Map();
     this._userFeedback = new Map();
     this._errorReports = new Map();
+    this._passwordResetTokens = new Map();
     
     this.currentUserId = 1;
     this.currentContactMessageId = 1;
@@ -283,6 +286,7 @@ export class MemStorage implements IStorage {
     this._currentFaqId = 1;
     this._currentUserFeedbackId = 1;
     this._currentErrorReportId = 1;
+    this._currentPasswordResetTokenId = 1;
     
     // Initialize with sample data
     this.initializeData();
@@ -1992,6 +1996,74 @@ export class MemStorage implements IStorage {
       return true;
     }
     return false;
+  }
+  
+  // Password Reset Token methods
+  async createPasswordResetToken(userId: number): Promise<PasswordResetToken> {
+    // Generate a secure random token
+    const token = randomBytes(32).toString('hex');
+    
+    // Set expiration to 30 minutes from now
+    const expiresAt = new Date();
+    expiresAt.setMinutes(expiresAt.getMinutes() + 30);
+    
+    const passwordResetToken: PasswordResetToken = {
+      id: this._currentPasswordResetTokenId++,
+      userId,
+      token,
+      expiresAt,
+      used: false,
+      createdAt: new Date()
+    };
+    
+    this._passwordResetTokens.set(passwordResetToken.id, passwordResetToken);
+    return passwordResetToken;
+  }
+  
+  async getPasswordResetTokenByToken(token: string): Promise<PasswordResetToken | undefined> {
+    for (const resetToken of this._passwordResetTokens.values()) {
+      if (resetToken.token === token) {
+        return resetToken;
+      }
+    }
+    return undefined;
+  }
+  
+  async validatePasswordResetToken(token: string): Promise<User | undefined> {
+    const resetToken = await this.getPasswordResetTokenByToken(token);
+    
+    if (!resetToken) {
+      return undefined;
+    }
+    
+    // Check if token is expired
+    if (resetToken.expiresAt < new Date()) {
+      return undefined;
+    }
+    
+    // Check if token has been used
+    if (resetToken.used) {
+      return undefined;
+    }
+    
+    // Get the user associated with this token
+    return this.getUser(resetToken.userId);
+  }
+  
+  async markTokenAsUsed(tokenId: number): Promise<PasswordResetToken | undefined> {
+    const token = this._passwordResetTokens.get(tokenId);
+    
+    if (!token) {
+      return undefined;
+    }
+    
+    const updatedToken = {
+      ...token,
+      used: true
+    };
+    
+    this._passwordResetTokens.set(tokenId, updatedToken);
+    return updatedToken;
   }
 }
 
