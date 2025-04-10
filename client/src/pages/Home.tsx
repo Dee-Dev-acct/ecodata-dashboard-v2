@@ -1,5 +1,6 @@
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
+import ValueProposition from "@/components/ValueProposition";
 import Services from "@/components/Services";
 import About from "@/components/About";
 import Impact from "@/components/Impact";
