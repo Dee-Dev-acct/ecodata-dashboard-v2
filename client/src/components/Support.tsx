@@ -321,7 +321,7 @@ const Support = () => {
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  We publish annual reports on how funds are allocated to maximize impact.
+                  We publish annual reports on how funds are allocated to maximise impact.
                 </p>
               </CardContent>
             </Card>
