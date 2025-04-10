@@ -18,7 +18,7 @@ const ValueProposition = () => {
           
           <div className="flex items-center gap-2 text-[#264653] dark:text-[#F4F1DE]">
             <ThumbsUp className="w-5 h-5 text-[#2A9D8F]" />
-            <span className="font-medium">5+ years of data expertise</span>
+            <span className="font-medium">More than 10 years of data expertise</span>
           </div>
         </div>
       </div>
