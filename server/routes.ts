@@ -206,9 +206,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   app.post("/api/auth/reset-password", async (req: Request, res: Response) => {
     try {
-      const { token, newPassword } = req.body;
+      const { token, password } = req.body;
       
-      if (!token || !newPassword) {
+      if (!token || !password) {
         return res.status(400).json({ message: "Token and new password are required" });
       }
       
@@ -227,7 +227,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Hash the new password
-      const hashedPassword = await hashPassword(newPassword);
+      const hashedPassword = await hashPassword(password);
       
       // Update the user's password
       await storage.updateUser(user.id, { password: hashedPassword });
