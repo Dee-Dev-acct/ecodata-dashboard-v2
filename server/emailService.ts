@@ -1,14 +1,18 @@
 import nodemailer from 'nodemailer';
 import { ContactMessage, NewsletterSubscriber } from '@shared/schema';
 
-// Configure email transport
+// Configure email transport with correct environment variable names
 const transport = nodemailer.createTransport({
-  host: process.env.EMAIL_HOST || 'smtp.example.com',
+  host: process.env.EMAIL_HOST || 'smtp.office365.com',
   port: parseInt(process.env.EMAIL_PORT || '587'),
-  secure: process.env.EMAIL_SECURE === 'true',
+  secure: false, // true for 465, false for other ports
   auth: {
-    user: process.env.EMAIL_USER || 'user@example.com',
+    user: process.env.EMAIL_USERNAME || 'user@example.com',
     pass: process.env.EMAIL_PASSWORD || 'password'
+  },
+  tls: {
+    ciphers: 'SSLv3',
+    rejectUnauthorized: false // ONLY FOR DEVELOPMENT - Remove this in production
   }
 });
 
@@ -122,6 +126,85 @@ export async function sendNewSubscriberNotification(subscriber: NewsletterSubscr
     return true;
   } catch (error) {
     console.error('Failed to send new subscriber notification:', error);
+    return false;
+  }
+}
+
+// Send password reset email
+export async function sendPasswordResetEmail(email: string, token: string, username?: string): Promise<boolean> {
+  try {
+    // Get the base URL from environment or default to localhost
+    const baseUrl = process.env.FRONTEND_URL || 'http://localhost:5000';
+    const resetUrl = `${baseUrl}/password-recovery?token=${token}`;
+    
+    await transport.sendMail({
+      from: process.env.EMAIL_FROM || 'noreply@ecodatacic.org',
+      to: email,
+      subject: 'ECODATA CIC - Password Reset Request',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <div style="background-color: #3E6259; color: white; padding: 20px; text-align: center;">
+            <h1 style="margin: 0;">ECODATA CIC</h1>
+            <p style="margin-top: 5px;">Password Reset</p>
+          </div>
+          <div style="padding: 20px; border: 1px solid #ddd; border-top: none;">
+            <p>Dear ${username || 'User'},</p>
+            <p>We received a request to reset your password for your ECODATA CIC account. If you didn't make this request, you can safely ignore this email.</p>
+            <p>To reset your password, click on the button below:</p>
+            <div style="text-align: center; margin: 25px 0;">
+              <a href="${resetUrl}" style="background-color: #3E6259; color: white; padding: 12px 20px; text-decoration: none; border-radius: 4px; display: inline-block;">Reset Password</a>
+            </div>
+            <p style="margin-bottom: 5px;">Or copy and paste this URL into your browser:</p>
+            <p style="background-color: #f5f5f5; padding: 10px; border-radius: 4px; word-break: break-all; font-size: 14px;">${resetUrl}</p>
+            <p>The link will expire in 30 minutes for security reasons.</p>
+            <p>If you continue to have issues, please contact our support team.</p>
+            <p>Best regards,<br>The ECODATA CIC Team</p>
+          </div>
+          <div style="background-color: #f5f5f5; padding: 15px; text-align: center; font-size: 12px; color: #666;">
+            <p>© 2025 ECODATA CIC. All rights reserved.</p>
+            <p>This email was sent to ${email} because you requested a password reset.</p>
+          </div>
+        </div>
+      `
+    });
+    
+    return true;
+  } catch (error) {
+    console.error('Failed to send password reset email:', error);
+    return false;
+  }
+}
+
+// Send password change confirmation email
+export async function sendPasswordChangeConfirmation(email: string, username?: string): Promise<boolean> {
+  try {
+    await transport.sendMail({
+      from: process.env.EMAIL_FROM || 'noreply@ecodatacic.org',
+      to: email,
+      subject: 'ECODATA CIC - Password Successfully Changed',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <div style="background-color: #3E6259; color: white; padding: 20px; text-align: center;">
+            <h1 style="margin: 0;">ECODATA CIC</h1>
+            <p style="margin-top: 5px;">Password Changed</p>
+          </div>
+          <div style="padding: 20px; border: 1px solid #ddd; border-top: none;">
+            <p>Dear ${username || 'User'},</p>
+            <p>This email confirms that your password for your ECODATA CIC account has been successfully changed.</p>
+            <p>If you did not authorize this change, please contact our support team immediately.</p>
+            <p>Best regards,<br>The ECODATA CIC Team</p>
+          </div>
+          <div style="background-color: #f5f5f5; padding: 15px; text-align: center; font-size: 12px; color: #666;">
+            <p>© 2025 ECODATA CIC. All rights reserved.</p>
+            <p>This email was sent to ${email} to confirm your password change.</p>
+          </div>
+        </div>
+      `
+    });
+    
+    return true;
+  } catch (error) {
+    console.error('Failed to send password change confirmation:', error);
     return false;
   }
 }
