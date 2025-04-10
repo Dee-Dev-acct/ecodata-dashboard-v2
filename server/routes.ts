@@ -17,7 +17,14 @@ import session from "express-session";
 import MemoryStore from "memorystore";
 import { storage } from "./storage";
 import { hashPassword, comparePassword, generateToken, authenticateToken, isAdmin, login } from "./auth";
-import { sendContactNotification, sendContactConfirmation, sendNewsletterConfirmation, sendNewSubscriberNotification } from "./emailService";
+import { 
+  sendContactNotification, 
+  sendContactConfirmation, 
+  sendNewsletterConfirmation, 
+  sendNewSubscriberNotification,
+  sendPasswordResetEmail,
+  sendPasswordChangeConfirmation
+} from "./emailService";
 import { processChatMessage, isRateLimited } from "./services/openaiService";
 import { sdgData } from "./services/sdgData";
 import Stripe from "stripe";
@@ -188,19 +195,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Create password reset token
       const resetToken = await storage.createPasswordResetToken(user.id);
       
-      // In a real production environment, we would send an email here
-      // For this demo, we'll just return the token directly for easy testing
-      console.log(`RESET TOKEN for ${email}: ${resetToken.token}`);
-      console.log(`DEBUG: Sending reset token response with token: ${resetToken.token}`);
+      // Send the password reset email
+      try {
+        const emailSent = await sendPasswordResetEmail(
+          email, 
+          resetToken.token,
+          user.username || user.firstName || ''
+        );
+        
+        console.log(`Password reset email sent to ${email}: ${emailSent ? 'Success' : 'Failed'}`);
+        
+        if (!emailSent) {
+          console.error("Failed to send password reset email");
+        }
+      } catch (emailError) {
+        console.error("Error sending password reset email:", emailError);
+      }
       
-      // For easier testing in development environment, return the actual token
-      // In production, this would be removed for security reasons
+      // For development environment only (should be removed in production)
+      // Log the token for debugging and testing
+      console.log(`RESET TOKEN for ${email}: ${resetToken.token}`);
+      
+      // For development/testing environments only
+      // In production, this token would not be returned for security
       const responseData = {
         message: "If that email exists in our system, we've sent a password reset link",
         token: resetToken.token,
         resetURL: `${process.env.FRONTEND_URL || ''}/password-recovery?token=${resetToken.token}`
       };
-      console.log("DEBUG: Response data:", responseData);
       
       return res.status(200).json(responseData);
     } catch (error) {
@@ -239,6 +261,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Mark the token as used
       await storage.markTokenAsUsed(resetToken.id);
+      
+      // Send confirmation email
+      try {
+        const emailSent = await sendPasswordChangeConfirmation(
+          user.email,
+          user.username || user.firstName || ''
+        );
+        
+        if (!emailSent) {
+          console.error(`Failed to send password change confirmation email to ${user.email}`);
+        }
+      } catch (emailError) {
+        console.error("Error sending password change confirmation email:", emailError);
+      }
       
       return res.status(200).json({ message: "Password has been successfully reset" });
     } catch (error) {
