@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Link } from "wouter";
 import { useTheme } from "@/components/ThemeProvider";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, User } from "lucide-react";
 
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -232,6 +232,13 @@ const Header = () => {
           >
             Contact
           </a>
+          <Link 
+            href="/admin/login" 
+            className="font-medium hover:text-[#2A9D8F] dark:text-[#F4F1DE] dark:hover:text-[#38B593] transition-colors flex items-center gap-1"
+          >
+            <User size={16} />
+            Login
+          </Link>
         </nav>
         
         {/* Theme toggler and mobile menu button */}
