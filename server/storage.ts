@@ -2847,6 +2847,69 @@ export class DatabaseStorage implements IStorage {
     const result = await db.delete(errorReports).where(eq(errorReports.id, id));
     return result.rowCount > 0;
   }
+  
+  // Password Reset Token methods
+  async createPasswordResetToken(userId: number): Promise<PasswordResetToken> {
+    // Generate a secure random token
+    const token = randomBytes(32).toString('hex');
+    
+    // Set expiration to 30 minutes from now
+    const expiresAt = new Date();
+    expiresAt.setMinutes(expiresAt.getMinutes() + 30);
+    
+    const tokenData: InsertPasswordResetToken = {
+      userId,
+      token,
+      expiresAt,
+      used: false
+    };
+    
+    const [passwordResetToken] = await db.insert(passwordResetTokens)
+      .values(tokenData)
+      .returning();
+      
+    return passwordResetToken;
+  }
+  
+  async getPasswordResetTokenByToken(token: string): Promise<PasswordResetToken | undefined> {
+    const [resetToken] = await db
+      .select()
+      .from(passwordResetTokens)
+      .where(eq(passwordResetTokens.token, token));
+      
+    return resetToken || undefined;
+  }
+  
+  async validatePasswordResetToken(token: string): Promise<User | undefined> {
+    const resetToken = await this.getPasswordResetTokenByToken(token);
+    
+    if (!resetToken) {
+      return undefined;
+    }
+    
+    // Check if token is expired
+    if (resetToken.expiresAt < new Date()) {
+      return undefined;
+    }
+    
+    // Check if token has been used
+    if (resetToken.used) {
+      return undefined;
+    }
+    
+    // Get the user associated with this token
+    return this.getUser(resetToken.userId);
+  }
+  
+  async markTokenAsUsed(tokenId: number): Promise<PasswordResetToken | undefined> {
+    const [updatedToken] = await db
+      .update(passwordResetTokens)
+      .set({ used: true })
+      .where(eq(passwordResetTokens.id, tokenId))
+      .returning();
+      
+    return updatedToken || undefined;
+  }
 }
 
 // Choose the correct database implementation based on which database is available
