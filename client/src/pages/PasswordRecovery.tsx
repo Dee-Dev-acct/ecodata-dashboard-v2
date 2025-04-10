@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation, Link } from "wouter";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -37,12 +37,38 @@ const PasswordRecovery = () => {
   const query = new URLSearchParams(window.location.search);
   const token = query.get("token");
 
-  // If token is in URL, go to reset step
-  useState(() => {
-    if (token) {
-      setStep("reset");
-    }
-  });
+  // If token is in URL, validate it and go to reset step
+  useEffect(() => {
+    const validateToken = async () => {
+      if (token) {
+        try {
+          const response = await apiRequest("GET", `/api/auth/validate-reset-token/${token}`);
+          
+          if (response.ok) {
+            setStep("reset");
+          } else {
+            // If token is invalid, show error and go back to request step
+            toast({
+              title: "Invalid Token",
+              description: "Your password reset link has expired or is invalid. Please request a new one.",
+              variant: "destructive",
+            });
+            setStep("request");
+          }
+        } catch (error) {
+          console.error("Token validation error:", error);
+          toast({
+            title: "Error",
+            description: "There was a problem validating your reset token. Please try again.",
+            variant: "destructive",
+          });
+          setStep("request");
+        }
+      }
+    };
+    
+    validateToken();
+  }, [token, toast]);
 
   const emailForm = useForm<EmailFormValues>({
     resolver: zodResolver(emailSchema),
@@ -64,7 +90,7 @@ const PasswordRecovery = () => {
     try {
       setEmail(data.email);
       
-      const response = await apiRequest("POST", "/api/auth/request-password-reset", {
+      const response = await apiRequest("POST", "/api/auth/forgot-password", {
         email: data.email,
       });
       
