@@ -426,6 +426,14 @@ const Header = () => {
             >
               Contact
             </a>
+            <Link 
+              href="/admin/login" 
+              onClick={() => setMobileMenuOpen(false)}
+              className="py-2 px-4 hover:bg-[#F4F1DE] dark:hover:bg-[#1A323C] dark:text-white rounded transition-colors flex items-center gap-2"
+            >
+              <User size={16} />
+              <span>Login / Dashboard</span>
+            </Link>
           </nav>
         </div>
       </div>
