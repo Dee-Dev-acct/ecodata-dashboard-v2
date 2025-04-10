@@ -119,26 +119,12 @@ const PasswordRecovery = () => {
             description: "If your email exists in our system, you will receive a password reset link shortly.",
           });
           
-          // Display the token information for testing purposes
+          // In production, we're sending the reset link by email
+          // Just log the token to console for debugging purposes
           if (responseData && responseData.token) {
-            console.log("Found token in response:", responseData.token);
-            setTimeout(() => {
-              const tokenInfoElement = document.getElementById('token-info');
-              if (tokenInfoElement) {
-                tokenInfoElement.innerHTML = `
-                  <div class="mb-2">
-                    <div>Your reset token: <strong>${responseData.token}</strong></div>
-                    <div class="text-xs mt-1">Copy this token or click the link below:</div>
-                  </div>
-                  <a href="${responseData.resetURL || `/password-recovery?token=${responseData.token}`}" 
-                     class="inline-block px-3 py-1 bg-primary text-white text-xs rounded-md hover:bg-primary/90">
-                    Open Reset Form
-                  </a>
-                `;
-              } else {
-                console.error("Token info element not found in DOM");
-              }
-            }, 300);
+            console.log("Password reset email initiated for:", data.email);
+            // Log token but only to console for developers/debugging
+            console.log("Debug: Reset token (admin only):", responseData.token);
           } else {
             console.warn("No token found in response data:", responseData);
           }
@@ -248,18 +234,11 @@ const PasswordRecovery = () => {
                     We've sent a recovery link to <strong>{email}</strong>. 
                     Please check your inbox and spam folders.
                   </p>
-                </div>
-                
-                <div className="text-sm text-muted-foreground">
-                  <p>The link will expire in 30 minutes.</p>
-                </div>
-                
-                {/* Token information display for testing purposes - remove in production */}
-                <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-md text-sm">
-                  <p className="font-semibold mb-1">For testing purposes only:</p>
-                  <p id="token-info">(Token will appear here after submission)</p>
-                  <p className="mt-2 text-xs text-muted-foreground">
-                    In a production environment, this would be sent via email
+                  <p className="text-sm mt-2">
+                    The link will expire in 30 minutes.
+                  </p>
+                  <p className="text-sm mt-2">
+                    If you don't receive an email within a few minutes, please check your spam folder or try again.
                   </p>
                 </div>
                 
