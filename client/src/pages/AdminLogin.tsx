@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useLocation, Redirect } from "wouter";
+import { useLocation, Redirect, Link } from "wouter";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import Header from "@/components/Header";
@@ -108,6 +108,12 @@ const AdminLogin = () => {
                 "Sign In"
               )}
             </button>
+            
+            <div className="mt-4 text-center">
+              <Link href="/password-recovery" className="text-sm text-[#2A9D8F] hover:text-[#1F7268] dark:text-[#38B593] dark:hover:text-[#F4F1DE]">
+                Forgot your password?
+              </Link>
+            </div>
           </form>
         </div>
       </main>

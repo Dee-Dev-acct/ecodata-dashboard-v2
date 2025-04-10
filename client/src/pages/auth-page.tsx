@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
-import { Redirect } from "wouter";
+import { Redirect, Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -118,6 +118,11 @@ export default function AuthPage() {
                     ) : null}
                     Sign In
                   </Button>
+                  <div className="mt-4 text-center">
+                    <Link href="/password-recovery" className="text-sm text-primary hover:underline">
+                      Forgot your password?
+                    </Link>
+                  </div>
                 </form>
               </TabsContent>
               <TabsContent value="register">
