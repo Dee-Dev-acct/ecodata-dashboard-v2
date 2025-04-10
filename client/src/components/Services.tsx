@@ -95,7 +95,7 @@ const Services = () => {
             <span className="absolute -bottom-3 left-0 w-full h-2 bg-[#2A9D8F] opacity-40"></span>
           </h2>
           <p className="text-lg max-w-2xl mx-auto dark:text-[#F4F1DE]">
-            We offer a comprehensive range of data-focused services to help organizations make informed decisions with positive environmental and social impact.
+            We offer a comprehensive range of data-focused services to help organisations make informed decisions with positive environmental and social impact.
           </p>
         </div>
         
