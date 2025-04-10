@@ -53,6 +53,12 @@ export interface IStorage {
   updateUserFreeConsultationUsage(id: number): Promise<User | undefined>;
   updateUserStripeInfo(id: number, stripeInfo: { stripeCustomerId: string, stripeSubscriptionId?: string }): Promise<User | undefined>;
   
+  // Password Reset Tokens
+  createPasswordResetToken(userId: number): Promise<PasswordResetToken>;
+  getPasswordResetTokenByToken(token: string): Promise<PasswordResetToken | undefined>;
+  validatePasswordResetToken(token: string): Promise<User | undefined>;
+  markTokenAsUsed(tokenId: number): Promise<PasswordResetToken | undefined>;
+  
   // User Activity Logs
   getUserActivityLogs(userId: number): Promise<UserActivityLog[]>;
   createUserActivityLog(log: InsertUserActivityLog): Promise<UserActivityLog>;
@@ -190,12 +196,6 @@ export interface IStorage {
   createErrorReport(report: InsertErrorReport): Promise<ErrorReport>;
   updateErrorReportStatus(id: number, status: string, adminNotes?: string): Promise<ErrorReport | undefined>;
   deleteErrorReport(id: number): Promise<boolean>;
-  
-  // Password Reset Tokens
-  createPasswordResetToken(userId: number): Promise<PasswordResetToken>;
-  getPasswordResetTokenByToken(token: string): Promise<PasswordResetToken | undefined>;
-  validatePasswordResetToken(token: string): Promise<User | undefined>;
-  markTokenAsUsed(tokenId: number): Promise<PasswordResetToken | undefined>;
 }
 
 export class MemStorage implements IStorage {
