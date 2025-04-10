@@ -20,6 +20,7 @@ const Home = () => {
       <Header />
       <main>
         <Hero />
+        <ValueProposition />
         <Services />
         <About />
         <Impact />
