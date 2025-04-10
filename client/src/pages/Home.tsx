@@ -13,6 +13,7 @@ import BookAppointment from "@/components/BookAppointment";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
 import SustainableDevelopmentGoalsHome from "@/components/SustainableDevelopmentGoalsHome";
+import FloatingCTA from "@/components/FloatingCTA";
 
 const Home = () => {
   return (
@@ -34,6 +35,7 @@ const Home = () => {
         <Contact />
       </main>
       <Footer />
+      <FloatingCTA />
     </div>
   );
 };
