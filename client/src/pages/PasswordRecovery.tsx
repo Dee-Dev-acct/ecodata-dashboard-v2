@@ -32,6 +32,7 @@ type ResetFormValues = z.infer<typeof resetSchema>;
 const PasswordRecovery = () => {
   const [step, setStep] = useState<"request" | "confirmation" | "reset" | "success">("request");
   const [email, setEmail] = useState("");
+  const [debugToken, setDebugToken] = useState("");
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const query = new URLSearchParams(window.location.search);
@@ -113,21 +114,21 @@ const PasswordRecovery = () => {
           responseData = JSON.parse(responseText);
           console.log("Parsed response data:", responseData);
           
+          // Store token for debugging
+          if (responseData && responseData.token) {
+            console.log("Password reset email initiated for:", data.email);
+            // Store token for display in the development environment
+            localStorage.setItem('passwordResetDebugToken', responseData.token);
+            setDebugToken(responseData.token);
+          } else {
+            console.warn("No token found in response data:", responseData);
+          }
+          
           setStep("confirmation");
           toast({
             title: "Request Sent",
             description: "If your email exists in our system, you will receive a password reset link shortly.",
           });
-          
-          // In production, we're sending the reset link by email
-          // Just log the token to console for debugging purposes
-          if (responseData && responseData.token) {
-            console.log("Password reset email initiated for:", data.email);
-            // Log token but only to console for developers/debugging
-            console.log("Debug: Reset token (admin only):", responseData.token);
-          } else {
-            console.warn("No token found in response data:", responseData);
-          }
         } catch (error) {
           console.error("Error processing response:", error);
           console.log("Raw response was:", responseText);
@@ -241,6 +242,27 @@ const PasswordRecovery = () => {
                     If you don't receive an email within a few minutes, please check your spam folder or try again.
                   </p>
                 </div>
+                
+                {debugToken && (
+                  <div className="border border-amber-500 bg-amber-50 text-amber-900 dark:bg-amber-900/20 dark:text-amber-300 p-4 rounded-lg mt-4">
+                    <p className="font-medium">Development Debug Token</p>
+                    <p className="text-xs mt-2 break-all">{debugToken}</p>
+                    <p className="text-xs mt-2">
+                      Copy this token to use in the password reset form or click the button below.
+                    </p>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      className="mt-2"
+                      onClick={() => {
+                        setStep("reset");
+                        resetForm.setValue("token", debugToken);
+                      }}
+                    >
+                      Use This Token
+                    </Button>
+                  </div>
+                )}
                 
                 <Button
                   variant="outline"
