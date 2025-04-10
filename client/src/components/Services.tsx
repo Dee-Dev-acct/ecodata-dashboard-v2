@@ -36,19 +36,19 @@ const ServiceCard = ({ title, description, icon }: { title: string; description:
   const serviceLink = serviceLinks[title];
   
   return (
-    <div className="bg-[#F4F1DE] dark:bg-[#264653] rounded-lg shadow-md p-6 transition-transform hover:translate-y-[-5px]">
-      <div className="w-14 h-14 bg-[#2A9D8F] bg-opacity-10 rounded-lg flex items-center justify-center mb-4">
+    <div className="bg-[#F4F1DE] dark:bg-[#264653] rounded-lg shadow-md p-6 transition-all duration-300 hover:translate-y-[-5px] hover:shadow-lg hover:bg-[#F4F1DE]/80 dark:hover:bg-[#264653]/80 group">
+      <div className="w-14 h-14 bg-[#2A9D8F] bg-opacity-10 rounded-lg flex items-center justify-center mb-4 transition-transform group-hover:scale-110 group-hover:bg-opacity-20">
         <i className={`fas ${icon} text-2xl text-[#2A9D8F]`}></i>
       </div>
-      <h3 className="text-xl font-heading font-semibold mb-3">{title}</h3>
+      <h3 className="text-xl font-heading font-semibold mb-3 group-hover:text-[#2A9D8F] transition-colors">{title}</h3>
       <p className="dark:text-[#F4F1DE] mb-4">
         {description}
       </p>
       
       {serviceLink && (
-        <Link href={serviceLink.href} className="inline-flex items-center text-[#2A9D8F] hover:text-[#38B593] font-medium">
+        <Link href={serviceLink.href} className="inline-flex items-center text-[#2A9D8F] hover:text-[#38B593] font-medium group-hover:underline">
           {serviceLink.linkText}
-          <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <svg className="w-4 h-4 ml-1 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
           </svg>
         </Link>
