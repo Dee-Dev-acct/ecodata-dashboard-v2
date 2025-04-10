@@ -95,11 +95,35 @@ const PasswordRecovery = () => {
       });
       
       if (response.ok) {
-        setStep("confirmation");
-        toast({
-          title: "Request Sent",
-          description: "If your email exists in our system, you will receive a password reset link shortly.",
-        });
+        try {
+          // For development purposes only - parse response to get token
+          const responseData = await response.json();
+          setStep("confirmation");
+          toast({
+            title: "Request Sent",
+            description: "If your email exists in our system, you will receive a password reset link shortly.",
+          });
+          
+          // Display the token information for testing purposes
+          setTimeout(() => {
+            const tokenInfoElement = document.getElementById('token-info');
+            if (tokenInfoElement && responseData.token) {
+              tokenInfoElement.innerHTML = `
+                <div class="mb-2">
+                  <div>Your reset token: <strong>${responseData.token}</strong></div>
+                  <div class="text-xs mt-1">Copy this token or click the link below:</div>
+                </div>
+                <a href="${responseData.resetURL || `/password-recovery?token=${responseData.token}`}" 
+                   class="inline-block px-3 py-1 bg-primary text-white text-xs rounded-md hover:bg-primary/90">
+                  Open Reset Form
+                </a>
+              `;
+            }
+          }, 100);
+        } catch (error) {
+          console.error("Error parsing token response:", error);
+          setStep("confirmation");
+        }
       } else {
         // We don't want to reveal if email exists for security reasons
         // So we still show confirmation even if the email doesn't exist
@@ -205,6 +229,15 @@ const PasswordRecovery = () => {
                 
                 <div className="text-sm text-muted-foreground">
                   <p>The link will expire in 30 minutes.</p>
+                </div>
+                
+                {/* Token information display for testing purposes - remove in production */}
+                <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-md text-sm">
+                  <p className="font-semibold mb-1">For testing purposes only:</p>
+                  <p id="token-info">(Token will appear here after submission)</p>
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    In a production environment, this would be sent via email
+                  </p>
                 </div>
                 
                 <Button
